@@ -1,0 +1,46 @@
+{
+  "name": "aiuag-website",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 9000",
+    "build": "next build",
+    "start": "next start -p 9000",
+    "lint": "next lint",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:seed": "npx tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "@radix-ui/react-slot": "^1.3.0",
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
+    "exceljs": "^4.4.0",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^0.511.0",
+    "next": "^15.5.19",
+    "next-auth": "^5.0.0-beta.31",
+    "nodemailer": "^7.0.13",
+    "qrcode": "^1.5.4",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-easy-crop": "^6.0.2",
+    "tailwind-merge": "^3.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.8",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.15.3",
+    "@types/nodemailer": "^8.0.1",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "eslint": "^9.27.0",
+    "eslint-config-next": "^15.5.19",
+    "prisma": "^6.19.3",
+    "tailwindcss": "^4.1.8",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,640 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  name           String
+  password       String
+  role           String           @default("member") // admin, moderator, member
+  image          String?
+  emailVerified  DateTime?
+  permissions    String?          // JSON array of page names this admin can access
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  member              Member?
+  news                News[]
+  eventRegistrations  EventRegistration[]
+  gallery             Gallery[]
+  contactMessages     ContactMessage[]
+}
+
+model Member {
+  id               String      @id @default(cuid())
+  userId           String      @unique
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studentId        String?     @unique
+  membershipNumber String?     @unique
+  // Personal
+  nameEn           String?
+  gender           String?
+  birthDate        String?
+  country          String?
+  state            String?
+  city             String?
+  // Contact
+  phone            String?
+  address          String?
+  // Academic
+  university       String?
+  faculty          String?
+  specialization   String?
+  graduationYear   Int?
+  degree           String?
+  // Work
+  employer         String?
+  jobTitle         String?
+  jobSector        String?
+  yearsOfExperience Int?
+  // Membership
+  membershipType   String?     @default("عضو عامل")
+  status           String      @default("pending") // pending, approved, rejected
+  membershipEndDate DateTime?
+  // Media
+  bio              String?
+  linkedin         String?
+  cardPhoto        String?
+  graduationCertificate String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  donations        Donation[]
+}
+
+model News {
+  id            String    @id @default(cuid())
+  titleAr       String
+  titleEn       String
+  slug          String    @unique
+  contentAr     String
+  contentEn     String
+  excerptAr     String?
+  excerptEn     String?
+  featuredImage String?
+  authorId      String
+  author        User      @relation(fields: [authorId], references: [id])
+  status        String    @default("draft") // draft, published, archived
+  category      String?
+  tags          String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Event {
+  id                   String            @id @default(cuid())
+  titleAr              String
+  titleEn              String
+  slug                 String            @unique
+  descriptionAr        String
+  descriptionEn        String
+  featuredImage        String?
+  date                 DateTime
+  time                 String?
+  endTime              String?
+  location             String
+  locationUrl          String?
+  capacity             Int?
+  registeredCount      Int               @default(0)
+  registrationDeadline DateTime?
+  status               String            @default("upcoming") // upcoming, ongoing, completed, cancelled
+  category             String?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  registrations        EventRegistration[]
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    String   @default("registered") // registered, cancelled, attended
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+}
+
+model Project {
+  id            String    @id @default(cuid())
+  titleAr       String
+  titleEn       String
+  slug          String    @unique
+  descriptionAr String
+  descriptionEn String
+  featuredImage String?
+  gallery       String? // JSON array of image URLs
+  startDate     DateTime?
+  endDate       DateTime?
+  status        String    @default("active") // active, completed, paused
+  category      String?
+  budget        Float?
+  partnerId     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Committee {
+  id            String    @id @default(cuid())
+  nameAr        String
+  nameEn        String
+  slug          String    @unique
+  descriptionAr String
+  descriptionEn String
+  type          String    @default("standing") // standing, adhoc, special
+  chairNameAr   String?
+  chairNameEn   String?
+  chairPhoto    String?
+  email         String?
+  phone         String?
+  order         Int       @default(0)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model BoardMember {
+  id            String    @id @default(cuid())
+  nameAr        String
+  nameEn        String
+  positionAr    String
+  positionEn    String
+  bioAr         String?
+  bioEn         String?
+  photo         String?
+  email         String?
+  phone         String?
+  order         Int       @default(0)
+  term          String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Gallery {
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  type         String    @default("image")
+  imageUrl     String
+  fileUrl      String?
+  thumbnailUrl String?
+  album        String    @default("general")
+  tags         String?
+  authorId     String?
+  author       User?     @relation(fields: [authorId], references: [id])
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Partner {
+  id            String    @id @default(cuid())
+  nameAr        String
+  nameEn        String
+  logo          String?
+  website       String?
+  descriptionAr String?
+  descriptionEn String?
+  type          String    @default("partner") // partner, sponsor, supporter
+  order         Int       @default(0)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model FAQ {
+  id         String    @id @default(cuid())
+  questionAr String
+  questionEn String
+  answerAr   String
+  answerEn   String
+  category   String?
+  order      Int       @default(0)
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model ContactMessage {
+  id        String    @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
+  status    String    @default("unread") // unread, read, replied
+  response  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Donation {
+  id              String    @id @default(cuid())
+  donationNumber  String    @unique @default("")
+  donorName       String
+  donorEmail      String?
+  donorPhone      String?
+  donorCountry    String?
+  amount          Float
+  currency        String    @default("USD")
+  exchangeRate    Float     @default(1)
+  paymentMethod   String?
+  gateway         String?
+  message         String?
+  isAnonymous     Boolean   @default(false)
+  status          String    @default("pending") // pending, processing, completed, failed, refunded
+  receiptUrl      String?
+  memberId        String?
+  member          Member?   @relation(fields: [memberId], references: [id])
+  payment         Payment?
+  receipt         DonationReceipt?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([donorEmail])
+}
+
+model Payment {
+  id                String   @id @default(cuid())
+  paymentNumber     String   @unique
+  donationId        String   @unique
+  donation          Donation @relation(fields: [donationId], references: [id], onDelete: Cascade)
+  gateway           String
+  gatewayReference  String?
+  gatewayPaymentId  String?
+  status            String   @default("pending") // pending, processing, completed, failed, cancelled, refunded, expired
+  amount            Float
+  currency          String
+  exchangeRate      Float    @default(1)
+  originalAmount    Float?
+  originalCurrency  String?
+  ipAddress         String?
+  userAgent         String?
+  metadata          String?  // JSON
+  paidAt            DateTime?
+  expiresAt         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  transactions      Transaction[]
+  refunds           Refund[]
+  logs              PaymentLog[]
+
+  @@index([gateway, gatewayReference])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Transaction {
+  id               String   @id @default(cuid())
+  transactionNumber String  @unique
+  paymentId        String
+  payment          Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  type             String   // authorization, capture, sale, refund, void
+  status           String   // pending, completed, failed
+  amount           Float
+  currency         String
+  gatewayReference String?
+  gatewayResponse  String?  // JSON
+  errorCode        String?
+  errorMessage     String?
+  createdAt        DateTime @default(now())
+
+  @@index([paymentId])
+  @@index([type])
+}
+
+model Refund {
+  id               String   @id @default(cuid())
+  refundNumber     String   @unique
+  paymentId        String
+  payment          Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  gatewayRefundId  String?
+  amount           Float
+  currency         String
+  reason           String?
+  status           String   @default("pending") // pending, processing, completed, failed
+  gatewayResponse  String?  // JSON
+  processedAt      DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([paymentId])
+  @@index([status])
+}
+
+model PaymentLog {
+  id        String   @id @default(cuid())
+  paymentId String
+  payment   Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  level     String   @default("info") // info, warning, error, debug
+  event     String
+  message   String?
+  data      String?  // JSON
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([paymentId])
+  @@index([event])
+  @@index([createdAt])
+}
+
+model Webhook {
+  id              String   @id @default(cuid())
+  gateway         String
+  eventType       String
+  gatewayReference String?
+  paymentId       String?
+  payload         String   // JSON
+  signature       String?
+  status          String   @default("received") // received, processed, failed, ignored
+  processedAt     DateTime?
+  errorMessage    String?
+  retryCount      Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  @@index([gateway, gatewayReference])
+  @@index([status])
+}
+
+model DonationReceipt {
+  id               String    @id @default(cuid())
+  receiptNumber    String    @unique
+  donationId       String    @unique
+  donation         Donation  @relation(fields: [donationId], references: [id], onDelete: Cascade)
+  donorName        String
+  donorEmail       String
+  amount           Float
+  currency         String
+  paymentMethod    String
+  gatewayReference String
+  issuedAt         DateTime  @default(now())
+  pdfUrl           String?
+
+  @@index([donorEmail])
+  @@index([receiptNumber])
+}
+
+model Newsletter {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  status       String    @default("active") // active, inactive
+  subscribedAt DateTime  @default(now())
+}
+
+model Page {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  titleAr         String
+  titleEn         String
+  contentAr       String
+  contentEn       String
+  metaTitle       String?
+  metaDescription String?
+  isPublished     Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model HeroImage {
+  id          String   @id @default(cuid())
+  pageSlugs   String
+  imageUrl    String
+  titleAr     String?
+  titleEn     String?
+  subtitleAr  String?
+  subtitleEn  String?
+  linkUrl     String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([pageSlugs])
+}
+
+model Notification {
+  id              String    @id @default(cuid())
+  titleAr         String
+  titleEn         String
+  messageAr       String
+  messageEn       String
+  type            String    @default("info") // info, success, warning, error
+  entityType      String?   // member, news, event, contact, donation, gallery
+  entityId        String?
+  isRead          Boolean   @default(false)
+  isGlobal        Boolean   @default(true) // true = for all admins, false = specific user
+  targetUserId    String?
+  createdAt       DateTime  @default(now())
+
+  @@index([isRead])
+  @@index([entityType])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model Settings {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+  group String @default("general")
+  updatedAt DateTime @updatedAt
+}
+
+model VolunteerApplication {
+  id           String   @id @default(cuid())
+  name         String
+  email        String
+  phone        String?
+  skills       String?
+  availability String?
+  message      String?
+  status       String   @default("pending") // pending, approved, rejected
+  createdAt    DateTime @default(now())
+}
+
+model Backup {
+  id        String   @id @default(cuid())
+  type      String   @default("manual") // manual, auto
+  status    String   @default("completed") // running, completed, failed
+  size      Int      @default(0)
+  tables    Int      @default(0)
+  data      String   // JSON backup data
+  summary   String   // JSON summary
+  createdAt DateTime @default(now())
+}
+
+model Graduate {
+  id              String    @id @default(cuid())
+  name            String
+  country         String
+  faculty         String
+  specialization  String?
+  graduationYear  Int
+  university      String    @default("جامعة إفريقيا العالمية")
+  email           String?
+  phone           String?
+  studentId       String?
+  isClaimed       Boolean   @default(false)
+  userId          String?
+  claimToken      String?   @unique
+  claimedAt       DateTime?
+  extraData       String?
+  createdAt       DateTime  @default(now())
+
+  @@index([name, country, faculty, graduationYear])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String
+  userEmail   String
+  userName    String
+  action      String   // login, logout, create, update, delete, view, export
+  entity      String   // member, news, event, graduate, settings, permissions, backup, etc.
+  entityId    String?
+  details     String?  // JSON: { field: "name", old: "Ahmed", new: "Mohamed" }
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([userEmail])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  title       String
+  titleEn     String?
+  url         String
+  description String?
+  category    String?
+  thumbnail   String?
+  authorId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+}
+
+model Publication {
+  id          String   @id @default(cuid())
+  title       String
+  titleEn     String?
+  description String?
+  category    String?
+  fileUrl     String?
+  imageUrl    String?
+  authorId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+}
+
+model Branch {
+  id          String   @id @default(cuid())
+  name        String
+  nameEn      String?
+  city        String
+  country     String
+  status      String?  @default("active")
+  type        String?  @default("sudan")
+  address     String?
+  phone       String?
+  email       String?
+  headName    String?
+  memberCount Int?     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([country])
+  @@index([city])
+}
+
+model SecretariatMember {
+  id        String   @id @default(cuid())
+  name      String
+  nameEn    String?
+  role      String
+  roleEn    String?
+  bio       String?
+  phone     String?
+  email     String?
+  image     String?
+  order     Int?     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  content   String
+  images    String?  // JSON array of image URLs
+  videos    String?  // JSON array of video URLs
+  authorId  String?
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  comments  PostComment[]
+  reactions PostReaction[]
+
+  @@index([createdAt])
+}
+
+model PostComment {
+  id         String   @id @default(cuid())
+  postId     String
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  memberId   String
+  content    String
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([postId])
+  @@index([memberId])
+}
+
+model PostReaction {
+  id       String   @id @default(cuid())
+  postId   String
+  post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  memberId String
+  type     String   // like, love, haha, wow, sad, angry
+
+  @@unique([postId, memberId])
+  @@index([postId])
+}
