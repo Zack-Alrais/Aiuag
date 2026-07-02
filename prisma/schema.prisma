@@ -407,6 +407,20 @@ model Page {
   updatedAt       DateTime  @updatedAt
 }
 
+model PageContent {
+  id        String   @id @default(cuid())
+  page      String   // e.g. "home", "about", "contact", "services", "membership", "media", "organization"
+  section   String   // e.g. "hero", "stats", "cta", "vision", "mission"
+  key       String   // e.g. "title", "subtitle", "description", "button_text"
+  valueAr   String   // Arabic text
+  valueEn   String?  // English text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([page, section, key])
+  @@index([page])
+}
+
 model HeroImage {
   id          String   @id @default(cuid())
   pageSlugs   String
@@ -589,14 +603,18 @@ model SecretariatMember {
   role      String
   roleEn    String?
   bio       String?
+  bioEn     String?
   phone     String?
   email     String?
   image     String?
+  category  String   @default("secretariat") // secretariat, department, committee
   order     Int?     @default(0)
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([order])
+  @@index([category])
 }
 
 model Post {

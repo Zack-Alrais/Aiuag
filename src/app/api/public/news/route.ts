@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const cached = getCached(cacheKey, CACHE_TTL.SHORT);
     if (cached) return NextResponse.json(cached);
 
-    const where: Record<string, unknown> = { published: true };
+    const where: Record<string, unknown> = { status: "published" };
     if (category && category !== "all") where.category = category;
 
     const news = await prisma.news.findMany({
@@ -21,12 +21,16 @@ export async function GET(request: NextRequest) {
       take: limit,
       select: {
         id: true,
-        title: true,
+        titleAr: true,
         titleEn: true,
-        excerpt: true,
-        content: true,
+        excerptAr: true,
+        excerptEn: true,
+        contentAr: true,
+        contentEn: true,
+        slug: true,
         category: true,
-        imageUrl: true,
+        featuredImage: true,
+        publishedAt: true,
         createdAt: true,
       },
     });

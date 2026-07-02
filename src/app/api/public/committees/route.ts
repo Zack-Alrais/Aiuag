@@ -12,14 +12,16 @@ export async function GET() {
       orderBy: { createdAt: "asc" },
       select: {
         id: true,
-        name: true,
+        nameAr: true,
         nameEn: true,
-        description: true,
+        descriptionAr: true,
         descriptionEn: true,
-        chairperson: true,
-        chairpersonEn: true,
-        members: true,
-        membersEn: true,
+        chairNameAr: true,
+        chairNameEn: true,
+        type: true,
+        email: true,
+        phone: true,
+        isActive: true,
       },
     });
 

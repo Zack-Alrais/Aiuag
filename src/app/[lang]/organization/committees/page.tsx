@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
   Users,
@@ -31,7 +32,8 @@ const committeeColors = [
 ];
 
 export default function CommitteesPage() {
-  const [lang] = useState("ar");
+  const params = useParams();
+  const lang = (params as { lang?: string })?.lang || "ar";
   const isArabic = lang === "ar";
   const dir = isArabic ? "rtl" : "ltr";
   const [committees, setCommittees] = useState<any[]>([]);

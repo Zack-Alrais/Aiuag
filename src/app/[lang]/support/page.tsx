@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, HelpCircle, BookOpen, Users, CreditCard, Headphones, MessageCircle, Phone, Mail } from "lucide-react";
 import HeroSection from "@/components/ui/hero-section";
 
 export default function SupportPage({ params }: { params: Promise<{ lang: string }> }) {
-  const [lang] = useState("ar");
+  const [lang, setLang] = useState("ar");
+
+  useEffect(() => {
+    params.then((p) => setLang(p.lang));
+  }, [params]);
   const isArabic = lang === "ar";
   const dir = isArabic ? "rtl" : "ltr";
   const [searchQuery, setSearchQuery] = useState("");

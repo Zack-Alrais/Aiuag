@@ -103,6 +103,7 @@ const navGroups = [
     title: "النظام",
     items: [
       { name: "Settings", nameAr: "الإعدادات", href: "/ai.admin/settings", icon: Settings, perm: "settings" },
+      { name: "Page Contents", nameAr: "نصوص الصفحات", href: "/ai.admin/page-contents", icon: FileEdit, perm: "settings" },
       { name: "Backup", nameAr: "النسخ الاحتياطي", href: "/ai.admin/backup", icon: Database, perm: "backup" },
       { name: "Graduates", nameAr: "الخريجين", href: "/ai.admin/graduates", icon: GraduationCap, perm: "settings" },
       { name: "Activity", nameAr: "تتبع النشاط", href: "/ai.admin/activity", icon: Activity, perm: "settings" },

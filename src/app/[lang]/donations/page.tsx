@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
+import { useParams } from "next/navigation"
 import { Heart, CreditCard, Loader2, CheckCircle, AlertCircle, Smartphone, Building, Shield } from "lucide-react"
 import HeroSection from "@/components/ui/hero-section"
 import {
@@ -22,7 +23,8 @@ interface GatewayInfo {
 }
 
 function DonationsContent() {
-  const [lang] = useState("ar")
+  const params = useParams()
+  const lang = (params as { lang?: string })?.lang || "ar"
   const isArabic = lang === "ar"
   const dir = isArabic ? "rtl" : "ltr"
 

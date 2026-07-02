@@ -15,7 +15,8 @@ export default async function GalleryPage({ params }: Props) {
   const isArabic = lang === "ar";
   const dir = isArabic ? "rtl" : "ltr";
 
-  const items = await prisma.galleryItem.findMany({
+  const items = await prisma.gallery.findMany({
+    where: { isActive: true },
     select: {
       id: true,
       title: true,
@@ -26,7 +27,6 @@ export default async function GalleryPage({ params }: Props) {
       thumbnailUrl: true,
       album: true,
       tags: true,
-      date: true,
       createdAt: true,
     },
     orderBy: { createdAt: "desc" },
@@ -37,7 +37,6 @@ export default async function GalleryPage({ params }: Props) {
     ...item,
     id: String(item.id),
     createdAt: item.createdAt?.toISOString() || null,
-    date: item.date?.toISOString() || null,
   }));
 
   return (

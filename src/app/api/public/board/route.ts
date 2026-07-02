@@ -12,14 +12,14 @@ export async function GET() {
       orderBy: { order: "asc" },
       select: {
         id: true,
-        name: true,
+        nameAr: true,
         nameEn: true,
-        position: true,
+        positionAr: true,
         positionEn: true,
-        image: true,
+        photo: true,
         email: true,
         phone: true,
-        bio: true,
+        bioAr: true,
         bioEn: true,
       },
     });

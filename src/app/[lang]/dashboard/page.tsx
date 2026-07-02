@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import { User, Calendar, FileText, Settings, Bell, BookOpen, Heart, Award, Clock, ChevronLeft, ChevronRight, MapPin, LogOut, Edit } from "lucide-react";
 
 export default function DashboardPage({ params }: { params: Promise<{ lang: string }> }) {
-  const [lang] = useState("ar");
+  const [lang, setLang] = useState("ar");
+
+  useEffect(() => {
+    params.then((p) => setLang(p.lang));
+  }, [params]);
   const isArabic = lang === "ar";
   const dir = isArabic ? "rtl" : "ltr";
 

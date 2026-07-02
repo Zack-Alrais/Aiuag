@@ -6,34 +6,35 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get("limit") || "50");
-    const cacheKey = `projects:${limit}`;
+    const cacheKey = `reports:${limit}`;
 
     const cached = getCached(cacheKey, CACHE_TTL.MEDIUM);
     if (cached) return NextResponse.json(cached);
 
-    const projects = await prisma.project.findMany({
+    const reports = await prisma.publication.findMany({
       orderBy: { createdAt: "desc" },
       take: limit,
       select: {
         id: true,
-        titleAr: true,
+        title: true,
         titleEn: true,
-        slug: true,
-        descriptionAr: true,
-        descriptionEn: true,
-        status: true,
-        featuredImage: true,
+        description: true,
         category: true,
-        startDate: true,
-        endDate: true,
-        budget: true,
+        fileUrl: true,
+        imageUrl: true,
         createdAt: true,
       },
     });
 
-    setCache(cacheKey, projects, CACHE_TTL.MEDIUM);
-    return NextResponse.json(projects);
+    // Enrich with year field from createdAt
+    const enriched = reports.map((r) => ({
+      ...r,
+      year: r.createdAt.getFullYear(),
+    }));
+
+    setCache(cacheKey, enriched, CACHE_TTL.MEDIUM);
+    return NextResponse.json(enriched);
   } catch {
-    return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch reports" }, { status: 500 });
   }
 }

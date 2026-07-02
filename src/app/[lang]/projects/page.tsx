@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { FolderOpen, Calendar, ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Clock, Users, Image } from "lucide-react";
 import Link from "next/link";
 import HeroSection from "@/components/ui/hero-section";
 
 export default function ProjectsPage() {
-  const [lang] = useState("ar");
+  const params = useParams();
+  const lang = (params as { lang?: string })?.lang || "ar";
   const isArabic = lang === "ar";
   const dir = isArabic ? "rtl" : "ltr";
   const [projects, setProjects] = useState<any[]>([]);

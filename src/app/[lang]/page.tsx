@@ -14,109 +14,98 @@ export default async function HomePage({ params }: HomeProps) {
   const isArabic = lang === "ar";
   const dir = isArabic ? "rtl" : "ltr";
 
-  let galleryImages: any[] = [];
-  try {
-    galleryImages = await prisma.gallery.findMany({
+  // Fetch dynamic data in parallel
+  const [galleryImages, latestNews, upcomingEvents, featuredProjects] = await Promise.all([
+    prisma.gallery.findMany({
       where: { isActive: true },
       orderBy: { createdAt: "desc" },
       take: 8,
-    });
-  } catch {}
+    }).catch(() => []),
+    prisma.news.findMany({
+      where: { status: "published" },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+      select: {
+        id: true,
+        titleAr: true,
+        titleEn: true,
+        slug: true,
+        excerptAr: true,
+        excerptEn: true,
+        featuredImage: true,
+        category: true,
+        publishedAt: true,
+        createdAt: true,
+      },
+    }).catch(() => []),
+    prisma.event.findMany({
+      where: { status: { in: ["upcoming", "ongoing"] } },
+      orderBy: { date: "asc" },
+      take: 3,
+      select: {
+        id: true,
+        titleAr: true,
+        titleEn: true,
+        slug: true,
+        date: true,
+        time: true,
+        location: true,
+        status: true,
+      },
+    }).catch(() => []),
+    prisma.project.findMany({
+      where: { status: { in: ["active", "completed"] } },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+      select: {
+        id: true,
+        titleAr: true,
+        titleEn: true,
+        slug: true,
+        descriptionAr: true,
+        descriptionEn: true,
+        status: true,
+        featuredImage: true,
+      },
+    }).catch(() => []),
+  ]);
+
+  // Count stats from DB
+  const [memberCount, eventCount, projectCount] = await Promise.all([
+    prisma.member.count({ where: { status: "approved" } }).catch(() => 0),
+    prisma.event.count().catch(() => 0),
+    prisma.project.count().catch(() => 0),
+  ]);
 
   const stats = [
-    { icon: Users, value: "2,500+", label: isArabic ? "عضو مسجل" : "Registered Members" },
-    { icon: Calendar, value: "50+", label: isArabic ? "حدث وفعالية" : "Events & Activities" },
-    { icon: FolderOpen, value: "100+", label: isArabic ? "مشروع تنفيذي" : "Implemented Projects" },
+    { icon: Users, value: `${memberCount > 0 ? memberCount.toLocaleString() : "2,500"}+`, label: isArabic ? "عضو مسجل" : "Registered Members" },
+    { icon: Calendar, value: `${eventCount > 0 ? eventCount : "50"}+`, label: isArabic ? "حدث وفعالية" : "Events & Activities" },
+    { icon: FolderOpen, value: `${projectCount > 0 ? projectCount : "100"}+`, label: isArabic ? "مشروع تنفيذي" : "Implemented Projects" },
     { icon: Award, value: "10+", label: isArabic ? "سنوات من العطاء" : "Years of Giving" },
   ];
 
-  const latestNews = [
-    {
-      id: 1,
-      title: isArabic ? "المؤتمر الخامس لرابطة الخريجين" : "5th Alumni Association Conference",
-      excerpt: isArabic ? "عقد المؤتمر الخامس لرابطة خريجي جامعة أفريقيا العالمية بحضور كبير من أعضاء الرابطة والخريجين" : "The 5th conference of the Alumni Association was held with great attendance",
-      date: isArabic ? "15 فبراير 2023" : "February 15, 2023",
-      category: isArabic ? "مؤتمرات" : "Conferences",
-      image: "/images/news-1.jpg",
-    },
-    {
-      id: 2,
-      title: isArabic ? "ملتقى أفريقيا الأول للتنمية" : "First Africa Development Forum",
-      excerpt: isArabic ? "إطلاق ملتقى أفريقيا الأول للتنمية بالتعاون مع جامعة أفريقيا العالمية" : "Launch of the First Africa Development Forum in collaboration with Africa International University",
-      date: isArabic ? "1 يونيو 2025" : "June 1, 2025",
-      category: isArabic ? "مهرجانات" : "Forums",
-      image: "/images/news-2.jpg",
-    },
-    {
-      id: 3,
-      title: isArabic ? "خطة الإعمار الجامعة" : "University Reconstruction Plan",
-      excerpt: isArabic ? "المصادقة على خطة الإعمار الشاملة لجامعة أفريقيا العالمية لتطوير البنية التحتية" : "Approval of the comprehensive reconstruction plan for Africa International University",
-      date: isArabic ? "مارس 2024" : "March 2024",
-      category: isArabic ? "مشاريع" : "Projects",
-      image: "/images/news-3.jpg",
-    },
-  ];
+  const formatDate = (date: Date | null | undefined) => {
+    if (!date) return "";
+    return date.toLocaleDateString(isArabic ? "ar" : "en", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
-  const upcomingEvents = [
-    {
-      id: 1,
-      title: isArabic ? "ورشة عمل المهارات المهنية" : "Professional Skills Workshop",
-      date: isArabic ? "10 يوليو 2026" : "July 10, 2026",
-      time: "09:00 AM",
-      location: isArabic ? "قاعة المؤتمرات - جامعة أفريقيا العالمية" : "Conference Hall - Africa International University",
-      status: isArabic ? "قادم" : "Upcoming",
-    },
-    {
-      id: 2,
-      title: isArabic ? "يوم التوظيف والتوظيف" : "Career Day",
-      date: isArabic ? "25 يوليو 2026" : "July 25, 2026",
-      time: "10:00 AM",
-      location: isArabic ? "المكتبة المركزية" : "Central Library",
-      status: isArabic ? "قادم" : "Upcoming",
-    },
-    {
-      id: 3,
-      title: isArabic ? "حلقة نقاش حول التنمية المستدامة" : "Sustainable Development Panel",
-      date: isArabic ? "5 أغسطس 2026" : "August 5, 2026",
-      time: "02:00 PM",
-      location: isArabic ? "صالة الندوات" : "Seminar Hall",
-      status: isArabic ? "قادم" : "Upcoming",
-    },
-  ];
+  const getMonthDay = (date: Date) => {
+    const day = date.getDate();
+    const month = date.toLocaleDateString(isArabic ? "ar" : "en", { month: "short" });
+    return { day: day.toString().padStart(2, "0"), month };
+  };
 
-  const projects = [
-    {
-      id: 1,
-      title: isArabic ? "إعمار الجامعة" : "University Reconstruction",
-      description: isArabic ? "مشروع تطوير البنية التحتية لجامعة أفريقيا العالمية" : "Infrastructure development project for Africa International University",
-      status: isArabic ? "جاري التنفيذ" : "In Progress",
-    },
-    {
-      id: 2,
-      title: isArabic ? "برنامج الإرشاد الأكاديمي" : "Academic Mentoring Program",
-      description: isArabic ? "برنامج لتوجيه الطلاب الحاليين من قبل الخريجين ذوي الخبرة" : "Program for mentoring current students by experienced graduates",
-      status: isArabic ? "نشط" : "Active",
-    },
-    {
-      id: 3,
-      title: isArabic ? "صندوق المنح الدراسية" : "Scholarship Fund",
-      description: isArabic ? "صندوق لدعم الطلاب المحتاجين من خلال المنح الدراسية" : "Fund to support needy students through scholarships",
-      status: isArabic ? "نشط" : "Active",
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: isArabic ? "أ. أحمد محمد" : "Ahmed Mohammed",
-      role: isArabic ? "خريج 2020" : "Class of 2020",
-      quote: isArabic ? "لقد غيرت الرابطة حياتي المهنية بشكل كبير من خلال التواصل مع الخريجين" : "The association has greatly changed my professional life through networking with alumni",
-    },
-    {
-      name: isArabic ? "د. فاطمة علي" : "Dr. Fatima Ali",
-      role: isArabic ? "خريجة 2018" : "Class of 2018",
-      quote: isArabic ? "البرامج التي تقدمها الرابطة مفيدة جداً وتساعد في التطوير المهني" : "The programs offered by the association are very helpful for professional development",
-    },
-  ];
+  const getStatusLabel = (status: string) => {
+    if (status === "active") return isArabic ? "نشط" : "Active";
+    if (status === "completed") return isArabic ? "مكتمل" : "Completed";
+    if (status === "upcoming") return isArabic ? "قادم" : "Upcoming";
+    if (status === "ongoing") return isArabic ? "جاري" : "Ongoing";
+    return status;
+  };
 
   return (
     <div dir={dir}>
@@ -183,58 +172,63 @@ export default async function HomePage({ params }: HomeProps) {
       </section>
 
       {/* Latest News Section */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
-              {isArabic ? "آخر الأخبار" : "Latest News"}
-            </h2>
-            <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
-          </div>
+      {latestNews.length > 0 && (
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
+                {isArabic ? "آخر الأخبار" : "Latest News"}
+              </h2>
+              <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
+            </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {latestNews.map((news) => (
-              <article key={news.id} className="bg-surface rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group">
-                <div className="h-48 bg-gradient-to-br from-primary to-primary-light relative overflow-hidden">
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                  <span className="absolute top-4 start-4 px-3 py-1 bg-secondary text-white text-xs font-bold rounded-full">
-                    {news.category}
-                  </span>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-2 text-text-secondary text-sm mb-3">
-                    <Calendar className="w-4 h-4" />
-                    <span>{news.date}</span>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+              {latestNews.map((news) => (
+                <article key={news.id} className="bg-surface rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group">
+                  <div className="h-48 bg-gradient-to-br from-primary to-primary-light relative overflow-hidden">
+                    {news.featuredImage && (
+                      <img src={news.featuredImage} alt={isArabic ? news.titleAr : news.titleEn} className="w-full h-full object-cover" />
+                    )}
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+                    <span className="absolute top-4 start-4 px-3 py-1 bg-secondary text-white text-xs font-bold rounded-full">
+                      {news.category || (isArabic ? "أخبار" : "News")}
+                    </span>
                   </div>
-                  <h3 className="text-lg font-bold text-text mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                    {news.title}
-                  </h3>
-                  <p className="text-text-secondary text-sm mb-4 line-clamp-2">
-                    {news.excerpt}
-                  </p>
-                  <Link
-                    href={`/${lang}/news`}
-                    className="inline-flex items-center gap-1 text-primary font-medium text-sm hover:gap-2 transition-all"
-                  >
-                    {isArabic ? "اقرأ المزيد" : "Read More"}
-                    {isArabic ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 text-text-secondary text-sm mb-3">
+                      <Calendar className="w-4 h-4" />
+                      <span>{formatDate(news.publishedAt || news.createdAt)}</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-text mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                      {isArabic ? news.titleAr : news.titleEn}
+                    </h3>
+                    <p className="text-text-secondary text-sm mb-4 line-clamp-2">
+                      {isArabic ? (news.excerptAr || "") : (news.excerptEn || "")}
+                    </p>
+                    <Link
+                      href={`/${lang}/news/${news.slug || news.id}`}
+                      className="inline-flex items-center gap-1 text-primary font-medium text-sm hover:gap-2 transition-all"
+                    >
+                      {isArabic ? "اقرأ المزيد" : "Read More"}
+                      {isArabic ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
 
-          <div className="text-center mt-8">
-            <Link
-              href={`/${lang}/news`}
-              className="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary rounded-xl font-bold hover:bg-primary hover:text-white transition-all"
-            >
-              {isArabic ? "عرض جميع الأخبار" : "View All News"}
-              {isArabic ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-            </Link>
+            <div className="text-center mt-8">
+              <Link
+                href={`/${lang}/news`}
+                className="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary rounded-xl font-bold hover:bg-primary hover:text-white transition-all"
+              >
+                {isArabic ? "عرض جميع الأخبار" : "View All News"}
+                {isArabic ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Gallery Section */}
       {galleryImages.length > 0 && (
@@ -259,7 +253,7 @@ export default async function HomePage({ params }: HomeProps) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="absolute bottom-0 inset-x-0 p-3 text-white opacity-0 group-hover:opacity-100 transition-opacity">
                     <p className="text-xs font-bold truncate">{image.title}</p>
-                    <p className="text-[10px] text-white/70">{image.date}</p>
+                    <p className="text-[10px] text-white/70">{formatDate(image.createdAt)}</p>
                   </div>
                 </div>
               ))}
@@ -278,127 +272,111 @@ export default async function HomePage({ params }: HomeProps) {
       )}
 
       {/* Upcoming Events Section */}
-      <section className="py-20 bg-surface">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
-              {isArabic ? "الأحداث القادمة" : "Upcoming Events"}
-            </h2>
-            <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
-          </div>
+      {upcomingEvents.length > 0 && (
+        <section className="py-20 bg-surface">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
+                {isArabic ? "الأحداث القادمة" : "Upcoming Events"}
+              </h2>
+              <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
+            </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {upcomingEvents.map((event) => (
-              <div key={event.id} className="bg-background rounded-2xl p-6 border border-border hover:border-primary/30 transition-all">
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-primary rounded-xl flex flex-col items-center justify-center text-white shrink-0">
-                    <span className="text-xs font-bold">{event.date.split(" ")[0]}</span>
-                    <span className="text-lg font-bold">{event.date.split(" ")[1]}</span>
-                  </div>
-                  <div className="flex-1">
-                    <span className="inline-block px-2 py-0.5 bg-accent/10 text-accent text-xs font-bold rounded mb-2">
-                      {event.status}
-                    </span>
-                    <h3 className="font-bold text-text mb-2">{event.title}</h3>
-                    <div className="flex items-center gap-2 text-text-secondary text-sm mb-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{event.time}</span>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {upcomingEvents.map((event) => {
+                const { day, month } = getMonthDay(event.date);
+                return (
+                  <div key={event.id} className="bg-background rounded-2xl p-6 border border-border hover:border-primary/30 transition-all">
+                    <div className="flex items-start gap-4">
+                      <div className="w-16 h-16 bg-primary rounded-xl flex flex-col items-center justify-center text-white shrink-0">
+                        <span className="text-xs font-bold">{day}</span>
+                        <span className="text-lg font-bold">{month}</span>
+                      </div>
+                      <div className="flex-1">
+                        <span className="inline-block px-2 py-0.5 bg-accent/10 text-accent text-xs font-bold rounded mb-2">
+                          {getStatusLabel(event.status)}
+                        </span>
+                        <h3 className="font-bold text-text mb-2">
+                          {isArabic ? event.titleAr : event.titleEn}
+                        </h3>
+                        {event.time && (
+                          <div className="flex items-center gap-2 text-text-secondary text-sm mb-1">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>{event.time}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 text-text-secondary text-sm">
+                          <MapPin className="w-3.5 h-3.5" />
+                          <span className="line-clamp-1">{event.location}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-text-secondary text-sm">
-                      <MapPin className="w-3.5 h-3.5" />
-                      <span className="line-clamp-1">{event.location}</span>
-                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
 
-          <div className="text-center mt-8">
-            <Link
-              href={`/${lang}/events`}
-              className="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary rounded-xl font-bold hover:bg-primary hover:text-white transition-all"
-            >
-              {isArabic ? "عرض جميع الأحداث" : "View All Events"}
-              {isArabic ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-            </Link>
+            <div className="text-center mt-8">
+              <Link
+                href={`/${lang}/events`}
+                className="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary rounded-xl font-bold hover:bg-primary hover:text-white transition-all"
+              >
+                {isArabic ? "عرض جميع الأحداث" : "View All Events"}
+                {isArabic ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Featured Projects Section */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
-              {isArabic ? "المشاريع المميزة" : "Featured Projects"}
-            </h2>
-            <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
-          </div>
+      {featuredProjects.length > 0 && (
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
+                {isArabic ? "المشاريع المميزة" : "Featured Projects"}
+              </h2>
+              <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
+            </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {projects.map((project) => (
-              <div key={project.id} className="bg-surface rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group">
-                <div className="h-48 bg-gradient-to-br from-secondary/20 to-secondary/5 flex items-center justify-center">
-                  <FolderOpen className="w-16 h-16 text-secondary/40" />
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+              {featuredProjects.map((project) => (
+                <div key={project.id} className="bg-surface rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group">
+                  <div className="h-48 bg-gradient-to-br from-secondary/20 to-secondary/5 flex items-center justify-center relative overflow-hidden">
+                    {project.featuredImage ? (
+                      <img src={project.featuredImage} alt={isArabic ? project.titleAr : project.titleEn} className="w-full h-full object-cover" />
+                    ) : (
+                      <FolderOpen className="w-16 h-16 text-secondary/40" />
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <span className="inline-block px-3 py-1 bg-accent/10 text-accent text-xs font-bold rounded-full mb-3">
+                      {getStatusLabel(project.status)}
+                    </span>
+                    <h3 className="text-lg font-bold text-text mb-2 group-hover:text-primary transition-colors">
+                      {isArabic ? project.titleAr : project.titleEn}
+                    </h3>
+                    <p className="text-text-secondary text-sm line-clamp-2">
+                      {isArabic ? project.descriptionAr : project.descriptionEn}
+                    </p>
+                  </div>
                 </div>
-                <div className="p-6">
-                  <span className="inline-block px-3 py-1 bg-accent/10 text-accent text-xs font-bold rounded-full mb-3">
-                    {project.status}
-                  </span>
-                  <h3 className="text-lg font-bold text-text mb-2 group-hover:text-primary transition-colors">
-                    {project.title}
-                  </h3>
-                  <p className="text-text-secondary text-sm line-clamp-2">
-                    {project.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          <div className="text-center mt-8">
-            <Link
-              href={`/${lang}/projects`}
-              className="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary rounded-xl font-bold hover:bg-primary hover:text-white transition-all"
-            >
-              {isArabic ? "عرض جميع المشاريع" : "View All Projects"}
-              {isArabic ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-            </Link>
+            <div className="text-center mt-8">
+              <Link
+                href={`/${lang}/projects`}
+                className="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary rounded-xl font-bold hover:bg-primary hover:text-white transition-all"
+              >
+                {isArabic ? "عرض جميع المشاريع" : "View All Projects"}
+                {isArabic ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 bg-primary text-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {isArabic ? "شهادات الخريجين" : "Alumni Testimonials"}
-            </h2>
-            <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                <div className="flex items-center gap-1 mb-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="w-5 h-5 text-secondary fill-secondary" />
-                  ))}
-                </div>
-                <p className="text-white/90 text-lg mb-6 leading-relaxed">
-                  &ldquo;{testimonial.quote}&rdquo;
-                </p>
-                <div>
-                  <div className="font-bold">{testimonial.name}</div>
-                  <div className="text-white/60 text-sm">{testimonial.role}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-20 bg-background">
