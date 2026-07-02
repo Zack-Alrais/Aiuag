@@ -47,6 +47,7 @@ function getNavItems(lang: string): NavItem[] {
         { label: isArabic ? "الفيديوهات" : "Videos", href: "/media/videos" },
         { label: isArabic ? "المنشورات" : "Publications", href: "/media/publications" },
         { label: isArabic ? "التقارير" : "Reports", href: "/media/reports" },
+        { label: isArabic ? "المنشورات التفاعلية" : "Interactive Posts", href: "/media/posts" },
       ],
     },
     {
@@ -65,7 +66,6 @@ function getNavItems(lang: string): NavItem[] {
         { label: isArabic ? "الخدمات" : "Services", href: "/services" },
         { label: isArabic ? "التطوع" : "Volunteer", href: "/volunteer" },
         { label: isArabic ? "التبرعات" : "Donations", href: "/donations" },
-        { label: isArabic ? "المنشورات" : "Publications", href: "/publications" },
       ],
     },
     { label: isArabic ? "اتصل بنا" : "Contact", href: "/contact" },
@@ -81,6 +81,7 @@ export default function Header({ lang }: HeaderProps) {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const dropdownTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -149,11 +150,12 @@ export default function Header({ lang }: HeaderProps) {
   }, [currentLang, pathname]);
 
   const handleDropdownEnter = (label: string) => {
+    if (dropdownTimerRef.current) clearTimeout(dropdownTimerRef.current);
     setActiveDropdown(label);
   };
 
   const handleDropdownLeave = () => {
-    setActiveDropdown(null);
+    dropdownTimerRef.current = setTimeout(() => setActiveDropdown(null), 150);
   };
 
   return (
@@ -205,7 +207,7 @@ export default function Header({ lang }: HeaderProps) {
                 </Link>
 
                 {item.children && activeDropdown === item.label && (
-                  <div className="absolute top-full start-0 mt-1 w-56 bg-white rounded-xl shadow-xl border border-border py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute top-full start-0 mt-0 pt-2 w-56 bg-white rounded-xl shadow-xl border border-border py-2 animate-in fade-in slide-in-from-top-2 duration-200">
                     {item.children.map((child) => (
                       <Link
                         key={child.href}
