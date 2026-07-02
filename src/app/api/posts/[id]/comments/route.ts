@@ -32,6 +32,7 @@ export async function GET(
 
     const enriched = comments.map((c) => ({
       ...c,
+      memberName: memberMap[c.memberId]?.name ?? null,
       member: memberMap[c.memberId] ?? null,
     }));
 

@@ -29,15 +29,15 @@ export async function GET(request: NextRequest) {
       prisma.post.count(),
     ]);
 
-    // Enrich with author data
+    // Enrich with author data (name/image are on User model)
     const authorIds = [...new Set(posts.map((p) => p.authorId).filter(Boolean))] as string[];
     const authors = authorIds.length
       ? await prisma.member.findMany({
           where: { id: { in: authorIds } },
-          select: { id: true, name: true, image: true, email: true },
+          select: { id: true, user: { select: { name: true, image: true, email: true } } },
         })
       : [];
-    const authorMap = new Map(authors.map((a) => [a.id, a]));
+    const authorMap = new Map(authors.map((a) => [a.id, a.user]));
 
     // Enrich with original post data for reposts
     const originalPostIds = posts.filter((p) => p.originalPostId).map((p) => p.originalPostId!);
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       return {
         ...post,
         author: author
-          ? { id: author.id, name: author.name, image: author.image }
+          ? { id: null, name: author.name, image: author.image }
           : null,
         reactionSummary,
         reactions: undefined,
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
               return {
                 ...orig,
                 author: origAuthor
-                  ? { id: origAuthor.id, name: origAuthor.name, image: origAuthor.image }
+                  ? { id: null, name: origAuthor.name, image: origAuthor.image }
                   : null,
               };
             })()
@@ -113,8 +113,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Content is required" }, { status: 400 });
     }
 
-    // Verify member exists
-    const member = await prisma.member.findUnique({ where: { id: authorId } });
+    // Verify member exists and get user data
+    const member = await prisma.member.findUnique({
+      where: { id: authorId },
+      include: { user: { select: { name: true, image: true } } },
+    });
     if (!member) {
       return NextResponse.json({ error: "Member not found" }, { status: 404 });
     }
@@ -129,25 +132,28 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Handle repost tracking
+    // Handle repost tracking (only increment on new share, not update)
     if (originalPostId) {
       try {
-        await prisma.postShare.upsert({
+        const existingShare = await prisma.postShare.findUnique({
           where: { postId_memberId: { postId: originalPostId, memberId: authorId } },
-          update: {},
-          create: { postId: originalPostId, memberId: authorId },
         });
-        await prisma.post.update({
-          where: { id: originalPostId },
-          data: { sharesCount: { increment: 1 } },
-        });
+        if (!existingShare) {
+          await prisma.postShare.create({
+            data: { postId: originalPostId, memberId: authorId },
+          });
+          await prisma.post.update({
+            where: { id: originalPostId },
+            data: { sharesCount: { increment: 1 } },
+          });
+        }
       } catch {}
     }
 
     // Return post with author data
     return NextResponse.json({
       ...post,
-      author: { id: member.id, name: member.name, image: member.image },
+      author: { id: null, name: member.user.name, image: member.user.image },
       _count: { comments: 0, reactions: 0, shares: 0 },
       reactionSummary: {},
       originalPost: null,

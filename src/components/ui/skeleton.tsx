@@ -160,8 +160,9 @@ export function HeroSkeleton() {
 }
 
 export function GridSkeleton({ count = 8, cols = 4 }: { count?: number; cols?: number }) {
+  const gridClass = cols === 2 ? "lg:grid-cols-2" : cols === 3 ? "lg:grid-cols-3" : cols === 5 ? "lg:grid-cols-5" : "lg:grid-cols-4";
   return (
-    <div className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-${cols} gap-4`}>
+    <div className={`grid grid-cols-2 sm:grid-cols-3 ${gridClass} gap-4`}>
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className="bg-surface rounded-2xl border border-border overflow-hidden">
           <div className="animate-pulse bg-gradient-to-r from-border-light via-surface to-border-light aspect-square" />

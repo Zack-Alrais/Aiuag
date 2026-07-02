@@ -13,15 +13,24 @@ export async function GET() {
       orderBy: { order: "asc" },
       select: {
         id: true,
-        title: true,
+        titleAr: true,
+        titleEn: true,
         imageUrl: true,
-        subtitle: true,
-        pageSlug: true,
+        subtitleAr: true,
+        subtitleEn: true,
+        linkUrl: true,
+        pageSlugs: true,
       },
     });
 
-    setCache(cacheKey, images, CACHE_TTL.LONG);
-    return NextResponse.json(images);
+    // Map to camelCase for frontend compatibility
+    const mapped = images.map((img) => ({
+      ...img,
+      pageSlug: img.pageSlugs,
+    }));
+
+    setCache(cacheKey, mapped, CACHE_TTL.LONG);
+    return NextResponse.json(mapped);
   } catch {
     return NextResponse.json({ error: "Failed to fetch hero images" }, { status: 500 });
   }

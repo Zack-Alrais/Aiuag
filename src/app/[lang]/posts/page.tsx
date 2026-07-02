@@ -26,7 +26,7 @@ interface Post {
   likes: number;
   createdAt: string;
   _count?: { comments: number; reactions: number };
-  reactions?: { type: string; count: number }[];
+  reactionSummary?: Record<string, number>;
   author?: { name: string; nameEn?: string; image?: string };
 }
 
@@ -179,8 +179,7 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
           {posts.map((post) => {
             const images = parseImages(post.images);
             const videos = parseImages(post.videos);
-            const reactionTypes = post.reactions || [];
-            const myReaction = member ? reactionTypes.find((r) => r.type === "like") : null;
+            const totalReactions = Object.values(post.reactionSummary || {}).reduce((s, v) => s + v, 0);
 
             return (
               <article key={post.id} className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
@@ -238,7 +237,7 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
 
                 {/* Stats bar */}
                 <div className="flex items-center justify-between px-4 py-2 text-xs text-text-secondary border-t border-border">
-                  <span>{reactionTypes.reduce((s, r) => s + r.count, 0)} {isArabic ? "تفاعل" : "reactions"}</span>
+                  <span>{totalReactions} {isArabic ? "تفاعل" : "reactions"}</span>
                   <button onClick={() => toggleComments(post.id)} className="hover:text-primary transition-colors">
                     {(post._count?.comments ?? 0)} {isArabic ? "تعليق" : "comments"}
                   </button>
@@ -253,7 +252,7 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                       onMouseLeave={() => setReactionPopover(null)}
                       className="w-full flex items-center justify-center gap-2 py-2.5 text-sm text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                     >
-                      <Heart className={`w-4 h-4 ${myReaction ? "fill-red-500 text-red-500" : ""}`} />
+                      <Heart className="w-4 h-4" />
                       {isArabic ? "إعجاب" : "Like"}
                     </button>
                     {reactionPopover === post.id && (

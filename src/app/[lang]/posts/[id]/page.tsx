@@ -104,10 +104,15 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
       .then(([postData, commentsData]) => {
         setPost(postData);
         setComments(commentsData.data || []);
-        if (postData.reactions) {
+        // Aggregate reactions from raw reaction records
+        if (postData.reactions && Array.isArray(postData.reactions)) {
           const counts: Record<string, number> = {};
-          postData.reactions.forEach((r: { type: string; count: number }) => { counts[r.type] = r.count; });
+          postData.reactions.forEach((r: any) => {
+            counts[r.type] = (counts[r.type] || 0) + 1;
+          });
           setReactionCounts(counts);
+        } else if (postData.reactionSummary) {
+          setReactionCounts(postData.reactionSummary);
         }
       })
       .catch(() => {})
