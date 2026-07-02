@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Posts GET error:", error);
-    return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch posts", detail: String(error) }, { status: 500 });
   }
 }
 
