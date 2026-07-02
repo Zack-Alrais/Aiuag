@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Camera, Play, FileText, BarChart3, ArrowLeft, ArrowRight } from "lucide-react";
+import { Camera, Play, FileText, BarChart3, ArrowLeft, ArrowRight, MessageSquare } from "lucide-react";
 import HeroSection from "@/components/ui/hero-section";
 
 export default async function MediaPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -35,6 +35,13 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
       desc: isArabic ? "تحميل التقارير السنوية وتقارير الفعاليات" : "Download annual reports and event reports",
       href: `/${lang}/media/reports`,
       color: "from-primary-dark to-primary",
+    },
+    {
+      icon: MessageSquare,
+      title: isArabic ? "المنشورات التفاعلية" : "Interactive Posts",
+      desc: isArabic ? "شارك وأتفاعل مع مجتمع الخريجين - نصوص، صور، فيديوهات، تعليقات" : "Share and interact with the alumni community - text, images, videos, comments",
+      href: `/${lang}/media/posts`,
+      color: "from-blue-600 to-indigo-600",
     },
   ];
 

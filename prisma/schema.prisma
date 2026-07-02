@@ -618,19 +618,23 @@ model SecretariatMember {
 }
 
 model Post {
-  id        String   @id @default(cuid())
-  content   String
-  images    String?  // JSON array of image URLs
-  videos    String?  // JSON array of video URLs
-  authorId  String?
-  likes     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  content        String
+  images         String?  // JSON array of image URLs
+  videos         String?  // JSON array of video URLs
+  authorId       String?
+  likes          Int      @default(0)
+  sharesCount    Int      @default(0)
+  originalPostId String?  // for reposts
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  comments  PostComment[]
-  reactions PostReaction[]
+  comments       PostComment[]
+  reactions      PostReaction[]
+  shares         PostShare[]
 
   @@index([createdAt])
+  @@index([originalPostId])
 }
 
 model PostComment {
@@ -647,11 +651,22 @@ model PostComment {
 }
 
 model PostReaction {
+  id       String @id @default(cuid())
+  postId   String
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  memberId String
+  type     String // like, love, haha, wow, sad, angry
+
+  @@unique([postId, memberId])
+  @@index([postId])
+}
+
+model PostShare {
   id       String   @id @default(cuid())
   postId   String
   post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   memberId String
-  type     String   // like, love, haha, wow, sad, angry
+  createdAt DateTime @default(now())
 
   @@unique([postId, memberId])
   @@index([postId])
