@@ -32,7 +32,6 @@ export async function GET() {
     setCache(cacheKey, mapped, CACHE_TTL.LONG);
     return NextResponse.json(mapped);
   } catch (e) {
-    console.error("Hero images error:", e);
-    return NextResponse.json({ error: "Failed to fetch hero images", detail: String(e) }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch hero images" }, { status: 500 });
   }
 }
