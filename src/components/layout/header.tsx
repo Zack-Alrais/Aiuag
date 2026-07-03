@@ -89,18 +89,28 @@ export default function Header({ lang }: HeaderProps) {
 
   const currentLang = lang || (pathname.startsWith("/ar") ? "ar" : "en");
   let navItems = getNavItems(currentLang);
-  // Remove "Apply" from Membership nav when user is logged in
-  if (session?.user) {
-    navItems = navItems.map((item) => {
-      if (item.href === "/membership") {
-        return {
-          ...item,
-          children: item.children?.filter((child) => child.href !== "/membership/apply"),
-        };
-      }
-      return item;
-    });
-  }
+  const isLoggedIn = !!session?.user;
+  navItems = navItems.map((item) => {
+    // Membership: show/hide children based on login status
+    if (item.href === "/membership" && item.children) {
+      return {
+        ...item,
+        children: item.children.filter((child) => {
+          if (child.href === "/membership/apply") return !isLoggedIn;
+          if (child.href === "/membership/manage") return isLoggedIn;
+          return true;
+        }),
+      };
+    }
+    // Media: hide interactive posts when not logged in
+    if (item.href === "/media" && item.children && !isLoggedIn) {
+      return {
+        ...item,
+        children: item.children.filter((child) => child.href !== "/media/posts"),
+      };
+    }
+    return item;
+  });
   const isArabic = currentLang === "ar";
 
   useEffect(() => {

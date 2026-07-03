@@ -196,6 +196,24 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // === MEMBER PAGE PROTECTION ===
+  // Protected pages that require member login
+  const memberPaths = ["/media/posts", "/profile", "/dashboard", "/membership/manage"];
+  const isMemberProtected = memberPaths.some(p => {
+    const pattern = new RegExp(`^/(ar|en)${p}`); // Match /ar/media/posts, /en/media/posts
+    return pattern.test(pathname);
+  });
+  if (isMemberProtected && !pathname.startsWith("/api/") && !pathname.startsWith("/ai.")) {
+    const sessionToken = request.cookies.get("next-auth.session-token")?.value
+      || request.cookies.get("__Secure-next-auth.session-token")?.value
+      || request.cookies.get("authjs.session-token")?.value;
+    if (!sessionToken) {
+      const loginUrl = new URL("/auth/login", request.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   // === PERFORMANCE HEADERS ===
   // Cache static assets aggressively
   if (pathname.startsWith("/_next/static/") || pathname.startsWith("/images/") || pathname.endsWith(".ico")) {

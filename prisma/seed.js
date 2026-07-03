@@ -8,12 +8,13 @@ async function main() {
   // Create admin user
   const admin = await prisma.user.upsert({
     where: { email: 'admin@aiuag.com' },
-    update: {},
+    update: { emailVerified: new Date() },
     create: {
       email: 'admin@aiuag.com',
       name: 'مدير النظام',
       password: 'admin123',
       role: 'admin',
+      emailVerified: new Date(),
     },
   });
   console.log('Admin user:', admin.id);
@@ -21,12 +22,13 @@ async function main() {
   // Create moderator user
   const mod = await prisma.user.upsert({
     where: { email: 'mod@aiuag.com' },
-    update: {},
+    update: { emailVerified: new Date() },
     create: {
       email: 'mod@aiuag.com',
       name: 'المشرف',
       password: 'mod123',
       role: 'moderator',
+      emailVerified: new Date(),
     },
   });
   console.log('Moderator user:', mod.id);
@@ -34,12 +36,13 @@ async function main() {
   // Create sample member user
   const memberUser = await prisma.user.upsert({
     where: { email: 'member@aiuag.com' },
-    update: {},
+    update: { emailVerified: new Date() },
     create: {
       email: 'member@aiuag.com',
       name: 'أحمد محمد',
       password: 'member123',
       role: 'member',
+      emailVerified: new Date(),
     },
   });
 

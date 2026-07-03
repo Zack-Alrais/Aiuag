@@ -367,102 +367,35 @@ const pageContents = [
 ];
 
 const secretariatMembers = [
-  {
-    name: "د. أحمد محمد علي",
-    nameEn: "Dr. Ahmed Mohamed Ali",
-    role: "الأمين العام",
-    roleEn: "Secretary General",
-    bio: "دكتور في إدارة الأعمال، له خبرة أكثر من 15 عاماً في الإدارة التنفيذية. يقود الأمانة العامة منذ تأسيس الرابطة.",
-    bioEn: "PhD in Business Administration with over 15 years of executive management experience. Has led the Secretariat since the association's founding.",
-    phone: "+249114210853",
-    email: "ahmed.ali@aiuag.org",
-    category: "secretariat",
-    order: 1,
-  },
-  {
-    name: "أ. فاطمة أحمد حسن",
-    nameEn: "Ms. Fatima Ahmed Hassan",
-    role: "نائبة الأمين العام للشؤون الإدارية",
-    roleEn: "Deputy Secretary General for Administrative Affairs",
-    bio: "ماجستير في الإدارة العامة، متخصصة في الشؤون الإدارية والموارد البشرية.",
-    bioEn: "Master's in Public Administration, specialized in administrative affairs and human resources.",
-    phone: "+249114210854",
-    email: "fatima.hassan@aiuag.org",
-    category: "secretariat",
-    order: 2,
-  },
-  {
-    name: "أ. محمد عبدالله أحمد",
-    nameEn: "Mr. Mohammed Abdullah Ahmed",
-    role: "نائب الأمين العام للشؤون المالية",
-    roleEn: "Deputy Secretary General for Financial Affairs",
-    bio: "محاسب معتمد، خبرة 12 عاماً في الإدارة المالية والمراجعية.",
-    bioEn: "Certified accountant with 12 years of experience in financial management and auditing.",
-    phone: "+249114210855",
-    email: "mohammed.abdullah@aiuag.org",
-    category: "secretariat",
-    order: 3,
-  },
-  {
-    name: "د. سارة يوسف Ibrahim",
-    nameEn: "Dr. Sara Youssef Ibrahim",
-    role: "مديرة قسم العضوية",
-    roleEn: "Head of Membership Department",
-    bio: "دكتوراه في_soc sciences، مسؤولة عن إدارة شؤون الأعضاء وتنمية قاعدة الأعضاء.",
-    bioEn: "PhD in Social Sciences, responsible for managing member affairs and growing the member base.",
-    phone: "+249114210856",
-    email: "sara.ibrahim@aiuag.org",
-    category: "department",
-    order: 4,
-  },
-  {
-    name: "أ. خالد عمر المصطفى",
-    nameEn: "Mr. Khalid Omar Mustafa",
-    role: "مدير قسم الإعلام والعلاقات",
-    roleEn: "Head of Media & Relations Department",
-    bio: "بكالوريوس صحافة وإعلام، خبرة واسعة في العلاقات العامة وإدارة وسائل التواصل الاجتماعي.",
-    bioEn: "Bachelor's in Journalism and Media, extensive experience in public relations and social media management.",
-    phone: "+249114210857",
-    email: "khalid.omar@aiuag.org",
-    category: "department",
-    order: 5,
-  },
-  {
-    name: "أ. نورة حسين محمد",
-    nameEn: "Ms. Noura Hussein Mohammed",
-    role: "مديرة قسم البرامج والأنشطة",
-    roleEn: "Head of Programs & Activities Department",
-    bio: "ماجستير في إدارة المشاريع، متخصصة في التخطيط والتنفيذ وال تنسيق البرامج والأنشطة.",
-    bioEn: "Master's in Project Management, specialized in planning, implementing and coordinating programs and activities.",
-    phone: "+249114210858",
-    email: "noura.hussein@aiuag.org",
-    category: "department",
-    order: 6,
-  },
-  {
-    name: "د. عبدالله علي الصالح",
-    nameEn: "Dr. Abdullah Ali Al-Salah",
-    role: "مستشار الأمين العام للشؤون الأكاديمية",
-    roleEn: "Academic Affairs Advisor to the Secretary General",
-    bio: "أستاذ جامعي، خبرة في الإرشاد الأكاديمي وتطوير المناهج الدراسية.",
-    bioEn: "University professor with experience in academic guidance and curriculum development.",
-    phone: "+249114210859",
-    email: "abdullah.saleh@aiuag.org",
-    category: "secretariat",
-    order: 7,
-  },
-  {
-    name: "أ. مريم عثمان أحمد",
-    nameEn: "Ms. Mariam Othman Ahmed",
-    role: "مشرفة على لجنة العضوية",
-    roleEn: "Membership Committee Supervisor",
-    bio: "خبرة 8 سنوات في إدارة العضوية والتحقق من البيانات الأكاديمية.",
-    bioEn: "8 years of experience in membership management and academic data verification.",
-    phone: "+249114210860",
-    email: "mariam.othman@aiuag.org",
-    category: "committee",
-    order: 8,
-  },
+  { name: "أ. د. عبدالرحمن محمد نور", nameEn: "Prof. Abdelrahman Mohamed Noor", role: "رئيس الرابطة", roleEn: "President of the Association", bio: "رئيس الرابطة، له خبرة أكاديمية وإدارية واسعة.", bioEn: "President of the Association with extensive academic and administrative experience.", phone: "+249911000001", email: "president@aiuag.org", category: "secretariat", order: 1 },
+  { name: "د. أحمد محمد علي", nameEn: "Dr. Ahmed Mohamed Ali", role: "الأمين العام", roleEn: "Secretary General", bio: "دكتور في إدارة الأعمال، له خبرة أكثر من 15 عاماً في الإدارة التنفيذية.", bioEn: "PhD in Business Administration with over 15 years of executive management experience.", phone: "+249911000002", email: "sg@aiuag.org", category: "secretariat", order: 2 },
+  { name: "أ. عمر عبدالله الطيب", nameEn: "Mr. Omar Abdullah Al-Tayeb", role: "النائب الأول لرئيس الرابطة", roleEn: "First Vice President", bio: "نائب أول لرئيس الرابطة، له خبرة في العمل التنظيمي.", bioEn: "First Vice President with organizational experience.", phone: "+249911000003", email: "firstvp@aiuag.org", category: "secretariat", order: 3 },
+  { name: "أ. خالد إبراهيم حسن", nameEn: "Mr. Khaled Ibrahim Hassan", role: "نائب رئيس الرابطة", roleEn: "Vice President", bio: "نائب رئيس الرابطة، له خبرة في العمل المجتمعي.", bioEn: "Vice President with community work experience.", phone: "+249911000004", email: "vp@aiuag.org", category: "secretariat", order: 4 },
+  { name: "د. فاطمة أحمد حسن", nameEn: "Dr. Fatima Ahmed Hassan", role: "نائب الأمين العام", roleEn: "Deputy Secretary General", bio: "ماجستير في الإدارة العامة، متخصصة في الشؤون الإدارية.", bioEn: "Master's in Public Administration.", phone: "+249911000005", email: "dsg@aiuag.org", category: "secretariat", order: 5 },
+  { name: "أ. محمد عبدالله أحمد", nameEn: "Mr. Mohammed Abdullah Ahmed", role: "أمين الشؤون المالية والإدارية", roleEn: "Secretary of Financial and Administrative Affairs", bio: "محاسب معتمد، خبرة 12 عاماً في الإدارة المالية.", bioEn: "Certified accountant with 12 years of financial management experience.", phone: "+249911000006", email: "finance@aiuag.org", category: "secretariat", order: 6 },
+  { name: "د. سليمان عثمان نور", nameEn: "Dr. Suleiman Othman Noor", role: "أمين العلاقات الخارجية", roleEn: "Secretary of External Relations", bio: "دكتوراه في العلاقات الدولية، خبرة واسعة في العمل الدبلوماسي.", bioEn: "PhD in International Relations with extensive diplomatic experience.", phone: "+249911000007", email: "external@aiuag.org", category: "secretariat", order: 7 },
+  { name: "أ. حسن علي موسى", nameEn: "Mr. Hassan Ali Musa", role: "أمين الشؤون الثقافية", roleEn: "Secretary of Cultural Affairs", bio: "خبرة في العمل الثقافي والإعلامي.", bioEn: "Experience in cultural and media work.", phone: "+249911000008", email: "cultural@aiuag.org", category: "secretariat", order: 8 },
+  { name: "د. مريم يوسف إبراهيم", nameEn: "Dr. Maryam Youssef Ibrahim", role: "أمين الأكاديمية", roleEn: "Secretary of Academic Affairs", bio: "دكتورة في التعليم العالي، خبرة في الشؤون الأكاديمية.", bioEn: "Doctorate in Higher Education with academic affairs experience.", phone: "+249911000009", email: "academic@aiuag.org", category: "secretariat", order: 9 },
+  { name: "أ. عبدالعزيز حسن عمر", nameEn: "Mr. Abdelaziz Hassan Omar", role: "أمين التخطيط والتدريب", roleEn: "Secretary of Planning and Training", bio: "خبرة في التخطيط الاستراتيجي والتدريب.", bioEn: "Experience in strategic planning and training.", phone: "+249911000010", email: "planning@aiuag.org", category: "secretariat", order: 10 },
+  { name: "أ. نور الهدى عثمان", nameEn: "Mr. Noor Al-Huda Othman", role: "أمين الاعلام", roleEn: "Secretary of Media", bio: "إعلامي محترف، خبرة في الإعلام الرقمي والتقليدي.", bioEn: "Professional media expert with digital and traditional media experience.", phone: "+249911000011", email: "media@aiuag.org", category: "secretariat", order: 11 },
+  { name: "د. إبراهيم محمد خير", nameEn: "Dr. Ibrahim Mohamed Khair", role: "أمين أمانة البحوث والدراسات", roleEn: "Secretary of Research and Studies", bio: "باحث أكاديمي، له العديد من المنشورات العلمية.", bioEn: "Academic researcher with numerous scientific publications.", phone: "+249911000012", email: "research@aiuag.org", category: "secretariat", order: 12 },
+  { name: "أ. طارق عبدالله البشير", nameEn: "Mr. Tariq Abdullah Al-Bashir", role: "أمين تنمية العلاقات الاقتصادية", roleEn: "Secretary of Economic Relations Development", bio: "خبير في التنمية الاقتصادية وريادة الأعمال.", bioEn: "Expert in economic development and entrepreneurship.", phone: "+249911000013", email: "economic@aiuag.org", category: "secretariat", order: 13 },
+  { name: "أ. سمية حسن أحمد", nameEn: "Ms. Sumaya Hassan Ahmed", role: "أمين الشؤون الاجتماعية", roleEn: "Secretary of Social Affairs", bio: "خبرة في العمل الاجتماعي والتنمية المجتمعية.", bioEn: "Experience in social work and community development.", phone: "+249911000014", email: "social@aiuag.org", category: "secretariat", order: 14 },
+  { name: "أ. هدى عبدالرحمن", nameEn: "Ms. Huda Abdelrahman", role: "أمينة الإحصاء والمعلومات والعضوية", roleEn: "Secretary of Statistics, Information and Membership", bio: "متخصصة في نظم المعلومات وإدارة قواعد البيانات.", bioEn: "Specialist in information systems and database management.", phone: "+249911000015", email: "membership@aiuag.org", category: "secretariat", order: 15 },
+  { name: "أ. أمل محمد سعيد", nameEn: "Ms. Amal Mohamed Saeed", role: "أمينة المرأة", roleEn: "Secretary of Women's Affairs", bio: "ناشطة في قضايا المرأة والتمكين.", bioEn: "Activist in women's issues and empowerment.", phone: "+249911000016", email: "women@aiuag.org", category: "secretariat", order: 16 },
+  { name: "أ. محمد عبدالقادر", nameEn: "Mr. Mohammed Abdelkader", role: "النائب الثاني للأمين العام", roleEn: "Second Deputy Secretary General", bio: "خبرة في الإدارة والعمل التنظيمي.", bioEn: "Experience in management and organizational work.", phone: "+249911000017", email: "second_dsg@aiuag.org", category: "secretariat", order: 17 },
+  { name: "أ. عبدالله حسن", nameEn: "Mr. Abdullah Hassan", role: "نائب أمين العلاقات الخارجية", roleEn: "Deputy Secretary of External Relations", bio: "خبرة في العلاقات الدولية والدبلوماسية.", bioEn: "Experience in international relations and diplomacy.", phone: "+249911000018", email: "dep_external@aiuag.org", category: "secretariat", order: 18 },
+  { name: "د. أسامة محمد علي", nameEn: "Dr. Osama Mohamed Ali", role: "نائب امين الأكاديمية", roleEn: "Deputy Secretary of Academic Affairs", bio: "أكاديمي متخصص في التعليم العالي.", bioEn: "Academic specializing in higher education.", phone: "+249911000019", email: "dep_academic@aiuag.org", category: "secretariat", order: 19 },
+  { name: "أ. بشرى عبدالله", nameEn: "Mr. Bushra Abdullah", role: "نائب أمين أمانة البحوث والدراسات", roleEn: "Deputy Secretary of Research and Studies", bio: "باحث في العلوم الاجتماعية والإنسانية.", bioEn: "Researcher in social and human sciences.", phone: "+249911000020", email: "dep_research@aiuag.org", category: "secretariat", order: 20 },
+  { name: "أ. معتصم بالله محمد", nameEn: "Mr. Mutasim Billah Mohamed", role: "نائب أمين التخطيط والتدريب", roleEn: "Deputy Secretary of Planning and Training", bio: "خبرة في التدريب والتطوير المؤسسي.", bioEn: "Experience in training and institutional development.", phone: "+249911000021", email: "dep_planning@aiuag.org", category: "secretariat", order: 21 },
+  { name: "أ. سعاد محمد نور", nameEn: "Ms. Suad Mohamed Noor", role: "نائبة أمين الشؤون المالية والإدارية", roleEn: "Deputy Secretary of Financial and Administrative Affairs", bio: "محاسبة قانونية، خبرة في الإدارة المالية.", bioEn: "Certified accountant with financial management experience.", phone: "+249911000022", email: "dep_finance@aiuag.org", category: "secretariat", order: 22 },
+  { name: "أ. علي حسن سليمان", nameEn: "Mr. Ali Hassan Suleiman", role: "نائب أمين تنمية العلاقات الإقتصادية", roleEn: "Deputy Secretary of Economic Relations Development", bio: "خبير اقتصادي، خبرة في التنمية.", bioEn: "Economic expert with development experience.", phone: "+249911000023", email: "dep_economic@aiuag.org", category: "secretariat", order: 23 },
+  { name: "أ. عبدالرحمن النور", nameEn: "Mr. Abdelrahman Al-Noor", role: "نائب أمين الشؤون الثقافية", roleEn: "Deputy Secretary of Cultural Affairs", bio: "مهتم بالشأن الثقافي والفني.", bioEn: "Interested in cultural and artistic affairs.", phone: "+249911000024", email: "dep_cultural@aiuag.org", category: "secretariat", order: 24 },
+  { name: "أ. محمد خير عثمان", nameEn: "Mr. Mohamed Khair Othman", role: "نائب أمين العلاقات الخارجية", roleEn: "Deputy Secretary of External Relations", bio: "خبرة في العمل الخارجي والعلاقات الدولية.", bioEn: "Experience in external work and international relations.", phone: "+249911000025", email: "dep_external2@aiuag.org", category: "secretariat", order: 25 },
+  { name: "أ. زينب عبدالله", nameEn: "Ms. Zainab Abdullah", role: "نائبة أمينة المرأة", roleEn: "Deputy Secretary of Women's Affairs", bio: "ناشطة في مجال تمكين المرأة.", bioEn: "Activist in women's empowerment.", phone: "+249911000026", email: "dep_women@aiuag.org", category: "secretariat", order: 26 },
+  { name: "أ. فيصل علي", nameEn: "Mr. Faisal Ali", role: "عضوا", roleEn: "Member", bio: "عضو في الأمانة العامة.", bioEn: "Member of the Secretariat.", phone: "+249911000027", email: "member1@aiuag.org", category: "secretariat", order: 27 },
+  { name: "أ. عماد حسن", nameEn: "Mr. Emad Hassan", role: "عضوا", roleEn: "Member", bio: "عضو في الأمانة العامة.", bioEn: "Member of the Secretariat.", phone: "+249911000028", email: "member2@aiuag.org", category: "secretariat", order: 28 },
+  { name: "أ. صلاح محمد", nameEn: "Mr. Salah Mohamed", role: "عضوا", roleEn: "Member", bio: "عضو في الأمانة العامة.", bioEn: "Member of the Secretariat.", phone: "+249911000029", email: "member3@aiuag.org", category: "secretariat", order: 29 },
 ];
 
 async function main() {
@@ -477,11 +410,10 @@ async function main() {
   console.log(`Seeded ${pageContents.length} PageContent entries`);
 
   console.log("Seeding SecretariatMembers...");
+  // Delete all and re-create to ensure fresh data
+  await prisma.secretariatMember.deleteMany();
   for (const member of secretariatMembers) {
-    const existing = await prisma.secretariatMember.findFirst({ where: { name: member.name } });
-    if (!existing) {
-      await prisma.secretariatMember.create({ data: member });
-    }
+    await prisma.secretariatMember.create({ data: member });
   }
   console.log(`Seeded ${secretariatMembers.length} SecretariatMembers`);
 
