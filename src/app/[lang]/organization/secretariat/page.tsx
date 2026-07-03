@@ -1,9 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
 import {
-  Building2, Mail, Phone, User, ChevronDown, ChevronUp, Loader2
+  Building2, Mail, Phone, User, ChevronDown, ChevronUp, Loader2, Crown, Shield, Users
 } from "lucide-react"
 import HeroSection from "@/components/ui/hero-section"
 
@@ -20,11 +19,165 @@ interface Member {
   order: number
 }
 
+interface LevelConfig {
+  label: string
+  labelEn: string
+  roles: string[]
+  color: string
+  icon: string
+}
+
+const LEVELS: LevelConfig[] = [
+  {
+    label: "رئيس الرابطة", labelEn: "President",
+    roles: ["رئيس الرابطة"],
+    color: "from-amber-500 to-amber-600", icon: "crown",
+  },
+  {
+    label: "القادة", labelEn: "Leadership",
+    roles: ["الأمين العام", "النائب الأول لرئيس الرابطة", "نائب رئيس الرابطة"],
+    color: "from-blue-600 to-blue-700", icon: "shield",
+  },
+  {
+    label: "الأمناء", labelEn: "Secretaries",
+    roles: ["نائب الأمين العام", "النائب الثاني للأمين العام", "أمين", "أمينة"],
+    color: "from-emerald-600 to-emerald-700", icon: "users",
+  },
+  {
+    label: "نواب الأمناء", labelEn: "Deputy Secretaries",
+    roles: ["نائب", "نائبة"],
+    color: "from-violet-500 to-violet-600", icon: "users",
+  },
+  {
+    label: "الأعضاء", labelEn: "Members",
+    roles: ["عضوا"],
+    color: "from-gray-500 to-gray-600", icon: "users",
+  },
+]
+
+function getMemberLevel(order: number): number {
+  if (order === 1) return 0
+  if (order <= 4) return 1
+  if (order <= 17) return 2
+  if (order <= 26) return 3
+  return 4
+}
+
+function LevelIcon({ icon }: { icon: string }) {
+  if (icon === "crown") return <Crown className="w-5 h-5" />
+  if (icon === "shield") return <Shield className="w-5 h-5" />
+  return <Users className="w-5 h-5" />
+}
+
+function MemberCard({ member, level, isArabic, onToggle, isOpen }: {
+  member: Member; level: number; isArabic: boolean; onToggle: () => void; isOpen: boolean
+}) {
+  const levelColors = [
+    "border-amber-300 dark:border-amber-600 shadow-amber-200/30",
+    "border-blue-300 dark:border-blue-600 shadow-blue-200/30",
+    "border-emerald-300 dark:border-emerald-600 shadow-emerald-200/30",
+    "border-violet-300 dark:border-violet-600 shadow-violet-200/30",
+    "border-gray-300 dark:border-gray-600 shadow-gray-200/30",
+  ]
+
+  return (
+    <div
+      className={`bg-white dark:bg-[#1a2332] rounded-2xl border-2 ${levelColors[level]} shadow-lg hover:shadow-xl transition-all cursor-pointer overflow-hidden`}
+      onClick={onToggle}
+    >
+      <div className="p-4 text-center">
+        <div className="w-20 h-20 mx-auto rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-md mb-3">
+          {member.image ? (
+            <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10">
+              <User className="w-10 h-10 text-primary/40" />
+            </div>
+          )}
+        </div>
+        <h3 className="font-bold text-text text-sm leading-tight">{member.name}</h3>
+        <p className="text-[10px] text-text-secondary mt-0.5 truncate">{member.nameEn}</p>
+        <span className={`inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-semibold text-white bg-gradient-to-r ${LEVELS[level].color}`}>
+          {isArabic ? member.role : (member.roleEn || member.role)}
+        </span>
+      </div>
+      {isOpen && (
+        <div className="px-4 pb-4 border-t border-border pt-3 space-y-2 text-xs">
+          {member.bio && <p className="text-text-secondary leading-relaxed">{member.bio}</p>}
+          {member.email && (
+            <a href={`mailto:${member.email}`} className="flex items-center gap-1.5 text-text-secondary hover:text-primary">
+              <Mail className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{member.email}</span>
+            </a>
+          )}
+          {member.phone && (
+            <a href={`tel:${member.phone}`} className="flex items-center gap-1.5 text-text-secondary hover:text-primary">
+              <Phone className="w-3.5 h-3.5 shrink-0" />
+              <span dir="ltr">{member.phone}</span>
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function HierarchyTree({ members, level, isArabic }: { members: Member[]; level: number; isArabic: boolean }) {
+  if (members.length === 0) return null
+  const [openId, setOpenId] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState(true)
+
+  const gridCols = level === 0 ? "justify-center" : level === 1 ? "grid-cols-1 sm:grid-cols-3" : level <= 3 ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4" : "grid-cols-3 sm:grid-cols-3 md:grid-cols-5"
+
+  return (
+    <div className="mb-2">
+      {/* Vertical connector line */}
+      {level > 0 && (
+        <div className="flex justify-center mb-2">
+          <div className="w-0.5 h-6 bg-gray-300 dark:bg-gray-600" />
+        </div>
+      )}
+
+      {/* Horizontal connector */}
+      {level > 0 && members.length > 1 && (
+        <div className="flex justify-center mb-2">
+          <div className="h-0.5 w-3/4 max-w-md bg-gray-300 dark:bg-gray-600" />
+        </div>
+      )}
+
+      {/* Level label */}
+      <div className="text-center mb-4">
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r ${LEVELS[level].color} shadow-md hover:shadow-lg transition-all`}
+        >
+          <LevelIcon icon={LEVELS[level].icon} />
+          {isArabic ? LEVELS[level].label : LEVELS[level].labelEn}
+          <span className="opacity-80">({members.length})</span>
+          {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+        </button>
+      </div>
+
+      {/* Cards */}
+      {expanded && (
+        <div className={`grid ${gridCols} gap-3 md:gap-4 max-w-5xl mx-auto`}>
+          {members.map((m) => (
+            <MemberCard
+              key={m.id} member={m} level={level} isArabic={isArabic}
+              isOpen={openId === m.id}
+              onToggle={() => setOpenId(openId === m.id ? null : m.id)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function SecretariatPage({ params: paramsPromise }: { params: Promise<{ lang: string }> }) {
   const [lang, setLang] = useState("ar")
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   useEffect(() => {
     paramsPromise.then(p => setLang(p.lang))
@@ -34,7 +187,11 @@ export default function SecretariatPage({ params: paramsPromise }: { params: Pro
     if (!lang) return
     fetch("/api/public/secretariat")
       .then(r => r.json())
-      .then(d => setMembers(d.data || []))
+      .then(d => {
+        const all = (d.data || []) as Member[]
+        all.sort((a, b) => a.order - b.order)
+        setMembers(all)
+      })
       .catch(() => setMembers([]))
       .finally(() => setLoading(false))
   }, [lang])
@@ -42,12 +199,11 @@ export default function SecretariatPage({ params: paramsPromise }: { params: Pro
   const isArabic = lang === "ar"
   const dir = isArabic ? "rtl" : "ltr"
 
-  const getRoleClass = (role: string) => {
-    if (role.includes("رئيس")) return "bg-amber-500"
-    if (role.includes("أمين") || role.includes("امين")) return "bg-blue-600"
-    if (role.includes("نائب") || role.includes("نائبة")) return "bg-emerald-600"
-    return "bg-gray-500"
-  }
+  const groupedByLevel: Member[][] = LEVELS.map(() => [])
+  members.forEach(m => {
+    const level = getMemberLevel(m.order)
+    groupedByLevel[level].push(m)
+  })
 
   return (
     <div dir={dir}>
@@ -74,17 +230,17 @@ export default function SecretariatPage({ params: paramsPromise }: { params: Pro
         </div>
       </HeroSection>
 
-      {/* Members Grid */}
+      {/* Hierarchy */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
-              {isArabic ? "أعضاء الأمانة العامة" : "Secretariat Members"}
+              {isArabic ? "الهيكل التنظيمي للأمانة العامة" : "Secretariat Organizational Structure"}
             </h2>
             <p className="text-text-secondary max-w-2xl mx-auto">
               {isArabic
-                ? "يضم فريق الأمانة العامة نخبة من الكوادر المؤهلة في مختلف التخصصات"
-                : "The secretariat team includes a distinguished group of qualified cadres in various specialties"}
+                ? "يتكون الأمانة العامة من 29 عضواً يتوزعون على 5 مستويات هرمية"
+                : "The Secretariat consists of 29 members distributed across 5 hierarchical levels"}
             </p>
             <div className="w-20 h-1 bg-secondary mx-auto rounded-full mt-4" />
           </div>
@@ -98,73 +254,9 @@ export default function SecretariatPage({ params: paramsPromise }: { params: Pro
               <p>{isArabic ? "لا يوجد أعضاء لعرضهم" : "No members to display"}</p>
             </div>
           ) : (
-            <div className="max-w-5xl mx-auto space-y-3">
-              {members.map((member, idx) => (
-                <div
-                  key={member.id}
-                  className="bg-surface rounded-2xl border border-border hover:border-primary/20 transition-all overflow-hidden shadow-sm"
-                >
-                  <button
-                    onClick={() => setExpandedId(expandedId === member.id ? null : member.id)}
-                    className="w-full flex items-center gap-4 p-4 md:p-5 text-right"
-                  >
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary font-bold text-sm shrink-0">
-                      {idx + 1}
-                    </div>
-                    <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 shrink-0 border-2 border-white shadow-sm">
-                      {member.image ? (
-                        <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10">
-                          <User className="w-6 h-6 text-primary/40" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0 text-right">
-                      <p className="font-bold text-text">{member.name}</p>
-                      <p className="text-sm text-text-secondary">{member.nameEn}</p>
-                    </div>
-                    <div className="hidden sm:block">
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium text-white ${getRoleClass(member.role)}`}>
-                        {isArabic ? member.role : (member.roleEn || member.role)}
-                      </span>
-                    </div>
-                    <div className="text-text-secondary">
-                      {expandedId === member.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                    </div>
-                  </button>
-
-                  {expandedId === member.id && (
-                    <div className="px-4 md:px-5 pb-5 border-t border-border">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                        {member.bio && (
-                          <div className="col-span-full">
-                            <p className="text-sm text-text-secondary leading-relaxed">
-                              {isArabic ? member.bio : (member.bio || "")}
-                            </p>
-                          </div>
-                        )}
-                        <div className="sm:hidden">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium text-white ${getRoleClass(member.role)}`}>
-                            {isArabic ? member.role : (member.roleEn || member.role)}
-                          </span>
-                        </div>
-                        {member.email && (
-                          <a href={`mailto:${member.email}`} className="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
-                            <Mail className="w-4 h-4" />
-                            {member.email}
-                          </a>
-                        )}
-                        {member.phone && (
-                          <a href={`tel:${member.phone}`} className="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
-                            <Phone className="w-4 h-4" />
-                            {member.phone}
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
+            <div className="max-w-6xl mx-auto">
+              {groupedByLevel.map((group, i) => (
+                <HierarchyTree key={i} members={group} level={i} isArabic={isArabic} />
               ))}
             </div>
           )}
@@ -183,19 +275,11 @@ export default function SecretariatPage({ params: paramsPromise }: { params: Pro
               : "For any inquiries or administrative communication, please contact us"}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:aiuagho@gmail.com"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white border-2 border-white/30 rounded-xl font-bold hover:bg-white/20 transition-all"
-            >
-              <Mail className="w-5 h-5" />
-              aiuagho@gmail.com
+            <a href="mailto:aiuagho@gmail.com" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white border-2 border-white/30 rounded-xl font-bold hover:bg-white/20 transition-all">
+              <Mail className="w-5 h-5" /> aiuagho@gmail.com
             </a>
-            <a
-              href="tel:+249114210853"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white border-2 border-white/30 rounded-xl font-bold hover:bg-white/20 transition-all"
-            >
-              <Phone className="w-5 h-5" />
-              +249114210853
+            <a href="tel:+249114210853" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white border-2 border-white/30 rounded-xl font-bold hover:bg-white/20 transition-all">
+              <Phone className="w-5 h-5" /> +249114210853
             </a>
           </div>
         </div>
