@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import ScrollReveal from "@/components/ui/scroll-reveal"
 import {
   Eye,
   Megaphone,
@@ -194,6 +195,7 @@ export default function UnifiedAbout({ lang }: UnifiedAboutProps) {
       </nav>
 
       {/* About Section */}
+      <ScrollReveal direction="up">
       <section id="about" className="py-20 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
@@ -236,8 +238,10 @@ export default function UnifiedAbout({ lang }: UnifiedAboutProps) {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* Vision Section */}
+      <ScrollReveal direction="up">
       <section id="vision" className="py-20 bg-white scroll-mt-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
@@ -266,8 +270,10 @@ export default function UnifiedAbout({ lang }: UnifiedAboutProps) {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* Mission Section */}
+      <ScrollReveal direction="up">
       <section id="mission" className="py-20 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
@@ -303,8 +309,10 @@ export default function UnifiedAbout({ lang }: UnifiedAboutProps) {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* Objectives Section */}
+      <ScrollReveal direction="up">
       <section id="objectives" className="py-20 bg-white scroll-mt-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
@@ -328,8 +336,10 @@ export default function UnifiedAbout({ lang }: UnifiedAboutProps) {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* History Timeline */}
+      <ScrollReveal direction="up">
       <section id="history" className="py-20 scroll-mt-20">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-16">
@@ -394,6 +404,7 @@ export default function UnifiedAbout({ lang }: UnifiedAboutProps) {
           </div>
         </div>
       </section>
+      </ScrollReveal>
     </div>
   )
 }

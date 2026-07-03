@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import Image from "next/image";
+import ScrollReveal from "@/components/ui/scroll-reveal";
 import {
   X,
   ChevronLeft,
@@ -305,6 +306,7 @@ export default function GalleryClient({
   return (
     <>
       {/* Stats Bar */}
+      <ScrollReveal direction="up">
       <section className="py-6 bg-white border-b border-border">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto">
@@ -347,8 +349,9 @@ export default function GalleryClient({
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
-      {/* Filters & Search */}
+      {/* Filters Bar */}
       <section className="py-4 bg-surface border-b border-border sticky top-0 z-30">
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
