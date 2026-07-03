@@ -111,27 +111,34 @@ export async function deleteBackup(id: string): Promise<boolean> {
   }
 }
 
+async function restoreTables(tables: BackupData["tables"]): Promise<{ success: boolean; message: string }> {
+  let restoredCount = 0
+  for (const table of tables) {
+    const model = (prisma as any)[table.name]
+    if (!model) continue
+    await model.deleteMany()
+    for (const record of table.records) {
+      await model.create({ data: record })
+      restoredCount++
+    }
+  }
+  return { success: true, message: `Restored ${tables.length} tables (${restoredCount} records)` }
+}
+
 export async function restoreFromBackup(id: string): Promise<{ success: boolean; message: string }> {
   const backup = await prisma.backup.findUnique({ where: { id } })
   if (!backup) return { success: false, message: "Backup not found" }
-
   try {
     const tables = JSON.parse(backup.data) as BackupData["tables"]
+    return await restoreTables(tables)
+  } catch (error: any) {
+    return { success: false, message: error.message || "Restore failed" }
+  }
+}
 
-    for (const table of tables) {
-      const model = (prisma as any)[table.name]
-      if (!model) continue
-
-      // Delete existing records
-      await model.deleteMany()
-
-      // Restore records
-      for (const record of table.records) {
-        await model.create({ data: record })
-      }
-    }
-
-    return { success: true, message: `Restored ${tables.length} tables with ${backup.tables} total records` }
+export async function restoreFromFile(jsonData: BackupData): Promise<{ success: boolean; message: string }> {
+  try {
+    return await restoreTables(jsonData.tables)
   } catch (error: any) {
     return { success: false, message: error.message || "Restore failed" }
   }

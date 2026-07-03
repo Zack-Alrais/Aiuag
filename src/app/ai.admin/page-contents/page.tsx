@@ -173,10 +173,10 @@ export default function PageContentsPage() {
                               </div>
                             </div>
                           ) : (
-                            <div className="flex-1 flex flex-col sm:flex-row gap-2">
-                              <div className="flex-1 text-sm text-gray-800 dark:text-gray-200 truncate" dir="rtl">{item.valueAr}</div>
-                              <div className="flex-1 text-sm text-gray-500 dark:text-gray-400 truncate">{item.valueEn}</div>
-                              <button onClick={() => { setEditingId(item.id); setEditAr(item.valueAr); setEditEn(item.valueEn || ""); }} className="px-3 py-1 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded">
+                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 items-start">
+                              <div className="text-sm text-gray-800 dark:text-gray-200 break-words min-w-0" dir="rtl">{item.valueAr}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400 break-words min-w-0">{item.valueEn}</div>
+                              <button onClick={() => { setEditingId(item.id); setEditAr(item.valueAr); setEditEn(item.valueEn || ""); }} className="px-3 py-1 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded whitespace-nowrap">
                                 تعديل
                               </button>
                             </div>

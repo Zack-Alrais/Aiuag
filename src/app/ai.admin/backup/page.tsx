@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Download, Trash2, RefreshCw, Database, Clock, HardDrive, CheckCircle, XCircle, Loader2, FileDown } from "lucide-react"
+import { Download, Trash2, RefreshCw, Database, Clock, HardDrive, CheckCircle, XCircle, Loader2, FileDown, Upload, RotateCcw } from "lucide-react"
 
 interface BackupItem {
   id: string
@@ -28,6 +28,9 @@ export default function BackupPage() {
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [total, setTotal] = useState(0)
+  const [restoring, setRestoring] = useState<string | null>(null)
+  const [importing, setImporting] = useState(false)
+  const [message, setMessage] = useState("")
 
   const fetchBackups = async () => {
     setLoading(true)
@@ -54,6 +57,41 @@ export default function BackupPage() {
       console.error("Failed to create backup:", e)
     } finally {
       setCreating(false)
+    }
+  }
+
+  const handleRestore = async (id: string) => {
+    if (!confirm("هل أنت متأكد من استعادة هذه النسخة؟ سيتم استبدال جميع البيانات الحالية.")) return
+    setRestoring(id)
+    setMessage("")
+    try {
+      const res = await fetch(`/api/admin/backup/${id}`, { method: "POST" })
+      const data = await res.json()
+      setMessage(data.success ? "تمت الاستعادة بنجاح" : "فشلت الاستعادة: " + data.message)
+    } catch {
+      setMessage("فشلت الاستعادة")
+    } finally {
+      setRestoring(null)
+    }
+  }
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImporting(true)
+    setMessage("")
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+      const res = await fetch("/api/admin/backup/import", { method: "POST", body: formData })
+      const data = await res.json()
+      setMessage(data.success ? "تم الاستيراد بنجاح" : "فشل الاستيراد: " + data.message)
+      if (data.success) fetchBackups()
+    } catch {
+      setMessage("فشل الاستيراد")
+    } finally {
+      setImporting(false)
+      e.target.value = ""
     }
   }
 
@@ -93,7 +131,7 @@ export default function BackupPage() {
           <h1 className="text-2xl font-bold text-[#0f2547] dark:text-white">النسخ الاحتياطي</h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">إدارة نسخ احتياطية لقاعدة البيانات والملفات</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <button
             onClick={fetchBackups}
             className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 dark:border-[#3b4f6b] rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1e2d42] transition-colors"
@@ -101,6 +139,15 @@ export default function BackupPage() {
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             تحديث
           </button>
+          <button
+            onClick={() => document.getElementById("import-file-input")?.click()}
+            disabled={importing}
+            className="flex items-center gap-2 px-4 py-2.5 border border-emerald-300 dark:border-emerald-700 rounded-xl text-sm font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+          >
+            {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+            {importing ? "...جاري الاستيراد" : "استيراد نسخة"}
+          </button>
+          <input id="import-file-input" type="file" accept=".json" onChange={handleImport} className="hidden" />
           <button
             onClick={handleCreate}
             disabled={creating}
@@ -150,6 +197,13 @@ export default function BackupPage() {
           </div>
         </div>
       </div>
+
+      {/* Message */}
+      {message && (
+        <div className={`mb-6 p-4 rounded-xl border text-sm ${message.includes("نجاح") ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300" : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 text-red-700 dark:text-red-300"}`}>
+          {message}
+        </div>
+      )}
 
       {/* Backup List */}
       <div className="bg-white dark:bg-[#1a2332] rounded-2xl border border-gray-100 dark:border-[#2a3d56] shadow-sm overflow-hidden">
@@ -216,6 +270,14 @@ export default function BackupPage() {
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{formatBytes(backup.size)}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 justify-end">
+                        <button
+                          onClick={() => handleRestore(backup.id)}
+                          disabled={restoring === backup.id}
+                          className="p-2 hover:bg-amber-100 dark:hover:bg-amber-500/10 rounded-lg text-gray-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors disabled:opacity-40"
+                          title="استعادة"
+                        >
+                          {restoring === backup.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+                        </button>
                         <button
                           onClick={() => handleDownload(backup.id)}
                           className="p-2 hover:bg-gray-100 dark:hover:bg-[#2a3d56] rounded-lg text-gray-400 hover:text-[#1A3A6B] dark:hover:text-blue-400 transition-colors"

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Menu, X, Globe, Search, ChevronDown, User, LogOut, ChevronUp, CreditCard, LogIn, Sun, Moon } from "lucide-react";
+import SearchOverlay from "./search-overlay";
 
 interface NavChild {
   label: string;
@@ -84,6 +85,7 @@ export default function Header({ lang }: HeaderProps) {
   const dropdownTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
@@ -240,11 +242,13 @@ export default function Header({ lang }: HeaderProps) {
           {/* Right Actions */}
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setSearchOpen(true)}
               className="p-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
               aria-label="Search"
             >
               <Search className="w-5 h-5" />
             </button>
+            {searchOpen && <SearchOverlay lang={currentLang} onClose={() => setSearchOpen(false)} />}
 
             <button
               onClick={toggleTheme}
