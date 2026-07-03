@@ -47,7 +47,7 @@ export async function POST() {
 
     // 3. Board Members (fix: use positionAr/positionEn + dedup)
     let boardCount = await prisma.boardMember.count();
-    if (boardCount > 6) {
+    if (boardCount !== 6) {
       await prisma.boardMember.deleteMany({});
       boardCount = 0;
     }
@@ -68,7 +68,7 @@ export async function POST() {
 
     // 4. Committees (fix: use chairNameAr/chairNameEn + slug + dedup)
     let committeeCount = await prisma.committee.count();
-    if (committeeCount > 6) {
+    if (committeeCount !== 6) {
       await prisma.committee.deleteMany({});
       committeeCount = 0;
     }
