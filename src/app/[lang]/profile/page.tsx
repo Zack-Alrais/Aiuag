@@ -116,7 +116,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
       if (res.ok) {
         setProfile(data)
         setEditing(false)
-        await update({ name: data.name })
+        await update({ name: data.name, image: data.image })
       } else {
         setSaveError(data.error || (isArabic ? "حدث خطأ" : "Save failed"))
       }

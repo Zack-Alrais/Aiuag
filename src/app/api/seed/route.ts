@@ -6,149 +6,192 @@ export async function POST() {
     const admin = await prisma.user.findFirst({ where: { role: "admin" } });
     if (!admin) return NextResponse.json({ error: "No admin found" }, { status: 400 });
 
-    let galleryCount = 0;
-    let newsCount = 0;
-    let videoCount = 0;
-    let publicationCount = 0;
-    let reportCount = 0;
-    let branchCount = 0;
+    const results: Record<string, number> = {};
 
-    const existingGallery = await prisma.gallery.count();
-    if (existingGallery === 0) {
-      const galleryItems = [
-        { title: "حفل التخرج 2023", description: "حفل تخرج دفعة 2023 من جامعة أفريقيا العالمية", type: "image", imageUrl: "/uploads/gallery/alumni-event-2023-01.jpeg", album: "events", tags: "تخرج,2023" },
-        { title: "المؤتمر السنوي", description: "افتتاح المؤتمر السنوي لرابطة الخريجين", type: "image", imageUrl: "/uploads/gallery/alumni-event-2023-05.jpeg", album: "conferences", tags: "مؤتمر" },
-        { title: "ورشة العمل البحثية", description: "ورشة عمل حول مناهج البحث العلمي", type: "image", imageUrl: "/uploads/gallery/alumni-event-2023-10.jpeg", album: "events", tags: "ورشة,بحث" },
-        { title: "لقاء الخريجين", description: "لقاء تواصلي مع خريجي الجامعة", type: "image", imageUrl: "/uploads/gallery/alumni-event-2023-15.jpeg", album: "events", tags: "لقاء,خريجين" },
-        { title: "الحرم الجامعي", description: "مناظر جميلة من حرم الجامعة", type: "image", imageUrl: "/uploads/gallery/alumni-event-2023-20.jpeg", album: "campus", tags: "حرم,جامعة" },
-        { title: "نشاط طلابي", description: "الأنشطة الطلابية المتنوعة", type: "image", imageUrl: "/uploads/gallery/alumni-event-2023-25.jpeg", album: "general", tags: "نشاط,طلاب" },
-        { title: "مؤتمر التقنية الحديثة", description: "مؤتمر التقنية الحديثة والذكاء الاصطناعي", type: "image", imageUrl: "/uploads/projects/1782278813617-5b6i4x.jpg", album: "conferences", tags: "تقنية,ذكاء_اصطناعي" },
-        { title: "مشاريع التخرج", description: "عرض مشاريع التخرج للطلاب المتميزين", type: "image", imageUrl: "/uploads/projects/1782263742971-qctx76.jpg", album: "general", tags: "مشروع,تخرج" },
-        { title: "صورة جماعية للخريجين", description: "لقاء تذكاري مع خريجي الدفعات السابقة", type: "image", imageUrl: "/uploads/gallery/alumni-event-2023-07.jpeg", album: "events", tags: "خريجين,لقاء" },
-        { title: "الاحتفال بالخريجين", description: "حفل تخليد ذكرى تخرج الخريجين", type: "image", imageUrl: "/uploads/gallery/alumni-event-2023-12.jpeg", album: "events", tags: "احتفال,تخرج" },
-        { title: "أبحاث الخريجين", description: "عرض الأبحاث العلمية للخريجين المتميزين", type: "image", imageUrl: "/uploads/general/1782565575771-j3dh1v.jpg", album: "conferences", tags: "أبحاث,علم" },
-        { title: "الأنشطة الطلابية", description: "الأنشطة والفعاليات الطلابية المتنوعة", type: "image", imageUrl: "/uploads/general/1782378070360-s0oj9p.jpg", album: "campus", tags: "نشاط,طلاب" },
+    // 1. Hero Images
+    const heroCount = await prisma.heroImage.count();
+    if (heroCount === 0) {
+      const heroes = [
+        { pageSlugs: "home", imageUrl: "https://images.unsplash.com/photo-1523050854058-8df90110c8f1?w=1600&h=900&fit=crop", titleAr: "رابطة خريجي جامعة أفريقيا العالمية", titleEn: "AIUAG Alumni Association", subtitleAr: "نربط الخريجين.. نبني المستقبل", subtitleEn: "Connecting Alumni, Building the Future", order: 1 },
+        { pageSlugs: "home", imageUrl: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&h=900&fit=crop", titleAr: "ابدأ رحلتك معنا", titleEn: "Start Your Journey With Us", subtitleAr: "انضم لمجتمع أكثر من 5000 خريج", subtitleEn: "Join a community of 5000+ alumni", order: 2 },
+        { pageSlugs: "media", imageUrl: "https://images.unsplash.com/photo-1504711434969-e33886168d9c?w=1600&h=900&fit=crop", titleAr: "المركز الإعلامي", titleEn: "Media Center", subtitleAr: "تابع آخر أخبارنا وفعالياتنا", subtitleEn: "Follow our latest news and events", order: 1 },
+        { pageSlugs: "gallery", imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&h=900&fit=crop", titleAr: "المعرض", titleEn: "Gallery", subtitleAr: "لحظات لا تُنسى من فعالياتنا", subtitleEn: "Unforgettable moments from our events", order: 1 },
+        { pageSlugs: "publications", imageUrl: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1600&h=900&fit=crop", titleAr: "المنشورات والتفاعل", titleEn: "Publications & Feed", subtitleAr: "شارك وتفاعل مع مجتمع الخريجين", subtitleEn: "Share and interact with alumni community", order: 1 },
+        { pageSlugs: "news", imageUrl: "https://images.unsplash.com/photo-1504711434969-e33886168d9c?w=1600&h=900&fit=crop", titleAr: "الأخبار والأحداث", titleEn: "News & Events", subtitleAr: "آخر المستجدات والأخبار", subtitleEn: "Latest updates and news", order: 1 },
+        { pageSlugs: "membership", imageUrl: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1600&h=900&fit=crop", titleAr: "العضوية", titleEn: "Membership", subtitleAr: "انضم لعائلة الخريجين", subtitleEn: "Join the alumni family", order: 1 },
+        { pageSlugs: "events", imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=1600&h=900&fit=crop", titleAr: "الأحداث والفعاليات", titleEn: "Events & Activities", subtitleAr: "积极参与 فعالياتنا المتنوعة", subtitleEn: "Participate in our diverse events", order: 1 },
+        { pageSlugs: "about", imageUrl: "https://images.unsplash.com/photo-1562774053-701939374585?w=1600&h=900&fit=crop", titleAr: "عن الرابطة", titleEn: "About Us", subtitleAr: "تعرف على رؤيتنا ورسالتنا", subtitleEn: "Learn about our vision and mission", order: 1 },
       ];
-      for (const item of galleryItems) {
-        await prisma.gallery.create({
-          data: { ...item, fileUrl: null, thumbnailUrl: null, authorId: admin.id, isActive: true },
-        });
+      for (const h of heroes) {
+        await prisma.heroImage.create({ data: { ...h, isActive: true } });
       }
-      galleryCount = galleryItems.length;
+      results.heroes = heroes.length;
     }
 
-    const existingNews = await prisma.news.count();
-    if (existingNews === 0) {
+    // 2. Events
+    const eventCount = await prisma.event.count();
+    if (eventCount === 0) {
       const now = new Date();
-      const newsItems = [
-        {
-          titleAr: "افتتاح المؤتمر الدولي الأول لرابطة الخريجين",
-          titleEn: "Opening of the First International Conference of the Alumni Association",
-          slug: "first-international-conference-2024",
-          contentAr: "<p>افتتح المؤتمر الدولي الأول لرابطة خريجي جامعة أفريقيا العالمية بحضور أكثر من 500 خريج من مختلف الدول العربية والأفريقية.</p>",
-          contentEn: "<p>The first international conference of the AIUAG Alumni Association was inaugurated with the attendance of over 500 graduates.</p>",
-          excerptAr: "مؤتمر دولي بمشاركة أكثر من 500 خريج من 15 دولة",
-          excerptEn: "An international conference with over 500 graduates from 15 countries",
-          featuredImage: "/uploads/gallery/alumni-event-2023-05.jpeg",
-          category: "conferences",
-          tags: "مؤتمر,دولي",
-        },
-        {
-          titleAr: "برنامج التدريب المهني للخريجين الجدد",
-          titleEn: "Professional Training Program for New Graduates",
-          slug: "professional-training-program-new-graduates",
-          contentAr: "<p>أعلنت رابطة خريجي جامعة أفريقيا العالمية عن إطلاق برنامج التدريب المهني الجديد.</p>",
-          contentEn: "<p>The AIUAG Alumni Association announced the launch of a new professional training program.</p>",
-          excerptAr: "برنامج تدريب مدته 3 أشهر يشمل إدارة أعمال وتسويق رقمي",
-          excerptEn: "A 3-month training program covering business management and digital marketing",
-          featuredImage: "/uploads/gallery/alumni-event-2023-10.jpeg",
-          category: "workshops",
-          tags: "تدريب,مهني",
-        },
+      const events = [
+        { titleAr: "المؤتمر السنوي لرابطة الخريجين 2025", titleEn: "AIUAG Annual Conference 2025", slug: "annual-conference-2025", descriptionAr: " المؤتمر السنوي الخامس لرابطة خريجي جامعة أفريقيا العالمية بعنوان \"الابتكار والريادة في عصر التحول الرقمي\". يجمع المؤتمر نخبة من الخبراء والمتحدثين من مختلف أنحاء أفريقيا.", descriptionEn: "The 5th annual conference of AIUAG under the theme 'Innovation and Leadership in the Digital Transformation Era'.", date: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), time: "09:00", location: "قاعة المؤتمرات الكبرى - جامعة أفريقيا العالمية", status: "upcoming", category: "conferences", capacity: 500, registeredCount: 280 },
+        { titleAr: "ورشة عمل: ريادة الأعمال الرقمية", titleEn: "Workshop: Digital Entrepreneurship", slug: "digital-entrepreneurship-workshop", descriptionAr: "ورشة عمل تطبيقية لمدة يومين حول أساسيات ريادة الأعمال الرقمية وبناء المشاريع الناشئة في العصر الرقمي.", descriptionEn: "A two-day practical workshop on digital entrepreneurship fundamentals.", date: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000), time: "10:00", location: "مركز التدريب - جامعة أفريقيا العالمية", status: "upcoming", category: "workshops", capacity: 50, registeredCount: 35 },
+        { titleAr: "يوم التوظيف والتوطين", titleEn: "Career Day", slug: "career-day-2025", descriptionAr: "يوم خاص بالخريجين يجمعهم مع الشركات الرائدة لفرص العمل والتدريب.", descriptionEn: "A special day connecting alumni with leading companies for job opportunities.", date: new Date(now.getTime() + 45 * 24 * 60 * 60 * 1000), time: "09:00", location: "الحرم الجامعي الرئيسي", status: "upcoming", category: "career", capacity: 300, registeredCount: 150 },
+        { titleAr: "حفل توزيع شهادات التخرج 2025", titleEn: "Graduation Ceremony 2025", slug: "graduation-ceremony-2025", descriptionAr: "حفل توزيع الشهادات على الدفعة الجديدة من خريجي جامعة أفريقيا العالمية.", descriptionEn: "Graduation ceremony for the new batch of AIUAG alumni.", date: new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000), time: "18:00", location: "قاعة الحفلات الكبرى", status: "upcoming", category: "ceremonies", capacity: 1000, registeredCount: 450 },
+        { titleAr: "لقاء الخريجين - دبي", titleEn: "Alumni Meetup - Dubai", slug: "alumni-meetup-dubai", descriptionAr: "لقاء تواصلي مع خريجي الجامعة المقيمين في الإمارات العربية المتحدة.", descriptionEn: "Networking meetup with alumni residing in the UAE.", date: new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000), time: "19:00", location: "فندق دبي ماريوت - الإمارات", status: "upcoming", category: "networking", capacity: 80, registeredCount: 45 },
       ];
-      for (const item of newsItems) {
-        await prisma.news.create({
-          data: { ...item, authorId: admin.id, status: "published", publishedAt: now },
-        });
+      for (const e of events) {
+        await prisma.event.create({ data: e });
       }
-      newsCount = newsItems.length;
+      results.events = events.length;
     }
 
-    const existingVideos = await prisma.video.count();
-    if (existingVideos === 0) {
-      const videoItems = [
-        { title: "مؤتمر الخريجين السنوي 2024", titleEn: "Annual Alumni Conference 2024", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", description: "المؤتمر السنوي لرابطة الخريجين بمشاركة نخبة من الم speakingين والخبراء", category: "conferences" },
-        { title: "محاضرة: مستقبل التعليم في أفريقيا", titleEn: "Lecture: Future of Education in Africa", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", description: "محاضرة أكاديمية حول تحديات وفرص التعليم العالي في القارة الأفريقية", category: "lectures" },
-        { title: "حفل توزيع شهادات التخرج 2024", titleEn: "Graduation Ceremony 2024", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", description: "حفل توزيع الشهادات على دفعة 2024 من جامعة أفريقيا العالمية", category: "events" },
-        { title: "ورشة العمل: ريادة الأعمال", titleEn: "Workshop: Entrepreneurship", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", description: "ورشة عمل تطبيقية حول أسس ريادة الأعمال وبناء المشاريع الناشئة", category: "lectures" },
-        { title: "مؤتمر شراكات الخريجين", titleEn: "Alumni Partnerships Conference", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", description: "مؤتمر لتعزيز الشراكات بين الخريجين والشركات والمؤسسات", category: "conferences" },
-        { title: "فعالية يوم الخريجين", titleEn: "Alumni Day Event", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", description: "اليوم السنوي للتواصل والتعارف بين خريجي الجامعة", category: "events" },
+    // 3. Board Members
+    const boardCount = await prisma.boardMember.count();
+    if (boardCount === 0) {
+      const boards = [
+        { nameAr: "د. عبدالله محمد أحمد", nameEn: "Dr. Abdullah Mohamed Ahmed", roleAr: "رئيس مجلس الإدارة", roleEn: "Chairman", bioAr: "أستاذ جامعي ورائد أعمال مع خبرة تزيد عن 20 عاماً في مجال التعليم العالي.", bioEn: "University professor and entrepreneur with over 20 years of experience in higher education.", order: 1, isActive: true },
+        { nameAr: "أ. فاطمة علي حسن", nameEn: "Ms. Fatima Ali Hassan", roleAr: "نائب الرئيس", roleEn: "Vice Chairwoman", bioAr: "مهندسة مشاريع ومتخصصة في إدارة المشاريع الكبرى.", bioEn: "Project engineer specializing in large-scale project management.", order: 2, isActive: true },
+        { nameAr: "د. محمد عثمان إبراهيم", nameEn: "Dr. Mohamed Othman Ibrahim", roleAr: "ال secretary العام", roleEn: "Secretary General", bioAr: "باحث أكاديمي متخصص في العلوم الاجتماعية والإدارة.", bioEn: "Academic researcher specialized in social sciences and management.", order: 3, isActive: true },
+        { nameAr: "م. سارة أحمد خالد", nameEn: "Eng. Sarah Ahmed Khalid", roleAr: "أمين الصندوق", roleEn: "Treasurer", bioAr: "مهندسة مدنية ومتخصصة في الإدارة المالية.", bioEn: "Civil engineer specializing in financial management.", order: 4, isActive: true },
+        { nameAr: "د. خالد محمد علي", nameEn: "Dr. Khaled Mohamed Ali", roleAr: "عضو مجلس", roleEn: "Board Member", bioAr: "طبيب جراح ومتخصص في الجراحة التجميلية.", bioEn: "Surgeon specializing in plastic surgery.", order: 5, isActive: true },
+        { nameAr: "أ. نورا حسن سعيد", nameEn: "Ms. Noura Hassan Saeed", roleAr: "عضو مجلس", roleEn: "Board Member", bioAr: "محامية ومتخصصة في القانون التجاري الدولي.", bioEn: "Lawyer specializing in international commercial law.", order: 6, isActive: true },
       ];
-      for (const item of videoItems) {
-        await prisma.video.create({ data: { ...item, authorId: admin.id } });
+      for (const b of boards) {
+        await prisma.boardMember.create({ data: b });
       }
-      videoCount = videoItems.length;
+      results.boards = boards.length;
     }
 
-    const existingPublications = await prisma.publication.count();
-    if (existingPublications === 0) {
-      const pubItems = [
-        { title: "دليل الخريجين 2024", titleEn: "Alumni Guide 2024", description: "دليل شامل للخريجين يتضمن معلومات عن الخدمات المتوفرة والبرامج والأنشطة", category: "guide" },
-        { title: "تقرير السنوي 2023", titleEn: "Annual Report 2023", description: "تقرير شامل عن أنشطة وإنجازات الرابطة خلال عام 2023", category: "annual" },
-        { title: "مجلة الخريجين - العدد الخامس", titleEn: "Alumni Magazine - Issue 5", description: "مجلة فصلية تتضمن أخبار الخريجين والمقالات والمقابلات", category: "magazine" },
-        { title: "بحث: مستقبل التعليم العالي في أفريقيا", titleEn: "Research: Future of Higher Education in Africa", description: "بحث أكاديمي يستعرض تحديات وفرص التعليم العالي في القارة الأفريقية", category: "research" },
-        { title: "دليل التوظيف والتوظيف", titleEn: "Employment and Recruitment Guide", description: "دليل عملي للخريجين حول فرص العمل ومهارات البحث عن وظائف", category: "guide" },
+    // 4. Committees
+    const committeeCount = await prisma.committee.count();
+    if (committeeCount === 0) {
+      const committees = [
+        { nameAr: "لجنة التخطيط والتطوير", nameEn: "Planning & Development Committee", descriptionAr: "مسؤولة عن التخطيط الاستراتيجي وتطوير برامج الرابطة.", descriptionEn: "Responsible for strategic planning and developing association programs.", headName: "د. عبدالله أحمد", memberCount: 8, isActive: true },
+        { nameAr: "لجنة العلاقات العامة", nameEn: "Public Relations Committee", descriptionAr: "تتولى بناء علاقات الرابطة مع المؤسسات والشركات.", descriptionEn: "Manages relationships with institutions and companies.", headName: "أ. فاطمة علي", memberCount: 6, isActive: true },
+        { nameAr: "لجنة الشباب والأنشطة", nameEn: "Youth & Activities Committee", descriptionAr: "ت策划 وتنفذ الأنشطة والفعاليات الشبابية.", descriptionEn: "Plans and executes youth activities and events.", headName: "م. سارة خالد", memberCount: 10, isActive: true },
+        { nameAr: "لجنة التقنية والمعلومات", nameEn: "IT & Technology Committee", descriptionAr: "مسؤولة عن البنية التحتية الرقمية والتحول الرقمي.", descriptionEn: "Responsible for digital infrastructure and transformation.", headName: "م. أحمد محمود", memberCount: 7, isActive: true },
+        { nameAr: "لجنة المالية والميزانية", nameEn: "Finance & Budget Committee", descriptionAr: "تتولى إدارة الشؤون المالية والميزانية.", descriptionEn: "Manages financial affairs and budget.", headName: "م. سارة أحمد", memberCount: 5, isActive: true },
+        { nameAr: "لجنة التعليم والبحث العلمي", nameEn: "Education & Research Committee", descriptionAr: "تتعقب البرامج التعليمية والأبحاث العلمية.", descriptionEn: "Oversees educational programs and scientific research.", headName: "د. محمد عثمان", memberCount: 9, isActive: true },
       ];
-      for (const item of pubItems) {
-        await prisma.publication.create({ data: { ...item, authorId: admin.id } });
+      for (const c of committees) {
+        await prisma.committee.create({ data: c });
       }
-      publicationCount = pubItems.length;
+      results.committees = committees.length;
     }
 
-    const existingReports = await prisma.report.count();
-    if (existingReports === 0) {
-      const reportItems = [
-        { title: "التقرير السنوي 2024", titleEn: "Annual Report 2024", description: "تقرير شامل عن أنشطة وإنجازات الرابطة خلال عام 2024", category: "annual", year: 2024 },
-        { title: "التقرير السنوي 2023", titleEn: "Annual Report 2023", description: "تقرير سنوي يتضمن ملخصاً لأنشطة الرابطة والإنجازات الرئيسية", category: "annual", year: 2023 },
-        { title: "التقرير السنوي 2022", titleEn: "Annual Report 2022", description: "تقرير يتضمن مراجعة شاملة لعمل الرابطة وتطوراتها", category: "annual", year: 2022 },
-        { title: "التقرير المالي السنوي 2024", titleEn: "Financial Annual Report 2024", description: "تقرير مالي تفصيلي يتضمن الإيرادات والنفقات والميزانية", category: "financial", year: 2024 },
-        { title: "التقرير المالي السنوي 2023", titleEn: "Financial Annual Report 2023", description: "تقرير مالي شامل عن الأداء المالي للرابطة", category: "financial", year: 2023 },
-        { title: "تقرير الأنشطة الربع سنوي - Q1 2024", titleEn: "Quarterly Activity Report - Q1 2024", description: "تقرير عن الأنشطة والبرامج المنفذة خلال الربع الأول", category: "quarterly", year: 2024 },
-        { title: "تقرير الأنشطة الربع سنوي - Q2 2024", titleEn: "Quarterly Activity Report - Q2 2024", description: "تقرير عن الأنشطة والبرامج المنفذة خلال الربع الثاني", category: "quarterly", year: 2024 },
+    // 5. FAQs
+    const faqCount = await prisma.fAQ.count();
+    if (faqCount === 0) {
+      const faqs = [
+        { questionAr: "كيف يمكنني الانضمام لرابطة الخريجين؟", answerAr: "يمكنك التسجيل عبر موقعنا الإلكتروني من خلال صفحة العضوية، أو التواصل مع أحد الفروع المحلية.", questionEn: "How can I join the alumni association?", answerEn: "You can register through our website's membership page, or contact one of the local branches.", category: "membership", order: 1, isActive: true },
+        { questionAr: "ما هي فوائد العضوية؟", answerAr: "تتضمن العضوية خدمات التوظيف، التدريب المهني، الخصومات لدى الشركاء، المشاركة في الفعاليات الحصرية، وبطاقة العضوية.", questionEn: "What are the membership benefits?", answerEn: "Membership includes employment services, professional training, partner discounts, exclusive events, and membership card.", category: "membership", order: 2, isActive: true },
+        { questionAr: "هل يمكنني تحديث بياناتي الشخصية؟", answerAr: "نعم، يمكنك تسجيل الدخول والذهاب لصفحة الملف الشخصي لتعديل جميع بياناتك.", questionEn: "Can I update my personal information?", answerEn: "Yes, you can log in and go to the profile page to edit all your information.", category: "general", order: 3, isActive: true },
+        { questionAr: "كيف أحصل على بطاقة العضوية؟", answerAr: "بمجرد موافقة طلب العضوية، يمكنك طباعة البطاقة من صفحة البطاقة في لوحة التحكم.", questionEn: "How do I get my membership card?", answerEn: "Once your membership is approved, you can print the card from the card page in your dashboard.", category: "membership", order: 4, isActive: true },
+        { questionAr: "ما هي خطوات التحقق من الهوية للخريج؟", answerAr: "قم بالبحث عن اسمك في صفحة التحقق، ثم اختر بياناتك من النتائج، وسيتم مراجعة طلبك من الإدارة.", questionEn: "What are the steps for graduate identity verification?", answerEn: "Search your name on the verification page, select your data from results, and your request will be reviewed by administration.", category: "verification", order: 5, isActive: true },
+        { questionAr: "هل يمكنني التبرع لرابطة الخريجين؟", answerAr: "نعم، يمكنك التبرع من خلال صفحة التبرعات باستخدام بطاقات الائتمان أو المحافظ الإلكترونية.", questionEn: "Can I donate to the alumni association?", answerEn: "Yes, you can donate through the donations page using credit cards or digital wallets.", category: "donations", order: 6, isActive: true },
+        { questionAr: "كيف أتواصل مع فرع الخريجين في بلدي؟", answerAr: "قم بزيارة صفحة الفروع لاكتشاف الفرع المحلي في بلدك ومعرفة بيانات التواصل.", questionEn: "How do I contact the alumni branch in my country?", answerEn: "Visit the branches page to find your local branch and contact information.", category: "branches", order: 7, isActive: true },
+        { questionAr: "ما هي الأنشطة التي تنظمها الرابطة؟", answerAr: "تنظم الرابطة مؤتمرات، ورش عمل، لقاءات خريجين، أنشطة تطوعية، وبرامج تدريب مهني.", questionEn: "What activities does the association organize?", answerEn: "The association organizes conferences, workshops, alumni meetups, volunteer activities, and professional training programs.", category: "activities", order: 8, isActive: true },
       ];
-      for (const item of reportItems) {
-        await prisma.report.create({ data: { ...item, authorId: admin.id } });
+      for (const f of faqs) {
+        await prisma.fAQ.create({ data: f });
       }
-      reportCount = reportItems.length;
+      results.faqs = faqs.length;
     }
 
-    const existingBranches = await prisma.branch.count();
-    if (existingBranches === 0) {
-      const branchItems = [
-        { name: "فرع الخرطوم", nameEn: "Khartoum Branch", city: "الخرطوم", country: "السودان", status: "active", type: "sudan", email: "khartoum@aiuag.org", memberCount: 500, headName: "أ. محمد أحمد" },
-        { name: "فرع أم درمان", nameEn: "Omdurman Branch", city: "أم درمان", country: "السودان", status: "active", type: "sudan", email: "omdurman@aiuag.org", memberCount: 350, headName: "د. فاطمة علي" },
-        { name: "فرع بحري", nameEn: "Bahri Branch", city: "بحري", country: "السودان", status: "active", type: "sudan", email: "bahri@aiuag.org", memberCount: 280, headName: "أ. خالد إبراهيم" },
-        { name: "فرع الخرطوم بحري", nameEn: "Khartoum North Branch", city: "الخرطوم بحري", country: "السودان", status: "establishing", type: "sudan", email: "khartoum-north@aiuag.org", memberCount: 120 },
-        { name: "فرع الجزيرة", nameEn: "Gezira Branch", city: "ولاية الجزيرة", country: "السودان", status: "active", type: "sudan", email: "gezira@aiuag.org", memberCount: 200, headName: "د. سعيد حسن" },
-        { name: "فرع كردفان", nameEn: "Kordofan Branch", city: "ولاية كردفان", country: "السودان", status: "establishing", type: "sudan", email: "kordofan@aiuag.org", memberCount: 80 },
-        { name: "فرع دارفور", nameEn: "Darfur Branch", city: "ولاية جنوب دارفور", country: "السودان", status: "planned", type: "sudan", email: "darfur@aiuag.org", memberCount: 60 },
-        { name: "فرع النيل الأبيض", nameEn: "White Nile Branch", city: "ولاية النيل الأبيض", country: "السودان", status: "planned", type: "sudan", email: "whitenile@aiuag.org", memberCount: 40 },
-        { name: "فرع أوغندا", nameEn: "Uganda Branch", city: "كامبالا", country: "أوغندا", status: "active", type: "africa", email: "uganda@aiuag.org", memberCount: 150, headName: "Dr. James Okello" },
-        { name: "فرع كينيا", nameEn: "Kenya Branch", city: "نيروبي", country: "كينيا", status: "active", type: "africa", email: "kenya@aiuag.org", memberCount: 120, headName: "Dr. Grace Wanjiku" },
-        { name: "فرع إثيوبيا", nameEn: "Ethiopia Branch", city: "أديس أبابا", country: "إثيوبيا", status: "establishing", type: "africa", email: "ethiopia@aiuag.org", memberCount: 80 },
-        { name: "فرع مصر", nameEn: "Egypt Branch", city: "القاهرة", country: "مصر", status: "active", type: "africa", email: "egypt@aiuag.org", memberCount: 100, headName: "د. أحمد سعيد" },
-        { name: "فرع تشاد", nameEn: "Chad Branch", city: "نجامينا", country: "تشاد", status: "planned", type: "africa", email: "chad@aiuag.org", memberCount: 30 },
-        { name: "فرع نيجيريا", nameEn: "Nigeria Branch", city: "لاغوس", country: "نيجيريا", status: "planned", type: "africa", email: "nigeria@aiuag.org", memberCount: 50 },
-        { name: "فرع جنوب السودان", nameEn: "South Sudan Branch", city: "جوبا", country: "جنوب السودان", status: "active", type: "africa", email: "southsudan@aiuag.org", memberCount: 70, headName: "Dr. Peter Deng" },
-        { name: "فرع ألمانيا", nameEn: "Germany Branch", city: "برلين", country: "ألمانيا", status: "establishing", type: "africa", email: "germany@aiuag.org", memberCount: 40 },
+    // 6. Projects
+    const projectCount = await prisma.project.count();
+    if (projectCount === 0) {
+      const projects = [
+        { titleAr: "مبادرة التوظيف للخريجين", titleEn: "Alumni Employment Initiative", slug: "alumni-employment-initiative", descriptionAr: "مبادرة لربط الخريجين بفرص العمل في الشركات والمؤسسات الشريكة.", descriptionEn: "An initiative connecting alumni with job opportunities at partner companies.", status: "active", category: "employment" },
+        { titleAr: "برنامج الإرشاد الأكاديمي", titleEn: "Academic Mentoring Program", slug: "academic-mentoring-program", descriptionAr: "برنامج يربط الخريجين المتميزين بالطلاب الحاليين للإرشاد الأكاديمي والمهني.", descriptionEn: "A program linking distinguished alumni with current students for academic and professional mentoring.", status: "active", category: "education" },
+        { titleAr: "مشروع البحث التعاوني", titleEn: "Collaborative Research Project", slug: "collaborative-research", descriptionAr: "مشروع لتعزيز البحث التعاوني بين الخريجين والأكاديميين.", descriptionEn: "A project to enhance collaborative research between alumni and academics.", status: "active", category: "research" },
+        { titleAr: "مبادرة الشباب والابتكار", titleEn: "Youth & Innovation Initiative", slug: "youth-innovation-initiative", descriptionAr: "مبادرة لدعم رواد الأعمال الشباب من بين الخريجين.", descriptionEn: "An initiative supporting young entrepreneurs among alumni.", status: "completed", category: "innovation" },
       ];
-      for (const item of branchItems) {
-        await prisma.branch.create({ data: item });
+      for (const p of projects) {
+        await prisma.project.create({ data: { ...p, authorId: admin.id } });
       }
-      branchCount = branchItems.length;
+      results.projects = projects.length;
     }
 
-    return NextResponse.json({ success: true, gallery: galleryCount, news: newsCount, videos: videoCount, publications: publicationCount, reports: reportCount, branches: branchCount });
+    // 7. Partners
+    const partnerCount = await prisma.partner.count();
+    if (partnerCount === 0) {
+      const partners = [
+        { nameAr: "شركة سودانيك", nameEn: "Sudanic Corp", descriptionAr: "شركة رائدة في مجال التقنية المعلومات", descriptionEn: "Leading IT company", website: "https://example.com", isActive: true },
+        { nameAr: "بنك فيصل الإسلامي", nameEn: "Faisal Islamic Bank", descriptionAr: "بنك رائد يدعم مشاريع الخريجين", descriptionEn: "Leading bank supporting alumni projects", website: "https://example.com", isActive: true },
+        { nameAr: "جامعة أفريقيا العالمية", nameEn: "Africa International University", descriptionAr: "الجامعة الأم لخريجي الرابطة", descriptionEn: "The parent university of our alumni", website: "https://example.com", isActive: true },
+        { nameAr: "منظمة الشباب الأفريقي", nameEn: "African Youth Organization", descriptionAr: "منظمة دولية تدعم برامج الشباب", descriptionEn: "International organization supporting youth programs", website: "https://example.com", isActive: true },
+      ];
+      for (const p of partners) {
+        await prisma.partner.create({ data: p });
+      }
+      results.partners = partners.length;
+    }
+
+    // 8. Secretariat Members
+    const secCount = await prisma.secretariatMember.count();
+    if (secCount === 0) {
+      const secs = [
+        { nameAr: "أ. أحمد محمد صالح", nameEn: "Mr. Ahmed Mohamed Saleh", roleAr: "مدير المكتب", roleEn: "Office Manager", email: "ahmed@aiuag.org", order: 1, isActive: true },
+        { nameAr: "أ. مريم عبدالرحمن", nameEn: "Ms. Mariam Abdelrahman", roleAr: "منسقة البرامج", roleEn: "Programs Coordinator", email: "mariam@aiuag.org", order: 2, isActive: true },
+        { nameAr: "م. عمر حسن إبراهيم", nameEn: "Eng. Omar Hassan Ibrahim", roleAr: "مسؤول تقني", roleEn: "IT Officer", email: "omar@aiuag.org", order: 3, isActive: true },
+      ];
+      for (const s of secs) {
+        await prisma.secretariatMember.create({ data: s });
+      }
+      results.secretariats = secs.length;
+    }
+
+    // 9. News (additional)
+    const newsCount = await prisma.news.count();
+    if (newsCount < 5) {
+      const now = new Date();
+      const extraNews = [
+        { titleAr: "انطلاق برنامج الإرشاد الأكاديمي الجديد", titleEn: "Launch of New Academic Mentoring Program", slug: "new-mentoring-program", contentAr: "<p>أعلنت رابطة خريجي جامعة أفريقيا العالمية عن انطلاق برنامج الإرشاد الأكاديمي الجديد الذي يهدف لربط الخريجين المتميزين بالطلاب الحاليين.</p>", contentEn: "<p>AIUAG announced the launch of a new academic mentoring program linking distinguished alumni with current students.</p>", excerptAr: "برنامج جديد يربط الخريجين بالطلاب للإرشاد الأكاديم", excerptEn: "A new program connecting alumni with students for academic mentoring", category: "programs" },
+        { titleAr: "إنجاز خريج في مؤتمر دولي", titleEn: "Alumni Achievement at International Conference", slug: "alumni-international-achievement", contentAr: "<p>حصد الخريج محمد أحمد على جائزة أفضل بحث في المؤتمر الدولي للتقنية المعلوماتية.</p>", contentEn: "<p>Alumni Mohamed Ahmed won the best paper award at the international IT conference.</p>", excerptAr: "خريج يحصل على جائزة أفضل بحث دولية", excerptEn: "Alumni wins international best paper award", category: "achievements" },
+        { titleAr: "شراكة جديدة مع شركة تقنية عالمية", titleEn: "New Partnership with Global Tech Company", slug: "new-tech-partnership", contentAr: "<p>وقعت رابطة الخريجيين اتفاقية شراكة مع شركة تقنية عالمية لتقنيات التدريب والتطوير.</p>", contentEn: "<p>The alumni association signed a partnership agreement with a global tech company for training and development technologies.</p>", excerptAr: "شراكة استراتيجية مع شركة عالمية", excerptEn: "Strategic partnership with a global company", category: "partnerships" },
+      ];
+      for (const n of extraNews) {
+        const slugExists = await prisma.news.findUnique({ where: { slug: n.slug } });
+        if (!slugExists) {
+          await prisma.news.create({ data: { ...n, authorId: admin.id, status: "published", publishedAt: now } });
+        }
+      }
+    }
+
+    // 10. Gallery (additional with video type)
+    const galCount = await prisma.gallery.count();
+    if (galCount < 15) {
+      const extras = [
+        { title: "فيديو المؤتمر الدولي", description: "فيديو يوثق المؤتمر الدولي الأول", type: "video", fileUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", imageUrl: "", album: "conferences", tags: "فيديو,مؤتمر" },
+        { title: "وثائقي عن الرابطة", description: "فيلم وثائقي عن تاريخ وإنجازات الرابطة", type: "video", fileUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", imageUrl: "", album: "general", tags: "وثائقي,رابطة" },
+        { title: "تقرير سنوي 2024", description: "التقرير السنوي الرسمي للرابطة", type: "document", fileUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", imageUrl: "", album: "general", tags: "تقرير,سنوي" },
+      ];
+      for (const item of extras) {
+        await prisma.gallery.create({ data: { ...item, thumbnailUrl: null, authorId: admin.id, isActive: true } });
+      }
+    }
+
+    // 11. Posts (sample for the social feed)
+    const postCount = await prisma.post.count();
+    if (postCount === 0) {
+      const members = await prisma.member.findMany({ take: 3, include: { user: true } });
+      if (members.length > 0) {
+        const posts = [
+          { content: "يسعدني أن أكون جزءاً من مجتمع خريجي جامعة أفريقيا العالمية. تمنياتي للجميع بالتوفيق والنجاح في مسيرتهم المهنية!", authorId: members[0]?.id },
+          { content: "أعلن عن نجاحي في الحصول على وظيفة جديدة في شركة تقنية عالمية. شكراً جزيلاً لرابطة الخريجين على الدعم والمساعدة في رحلة البحث عن العمل.", authorId: members[Math.min(1, members.length - 1)]?.id },
+          { content: "مؤتمر الخريجين السنوي كان رائعاً! شكراً لكل من ساهم في تنظيم هذا الحدث المميز. نتطلع للمؤتمر القادم.", authorId: members[Math.min(2, members.length - 1)]?.id },
+        ];
+        for (const p of posts) {
+          if (p.authorId) {
+            await prisma.post.create({ data: p });
+          }
+        }
+        results.posts = posts.length;
+      }
+    }
+
+    return NextResponse.json({ success: true, ...results });
   } catch (error: any) {
     console.error("Seed error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

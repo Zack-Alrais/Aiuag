@@ -71,11 +71,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, session, trigger }) {
       if (user) {
         token.role = (user as any).role;
         token.id = user.id;
         token.picture = user.image;
+      }
+      if (trigger === "update" && session) {
+        if ((session as any).image !== undefined) token.picture = (session as any).image;
+        if (session.name !== undefined) token.name = session.name;
       }
       return token;
     },
