@@ -1068,7 +1068,8 @@ export default function MembersManagement() {
                     try {
                       const res = await fetch("/api/upload", { method: "POST", body: fd })
                       const data = await res.json()
-                      if (data.url) handleFieldChange("graduationCertificate", data.url)
+                      const url = data.files?.[0]?.url || data.urls?.[0]
+                      if (url) handleFieldChange("graduationCertificate", url)
                     } catch {}
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"

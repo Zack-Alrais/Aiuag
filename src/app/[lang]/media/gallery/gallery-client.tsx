@@ -17,6 +17,10 @@ import {
   FolderOpen,
   Eye,
   Image as ImageIcon,
+  Grid3X3,
+  LayoutGrid,
+  Search,
+  Loader2,
 } from "lucide-react";
 
 interface GalleryItem {
@@ -71,7 +75,10 @@ export default function GalleryClient({
 }) {
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
   const [activeAlbum, setActiveAlbum] = useState<string>("all");
+  const [activeMedia, setActiveMedia] = useState<"all" | "image" | "video" | "document">("all");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [layout, setLayout] = useState<"masonry" | "grid">("masonry");
   const thumbScrollRef = useRef<HTMLDivElement>(null);
 
   const albums = useMemo(
@@ -104,13 +111,25 @@ export default function GalleryClient({
     return counts;
   }, [items]);
 
-  const filteredItems = useMemo(
-    () =>
-      activeAlbum === "all"
-        ? items
-        : items.filter((i) => i.album === activeAlbum),
-    [items, activeAlbum]
-  );
+  const filteredItems = useMemo(() => {
+    let result = items;
+    if (activeAlbum !== "all") {
+      result = result.filter((i) => i.album === activeAlbum);
+    }
+    if (activeMedia !== "all") {
+      result = result.filter((i) => getMediaType(i) === activeMedia);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (i) =>
+          i.title?.toLowerCase().includes(q) ||
+          i.description?.toLowerCase().includes(q) ||
+          i.tags?.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [items, activeAlbum, activeMedia, searchQuery]);
 
   const openLightbox = (item: GalleryItem) => {
     const idx = filteredItems.findIndex((i) => i.id === item.id);
@@ -329,48 +348,85 @@ export default function GalleryClient({
         </div>
       </section>
 
-      {/* Album Filters */}
-      <section className="py-6 bg-background">
+      {/* Filters & Search */}
+      <section className="py-4 bg-surface border-b border-border sticky top-0 z-30">
         <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-2 justify-center">
-            <button
-              onClick={() => setActiveAlbum("all")}
-              className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
-                activeAlbum === "all"
-                  ? "bg-primary text-white shadow-lg shadow-primary/25"
-                  : "bg-surface text-text-secondary hover:bg-primary/10 border border-border hover:border-primary/30"
-              }`}
-            >
-              {isArabic ? "الكل" : "All"}
-              <span className={`ms-1.5 text-xs px-1.5 py-0.5 rounded-full ${
-                activeAlbum === "all" ? "bg-white/20 text-white" : "bg-border text-text-light"
-              }`}>
-                {albumCounts.all || 0}
-              </span>
-            </button>
-            {albums.map((album) => (
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+            <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 scrollbar-hide">
               <button
-                key={album}
-                onClick={() => setActiveAlbum(album || "all")}
-                className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
-                  activeAlbum === album
-                    ? "bg-primary text-white shadow-lg shadow-primary/25"
-                    : "bg-surface text-text-secondary hover:bg-primary/10 border border-border hover:border-primary/30"
+                onClick={() => setActiveAlbum("all")}
+                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                  activeAlbum === "all"
+                    ? "bg-primary text-white shadow-md"
+                    : "bg-background text-text-secondary hover:bg-primary/5 border border-border"
                 }`}
               >
-                {getAlbumLabel(album)}
-                <span className={`ms-1.5 text-xs px-1.5 py-0.5 rounded-full ${
-                  activeAlbum === album ? "bg-white/20 text-white" : "bg-border text-text-light"
-                }`}>
-                  {albumCounts[album] || 0}
-                </span>
+                {isArabic ? "الكل" : "All"}
+                <span className="ms-1 text-[10px] opacity-70">{albumCounts.all}</span>
+              </button>
+              {albums.map((album) => (
+                <button
+                  key={album}
+                  onClick={() => setActiveAlbum(album || "all")}
+                  className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                    activeAlbum === album
+                      ? "bg-primary text-white shadow-md"
+                      : "bg-background text-text-secondary hover:bg-primary/5 border border-border"
+                  }`}
+                >
+                  {getAlbumLabel(album)}
+                  <span className="ms-1 text-[10px] opacity-70">{albumCounts[album] || 0}</span>
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:w-56">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-light" />
+                <input
+                  type="text"
+                  placeholder={isArabic ? "بحث..." : "Search..."}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-xl text-sm text-text placeholder:text-text-light focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+              <div className="flex bg-background border border-border rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setLayout("masonry")}
+                  className={`p-2 transition-colors ${layout === "masonry" ? "bg-primary text-white" : "text-text-light hover:text-text"}`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setLayout("grid")}
+                  className={`p-2 transition-colors ${layout === "grid" ? "bg-primary text-white" : "text-text-light hover:text-text"}`}
+                >
+                  <Grid3X3 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 mt-3 overflow-x-auto pb-1 scrollbar-hide">
+            {(["all", "image", "video", "document"] as const).map((type) => (
+              <button
+                key={type}
+                onClick={() => setActiveMedia(type)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all ${
+                  activeMedia === type
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "bg-background text-text-secondary hover:bg-primary/5 border border-border"
+                }`}
+              >
+                {type === "all" ? <Eye className="w-3 h-3" /> : type === "image" ? <Camera className="w-3 h-3" /> : type === "video" ? <Film className="w-3 h-3" /> : <FileText className="w-3 h-3" />}
+                {type === "all" ? (isArabic ? "الكل" : "All") : type === "image" ? (isArabic ? "صور" : "Photos") : type === "video" ? (isArabic ? "فيديوهات" : "Videos") : (isArabic ? "مستندات" : "Documents")}
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Gallery Grid */}
+      {/* Gallery Grid - Pinterest Masonry */}
       <section className="py-6 pb-16 bg-background">
         <div className="container mx-auto px-4">
           {filteredItems.length === 0 ? (
@@ -379,31 +435,103 @@ export default function GalleryClient({
                 <ImageIcon className="w-12 h-12 text-text-light" />
               </div>
               <h3 className="text-xl font-bold text-text mb-2">
-                {isArabic ? "لا توجد عناصر" : "No items found"}
+                {isArabic ? "لا توجد نتائج" : "No results"}
               </h3>
               <p className="text-text-secondary text-sm">
-                {isArabic ? "لم يتم العثور على عناصر في هذا الألبوم" : "No items found in this album"}
+                {isArabic ? "جرب تغيير الفلتر أو البحث" : "Try changing the filter or search"}
               </p>
             </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[180px] sm:auto-rows-[220px]">
-              {filteredItems.map((item, idx) => {
+          ) : layout === "masonry" ? (
+            <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 space-y-4">
+              {filteredItems.map((item) => {
                 const mediaType = getMediaType(item);
                 const thumbSrc = item.thumbnailUrl || item.imageUrl || "";
-                const isFeatured = idx % 7 === 0;
 
                 return (
                   <div
                     key={item.id}
                     onClick={() => openLightbox(item)}
-                    className={`group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 ${
-                      isFeatured ? "row-span-2 col-span-2" : "row-span-1 col-span-1"
-                    }`}
+                    className="break-inside-avoid group relative rounded-2xl overflow-hidden cursor-pointer hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500"
                   >
                     {mediaType === "video" ? (
                       <>
                         {thumbSrc ? (
-                          <Image src={thumbSrc} alt={item.title || ""} fill className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" unoptimized />
+                          <img src={thumbSrc} alt={item.title || ""} className="w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy" />
+                        ) : (
+                          <div className="w-full aspect-video bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                            <Play className="w-16 h-16 text-white/20" />
+                          </div>
+                        )}
+                      </>
+                    ) : thumbSrc ? (
+                      <img src={thumbSrc} alt={item.title || ""} className="w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy" />
+                    ) : (
+                      <div className="w-full aspect-square bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                        <ImageIcon className="w-12 h-12 text-primary/30" />
+                      </div>
+                    )}
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                    <div className="absolute top-3 inset-x-3 flex items-center justify-between z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/40 backdrop-blur-md text-white text-[10px] font-bold rounded-full border border-white/10">
+                        {mediaType === "video" ? <Play className="w-3 h-3" fill="white" /> : mediaType === "document" ? <FileText className="w-3 h-3" /> : <Camera className="w-3 h-3" />}
+                        {mediaType === "video" ? (isArabic ? "فيديو" : "Video") : mediaType === "document" ? (isArabic ? "مستند" : "Doc") : (isArabic ? "صورة" : "Photo")}
+                      </span>
+                      <div className="w-9 h-9 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10">
+                        <Maximize2 className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+
+                    {mediaType === "video" && (
+                      <div className="absolute inset-0 flex items-center justify-center z-10">
+                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 group-hover:scale-110 group-hover:bg-white/30 transition-all duration-500 shadow-2xl">
+                          <Play className="w-7 h-7 text-white ms-1" fill="white" />
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="absolute bottom-0 inset-x-0 p-4 z-10 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                      {item.title && (
+                        <h3 className="font-bold text-white text-sm leading-tight mb-1">
+                          {item.title}
+                        </h3>
+                      )}
+                      <div className="flex items-center gap-2 text-white/60 text-[11px]">
+                        {item.album && (
+                          <span className="inline-flex items-center gap-1">
+                            <FolderOpen className="w-3 h-3" />
+                            {getAlbumLabel(item.album)}
+                          </span>
+                        )}
+                        {item.createdAt && (
+                          <span className="inline-flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(item.createdAt).toLocaleDateString(isArabic ? "ar-SA" : "en-US", { month: "short", day: "numeric" })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {filteredItems.map((item) => {
+                const mediaType = getMediaType(item);
+                const thumbSrc = item.thumbnailUrl || item.imageUrl || "";
+
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => openLightbox(item)}
+                    className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500"
+                  >
+                    {mediaType === "video" ? (
+                      <>
+                        {thumbSrc ? (
+                          <img src={thumbSrc} alt={item.title || ""} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
                             <Play className="w-16 h-16 text-white/20" />
@@ -411,7 +539,7 @@ export default function GalleryClient({
                         )}
                       </>
                     ) : thumbSrc ? (
-                      <Image src={thumbSrc} alt={item.title || ""} fill className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" unoptimized />
+                      <img src={thumbSrc} alt={item.title || ""} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy" />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
                         <ImageIcon className="w-12 h-12 text-primary/30" />
@@ -440,7 +568,7 @@ export default function GalleryClient({
 
                     <div className="absolute bottom-0 inset-x-0 p-4 z-10 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
                       {item.title && (
-                        <h3 className={`font-bold text-white leading-tight mb-1 ${isFeatured ? "text-lg" : "text-sm"}`}>
+                        <h3 className="font-bold text-white text-sm leading-tight mb-1">
                           {item.title}
                         </h3>
                       )}

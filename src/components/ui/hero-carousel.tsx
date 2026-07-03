@@ -22,6 +22,7 @@ interface HeroCarouselProps {
   defaultSubtitle?: string;
   gradient?: string;
   children?: React.ReactNode;
+  badge?: React.ReactNode;
 }
 
 export default function HeroCarousel({
@@ -31,6 +32,7 @@ export default function HeroCarousel({
   defaultSubtitle,
   gradient = "from-primary via-primary-light to-primary",
   children,
+  badge,
 }: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -88,7 +90,7 @@ export default function HeroCarousel({
     img ? (isArabic ? img.subtitleAr : img.subtitleEn) || defaultSubtitle : defaultSubtitle;
 
   return (
-    <section className="relative py-20 overflow-hidden" dir={isArabic ? "rtl" : "ltr"}>
+    <section className="relative py-20 md:py-28 overflow-hidden" dir={isArabic ? "rtl" : "ltr"}>
       <div className="absolute inset-0">
         {hasImages ? (
           <>
@@ -107,6 +109,7 @@ export default function HeroCarousel({
                   loading={i === 0 ? "eager" : "lazy"}
                   priority={i === 0}
                   sizes="100vw"
+                  unoptimized
                 />
                 <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70" />
               </div>
@@ -127,6 +130,7 @@ export default function HeroCarousel({
           <div>{children}</div>
         ) : (
           <div className="max-w-3xl mx-auto text-center">
+            {badge && <div className="mb-4">{badge}</div>}
             <h1
               key={`title-${currentIndex}`}
               className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight animate-fade-in"

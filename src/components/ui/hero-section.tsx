@@ -1,17 +1,5 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import prisma from "@/lib/prisma";
 import HeroCarousel from "./hero-carousel";
-
-interface HeroImage {
-  id: string;
-  imageUrl: string;
-  titleAr: string | null;
-  titleEn: string | null;
-  subtitleAr: string | null;
-  subtitleEn: string | null;
-  linkUrl: string | null;
-}
 
 interface HeroSectionProps {
   pageSlug: string;
@@ -23,54 +11,54 @@ interface HeroSectionProps {
   badge?: React.ReactNode;
 }
 
-export default function HeroSection({
+export default async function HeroSection({
   pageSlug,
   lang,
   defaultTitle,
   defaultSubtitle,
   gradient = "from-primary via-primary-light to-primary",
   children,
+  badge,
 }: HeroSectionProps) {
-  const [images, setImages] = useState<HeroImage[]>([]);
-  const [loading, setLoading] = useState(true);
+  let images: {
+    id: string;
+    imageUrl: string;
+    titleAr: string | null;
+    titleEn: string | null;
+    subtitleAr: string | null;
+    subtitleEn: string | null;
+    linkUrl: string | null;
+  }[] = [];
 
-  useEffect(() => {
-    fetch("/api/public/hero-images")
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => {
-        const list = Array.isArray(data) ? data : [];
-        const filtered = list.filter(
-          (img: { pageSlug?: string }) =>
-            img.pageSlug?.includes(pageSlug)
-        );
-        setImages(
-          filtered.map((img: any) => ({
-            id: img.id,
-            imageUrl: img.imageUrl,
-            titleAr: img.titleAr || null,
-            titleEn: img.titleEn || null,
-            subtitleAr: img.subtitleAr || null,
-            subtitleEn: img.subtitleEn || null,
-            linkUrl: img.linkUrl || null,
-          }))
-        );
-      })
-      .catch(() => setImages([]))
-      .finally(() => setLoading(false));
-  }, [pageSlug]);
+  try {
+    const dbImages = await prisma.heroImage.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+      select: {
+        id: true,
+        imageUrl: true,
+        titleAr: true,
+        titleEn: true,
+        subtitleAr: true,
+        subtitleEn: true,
+        linkUrl: true,
+        pageSlugs: true,
+      },
+    });
 
-  if (loading) {
-    return (
-      <section className="relative py-20 overflow-hidden">
-        <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
-        <div className="container mx-auto px-4 relative z-30">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="h-12 w-64 bg-white/10 rounded-xl mx-auto animate-pulse mb-4" />
-            <div className="h-6 w-96 bg-white/10 rounded-lg mx-auto animate-pulse" />
-          </div>
-        </div>
-      </section>
-    );
+    images = dbImages
+      .filter((img) => img.pageSlugs?.includes(pageSlug))
+      .map((img) => ({
+        id: img.id,
+        imageUrl: img.imageUrl,
+        titleAr: img.titleAr,
+        titleEn: img.titleEn,
+        subtitleAr: img.subtitleAr,
+        subtitleEn: img.subtitleEn,
+        linkUrl: img.linkUrl,
+      }));
+  } catch {
+    images = [];
   }
 
   return (
@@ -81,6 +69,7 @@ export default function HeroSection({
       defaultTitle={defaultTitle}
       defaultSubtitle={defaultSubtitle}
       gradient={gradient}
+      badge={badge}
     >
       {children}
     </HeroCarousel>

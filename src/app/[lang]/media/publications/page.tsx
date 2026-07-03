@@ -15,10 +15,10 @@ export default async function PublicationsPage({ params }: Props) {
   const isArabic = lang === "ar";
   const dir = isArabic ? "rtl" : "ltr";
 
-  const [posts, publications] = await Promise.all([
+  const [posts, publications, news, events] = await Promise.all([
     prisma.post.findMany({
       orderBy: { createdAt: "desc" },
-      take: 20,
+      take: 30,
       include: {
         _count: {
           select: {
@@ -42,7 +42,43 @@ export default async function PublicationsPage({ params }: Props) {
         createdAt: true,
       },
       orderBy: { createdAt: "desc" },
-      take: 20,
+      take: 30,
+    }),
+    prisma.news.findMany({
+      where: { status: "published" },
+      select: {
+        id: true,
+        titleAr: true,
+        titleEn: true,
+        excerptAr: true,
+        excerptEn: true,
+        featuredImage: true,
+        category: true,
+        publishedAt: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
+    prisma.event.findMany({
+      where: { status: { in: ["upcoming", "ongoing"] } },
+      select: {
+        id: true,
+        titleAr: true,
+        titleEn: true,
+        descriptionAr: true,
+        descriptionEn: true,
+        featuredImage: true,
+        date: true,
+        time: true,
+        location: true,
+        status: true,
+        category: true,
+        capacity: true,
+        registeredCount: true,
+      },
+      orderBy: { date: "asc" },
+      take: 10,
     }),
   ]);
 
@@ -76,10 +112,49 @@ export default async function PublicationsPage({ params }: Props) {
     };
   });
 
-  const serializedPubs = publications.map((p) => ({
+  const reports = publications.filter((p) => {
+    const cat = (p.category || "").toLowerCase();
+    return cat.includes("تقرير") || cat.includes("report") || cat.includes("annual");
+  });
+
+  const otherPubs = publications.filter((p) => {
+    const cat = (p.category || "").toLowerCase();
+    return !(cat.includes("تقرير") || cat.includes("report") || cat.includes("annual"));
+  });
+
+  const serializedReports = reports.map((p) => ({
     ...p,
     id: String(p.id),
     createdAt: p.createdAt.toISOString(),
+  }));
+
+  const serializedOtherPubs = otherPubs.map((p) => ({
+    ...p,
+    id: String(p.id),
+    createdAt: p.createdAt.toISOString(),
+  }));
+
+  const serializedNews = news.map((n) => ({
+    id: n.id,
+    title: isArabic ? n.titleAr : n.titleEn,
+    excerpt: isArabic ? (n.excerptAr || n.titleAr) : (n.excerptEn || n.titleEn),
+    featuredImage: n.featuredImage,
+    category: n.category,
+    date: (n.publishedAt || n.createdAt).toISOString(),
+  }));
+
+  const serializedEvents = events.map((e) => ({
+    id: e.id,
+    title: isArabic ? e.titleAr : e.titleEn,
+    description: isArabic ? e.descriptionAr : e.descriptionEn,
+    featuredImage: e.featuredImage,
+    date: e.date.toISOString(),
+    time: e.time,
+    location: e.location,
+    status: e.status,
+    category: e.category,
+    capacity: e.capacity,
+    registeredCount: e.registeredCount,
   }));
 
   return (
@@ -90,12 +165,12 @@ export default async function PublicationsPage({ params }: Props) {
           lang={lang}
           defaultTitle={isArabic ? "المنشورات والتفاعل" : "Posts & Publications"}
           defaultSubtitle={isArabic
-            ? "شارك أفكارك ومنشوراتك وتفاعل مع أعضاء الرابطة"
-            : "Share your thoughts and interact with association members"}
+            ? "شارك أفكارك وشاهد التقارير والمنشورات الرسمية"
+            : "Share your thoughts and view official reports and publications"}
           badge={
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-white/80 text-sm">
               <FileText className="w-4 h-4" />
-              <span>{isArabic ? "المنشورات" : "Posts"}</span>
+              <span>{isArabic ? "المنشورات" : "Publications"}</span>
             </div>
           }
         />
@@ -103,7 +178,10 @@ export default async function PublicationsPage({ params }: Props) {
 
       <PublicationsFeedClient
         initialPosts={serializedPosts}
-        publications={serializedPubs}
+        reports={serializedReports}
+        publications={serializedOtherPubs}
+        news={serializedNews}
+        events={serializedEvents}
         isArabic={isArabic}
         lang={lang}
       />

@@ -67,7 +67,9 @@ export default function RegisterPage() {
       const res = await fetch("/api/upload", { method: "POST", body: fd })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
-      setForm((prev) => ({ ...prev, graduationCertificate: data.url }))
+      const url = data.files?.[0]?.url || data.urls?.[0]
+      if (!url) throw new Error("No URL returned")
+      setForm((prev) => ({ ...prev, graduationCertificate: url }))
     } catch { setError("فشل رفع الملف") }
     finally { setUploadingCert(false) }
   }

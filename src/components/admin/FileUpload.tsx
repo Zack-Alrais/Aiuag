@@ -48,7 +48,7 @@ export default function FileUpload({
       const res = await fetch("/api/upload", { method: "POST", body: formData })
       if (res.ok) {
         const data = await res.json()
-        onChange(data.url)
+        onChange(data.files?.[0]?.url || data.urls?.[0])
       } else {
         const err = await res.json()
         setError(err.error || "فشل في رفع الملف")

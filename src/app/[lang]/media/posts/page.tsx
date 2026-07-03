@@ -156,9 +156,10 @@ function CreatePostBox({ member, onPost, lang }: { member: MemberData | null; on
         const res = await fetch("/api/upload", { method: "POST", body: formData });
         if (!res.ok) { setError(isAr ? "فشل الرفع" : "Upload failed"); continue; }
         const data = await res.json();
-        if (data.url) {
-          if (type === "video") setVideos((prev) => [...prev, data.url]);
-          else setImages((prev) => [...prev, data.url]);
+        const url = data.files?.[0]?.url || data.urls?.[0];
+        if (url) {
+          if (type === "video") setVideos((prev) => [...prev, url]);
+          else setImages((prev) => [...prev, url]);
         }
       } catch { setError(isAr ? "خطأ في الاتصال" : "Connection error"); }
     }

@@ -143,20 +143,24 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
     const file = new File([croppedBlob], "cropped-image.jpg", { type: "image/jpeg" })
     const fd = new FormData()
     fd.append("file", file)
+    fd.append("folder", target === "avatar" ? "avatars" : "cards")
     try {
       const res = await fetch("/api/upload", { method: "POST", body: fd })
       const data = await res.json()
-      const url = data.url || data.imageUrl
+      const url = data.files?.[0]?.url || data.urls?.[0]
+      if (!url) throw new Error("No URL returned from upload")
 
       if (target === "avatar") {
         await fetch("/api/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: url }) })
         setProfile((p) => p ? { ...p, image: url } : null)
-        // Update session so the navbar shows the new image immediately
         await update({ image: url })
       } else {
         await fetch("/api/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cardPhoto: url }) })
         setProfile((p) => p ? { ...p, cardPhoto: url } : null)
       }
+    } catch (err) {
+      console.error("Upload failed:", err)
+      alert(isArabic ? "فشل رفع الصورة" : "Image upload failed")
     } finally {
       if (target === "avatar") setUploadingAvatar(false)
       else setUploadingCard(false)
@@ -430,13 +434,15 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
                           onChange={async (e) => {
                             const file = e.target.files?.[0]; if (!file) return
                             if (file.size > 5 * 1024 * 1024) { alert(isArabic ? "الحد الأقصى 5 ميجابايت" : "Max 5MB"); return }
-                            const fd = new FormData(); fd.append("file", file); fd.append("folder", "members")
+                            const fd = new FormData(); fd.append("file", file); fd.append("folder", "certificates")
                             try {
                               const res = await fetch("/api/upload", { method: "POST", body: fd })
                               const d = await res.json()
                               if (!res.ok) throw new Error(d.error)
-                              await fetch("/api/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ graduationCertificate: d.url }) })
-                              setProfile((p) => p ? { ...p, graduationCertificate: d.url } : null)
+                              const url = d.files?.[0]?.url || d.urls?.[0]
+                              if (!url) throw new Error("No URL returned")
+                              await fetch("/api/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ graduationCertificate: url }) })
+                              setProfile((p) => p ? { ...p, graduationCertificate: url } : null)
                             } catch { alert(isArabic ? "فشل الرفع" : "Upload failed") }
                           }} />
                       </label>
