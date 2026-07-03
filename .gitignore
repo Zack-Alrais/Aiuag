@@ -50,3 +50,6 @@ next-env.d.ts
 
 # uploads (managed by database)
 /public/uploads/
+
+# debug scripts
+/prisma/check-*

@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get("limit") || "100")
-    const data = await prisma.secretariatMember.findMany({ orderBy: { createdAt: "desc" }, take: limit })
+    const data = await prisma.secretariatMember.findMany({ orderBy: { order: "asc" }, take: limit })
     return NextResponse.json({ data })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })

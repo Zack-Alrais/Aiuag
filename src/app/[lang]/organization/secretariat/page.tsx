@@ -1,126 +1,53 @@
-import Link from "next/link";
-import {
-  Building2,
-  Users,
-  FileText,
-  ClipboardList,
-  Calendar,
-  Settings,
-  Database,
-  Globe,
-  Mail,
-  Phone,
-  ChevronLeft,
-  ChevronRight,
-  CheckCircle2,
-  ArrowDown,
-} from "lucide-react";
-import HeroSection from "@/components/ui/hero-section";
+"use client"
 
-interface SecretariatPageProps {
-  params: Promise<{ lang: string }>;
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import {
+  Building2, Mail, Phone, User, ChevronDown, ChevronUp, Loader2
+} from "lucide-react"
+import HeroSection from "@/components/ui/hero-section"
+
+interface Member {
+  id: string
+  name: string
+  nameEn: string
+  role: string
+  roleEn: string
+  bio: string
+  phone: string
+  email: string
+  image: string
+  order: number
 }
 
-export default async function SecretariatPage({ params }: SecretariatPageProps) {
-  const { lang } = await params;
-  const isArabic = lang === "ar";
-  const dir = isArabic ? "rtl" : "ltr";
+export default function SecretariatPage({ params: paramsPromise }: { params: Promise<{ lang: string }> }) {
+  const [lang, setLang] = useState("ar")
+  const [members, setMembers] = useState<Member[]>([])
+  const [loading, setLoading] = useState(true)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  const responsibilities = [
-    {
-      icon: FileText,
-      title: isArabic ? "إدارة الوثائق الرسمية" : "Official Documents Management",
-      description: isArabic
-        ? "إعداد وتنظيم جميع الوثائق الرسمية للرابطة بما في ذلك المحاضر والتقارير والمراسلات"
-        : "Preparing and organizing all official association documents including minutes, reports, and correspondence",
-    },
-    {
-      icon: ClipboardList,
-      title: isArabic ? "تنفيذ القرارات" : "Decision Implementation",
-      description: isArabic
-        ? "متابعة تنفيذ قرارات مجلس الإدارة ومتابعة التقدم في البرامج والمشاريع"
-        : "Following up on board decisions and tracking progress in programs and projects",
-    },
-    {
-      icon: Users,
-      title: isArabic ? "إدارة شؤون الأعضاء" : "Member Affairs Management",
-      description: isArabic
-        ? "إدارة قاعدة بيانات الأعضاء وسجلات العضوية وتجديد الاشتراكات"
-        : "Managing member database, membership records, and subscription renewals",
-    },
-    {
-      icon: Calendar,
-      title: isArabic ? "تنسيق الأنشطة" : "Activity Coordination",
-      description: isArabic
-        ? "تنسيق وتنظيم الاجتماعات والمؤتمرات والفعاليات المختلفة للرابطة"
-        : "Coordinating and organizing meetings, conferences, and various association events",
-    },
-    {
-      icon: Database,
-      title: isArabic ? "إدارة المعلومات" : "Information Management",
-      description: isArabic
-        ? "جمع وتحليل وتخزين المعلومات والإحصاءات المتعلقة بالأعضاء والأنشطة"
-        : "Collecting, analyzing, and storing information and statistics about members and activities",
-    },
-    {
-      icon: Settings,
-      title: isArabic ? "التنسيق الإداري" : "Administrative Coordination",
-      description: isArabic
-        ? "التنسيق بين الأعضاء واللجان المختلفة لضمان سير العمل بفعالية"
-        : "Coordinating between members and various committees to ensure efficient workflow",
-    },
-  ];
+  useEffect(() => {
+    paramsPromise.then(p => setLang(p.lang))
+  }, [paramsPromise])
 
-  const orgChart = [
-    {
-      level: isArabic ? "مجلس الإدارة" : "Board of Directors",
-      color: "bg-secondary",
-      children: [
-        {
-          level: isArabic ? "الأمانة العامة" : "Secretariat",
-          color: "bg-primary",
-          children: [
-            {
-              level: isArabic ? "الأمين العام" : "Secretary General",
-              color: "bg-primary-light",
-              children: [],
-            },
-            {
-              level: isArabic ? "اللجان المختلفة" : "Various Committees",
-              color: "bg-primary-light",
-              children: [
-                { level: isArabic ? "لجنة العضوية" : "Membership Committee", color: "bg-accent/80", children: [] },
-                { level: isArabic ? "لجنة الأنشطة" : "Activities Committee", color: "bg-accent/80", children: [] },
-                { level: isArabic ? "لجنة المشاريع" : "Projects Committee", color: "bg-accent/80", children: [] },
-                { level: isArabic ? "لجنة الإعلام" : "Media Committee", color: "bg-accent/80", children: [] },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ];
+  useEffect(() => {
+    if (!lang) return
+    fetch("/api/public/secretariat")
+      .then(r => r.json())
+      .then(d => setMembers(d.data || []))
+      .catch(() => setMembers([]))
+      .finally(() => setLoading(false))
+  }, [lang])
 
-  const departments = [
-    {
-      title: isArabic ? "القسم الإداري" : "Administrative Department",
-      items: isArabic
-        ? ["إدارة الملفات والأرشيف", "تنظيم الاجتماعات", "متابعة القرارات", "إدارة المراسلات"]
-        : ["File and archive management", "Meeting organization", "Decision follow-up", "Correspondence management"],
-    },
-    {
-      title: isArabic ? "قسم العضوية" : "Membership Department",
-      items: isArabic
-        ? ["تسجيل الأعضاء الجدد", "تجديد الاشتراكات", "إصدار بطاقات العضوية", "إعداد قواعد البيانات"]
-        : ["New member registration", "Subscription renewal", "Membership card issuance", "Database preparation"],
-    },
-    {
-      title: isArabic ? "قسم الإعلام والعلاقات" : "Media & Relations Department",
-      items: isArabic
-        ? ["إدارة وسائل التواصل الاجتماعي", "النشرات الصحفية", "العلاقات مع وسائل الإعلام", "التوثيق الإعلامي"]
-        : ["Social media management", "Press releases", "Media relations", "Media documentation"],
-    },
-  ];
+  const isArabic = lang === "ar"
+  const dir = isArabic ? "rtl" : "ltr"
+
+  const getRoleClass = (role: string) => {
+    if (role.includes("رئيس")) return "bg-amber-500"
+    if (role.includes("أمين") || role.includes("امين")) return "bg-blue-600"
+    if (role.includes("نائب") || role.includes("نائبة")) return "bg-emerald-600"
+    return "bg-gray-500"
+  }
 
   return (
     <div dir={dir}>
@@ -147,159 +74,100 @@ export default async function SecretariatPage({ params }: SecretariatPageProps) 
         </div>
       </HeroSection>
 
-      {/* About Secretariat */}
+      {/* Members Grid */}
       <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-surface rounded-3xl p-8 md:p-12 border border-border">
-              <h2 className="text-2xl md:text-3xl font-bold text-text mb-6">
-                {isArabic ? "نبذة عن الأمانة العامة" : "About the Secretariat"}
-              </h2>
-              <div className="space-y-4 text-text-secondary leading-relaxed">
-                <p>
-                  {isArabic
-                    ? "الأمانة العامة هي الجهاز التنفيذي الرئيسي في رابطة خريجي جامعة أفريقيا العالمية. وهي المسؤولة عن تنفيذ سياسات مجلس الإدارة وإدارة العمليات اليومية للرابطة."
-                    : "The Secretariat is the main executive body in the Association of IUA Graduates. It is responsible for implementing board policies and managing the association's daily operations."}
-                </p>
-                <p>
-                  {isArabic
-                    ? "تتكون الأمانة العامة من الأقسام الإدارية المختلفة التي تعمل بتناغم لضمان تحقيق أهداف الرابطة وخدم أعضائها بأفضل صورة ممكنة."
-                    : "The Secretariat consists of various administrative departments working in harmony to ensure the achievement of the association's goals and serve its members in the best possible way."}
-                </p>
-                <p>
-                  {isArabic
-                    ? "يترأس الأمانة العامة الأمين العام الذي ينوب عن الرئيس في إدارة الشؤون الإدارية والفنية اليومية، ويضمن الاتصال الفعال بين مجلس الإدارة واللجان المختلفة."
-                    : "The Secretariat is headed by the Secretary General who deputizes for the President in managing daily administrative and technical affairs, and ensures effective communication between the board and various committees."}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Organizational Chart */}
-      <section className="py-20 bg-surface">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
-              {isArabic ? "الهيكل التنظيمي" : "Organizational Structure"}
+              {isArabic ? "أعضاء الأمانة العامة" : "Secretariat Members"}
             </h2>
-            <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
+            <p className="text-text-secondary max-w-2xl mx-auto">
+              {isArabic
+                ? "يضم فريق الأمانة العامة نخبة من الكوادر المؤهلة في مختلف التخصصات"
+                : "The secretariat team includes a distinguished group of qualified cadres in various specialties"}
+            </p>
+            <div className="w-20 h-1 bg-secondary mx-auto rounded-full mt-4" />
           </div>
 
-          <div className="max-w-4xl mx-auto">
-            {/* Board Level */}
-            <div className="flex justify-center mb-4">
-              <div className="bg-secondary text-white px-8 py-4 rounded-2xl text-center shadow-lg">
-                <span className="font-bold text-lg">
-                  {isArabic ? "مجلس الإدارة" : "Board of Directors"}
-                </span>
-              </div>
+          {loading ? (
+            <div className="flex justify-center py-16">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
-            <div className="flex justify-center mb-4">
-              <div className="w-0.5 h-8 bg-secondary/30" />
+          ) : members.length === 0 ? (
+            <div className="text-center py-16 text-text-secondary">
+              <p>{isArabic ? "لا يوجد أعضاء لعرضهم" : "No members to display"}</p>
             </div>
-
-            {/* Secretary General */}
-            <div className="flex justify-center mb-4">
-              <div className="bg-primary text-white px-8 py-4 rounded-2xl text-center shadow-lg">
-                <span className="font-bold text-lg">
-                  {isArabic ? "الأمين العام" : "Secretary General"}
-                </span>
-                <p className="text-white/80 text-sm mt-1">
-                  {isArabic ? "الأمانة العامة" : "The Secretariat"}
-                </p>
-              </div>
-            </div>
-            <div className="flex justify-center mb-4">
-              <div className="w-0.5 h-8 bg-primary/30" />
-            </div>
-
-            {/* Committees Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-              {[
-                { ar: "لجنة العضوية", en: "Membership Committee", color: "bg-primary-light" },
-                { ar: "لجنة الأنشطة", en: "Activities Committee", color: "bg-primary-light" },
-                { ar: "لجنة المشاريع", en: "Projects Committee", color: "bg-primary-light" },
-                { ar: "لجنة الإعلام", en: "Media Committee", color: "bg-primary-light" },
-              ].map((committee, index) => (
+          ) : (
+            <div className="max-w-5xl mx-auto space-y-3">
+              {members.map((member, idx) => (
                 <div
-                  key={index}
-                  className={`${committee.color} text-white px-4 py-3 rounded-xl text-center shadow-md`}
+                  key={member.id}
+                  className="bg-surface rounded-2xl border border-border hover:border-primary/20 transition-all overflow-hidden shadow-sm"
                 >
-                  <span className="font-bold text-sm">
-                    {isArabic ? committee.ar : committee.en}
-                  </span>
+                  <button
+                    onClick={() => setExpandedId(expandedId === member.id ? null : member.id)}
+                    className="w-full flex items-center gap-4 p-4 md:p-5 text-right"
+                  >
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary font-bold text-sm shrink-0">
+                      {idx + 1}
+                    </div>
+                    <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 shrink-0 border-2 border-white shadow-sm">
+                      {member.image ? (
+                        <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10">
+                          <User className="w-6 h-6 text-primary/40" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0 text-right">
+                      <p className="font-bold text-text">{member.name}</p>
+                      <p className="text-sm text-text-secondary">{member.nameEn}</p>
+                    </div>
+                    <div className="hidden sm:block">
+                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium text-white ${getRoleClass(member.role)}`}>
+                        {isArabic ? member.role : (member.roleEn || member.role)}
+                      </span>
+                    </div>
+                    <div className="text-text-secondary">
+                      {expandedId === member.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </div>
+                  </button>
+
+                  {expandedId === member.id && (
+                    <div className="px-4 md:px-5 pb-5 border-t border-border">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                        {member.bio && (
+                          <div className="col-span-full">
+                            <p className="text-sm text-text-secondary leading-relaxed">
+                              {isArabic ? member.bio : (member.bio || "")}
+                            </p>
+                          </div>
+                        )}
+                        <div className="sm:hidden">
+                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium text-white ${getRoleClass(member.role)}`}>
+                            {isArabic ? member.role : (member.roleEn || member.role)}
+                          </span>
+                        </div>
+                        {member.email && (
+                          <a href={`mailto:${member.email}`} className="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
+                            <Mail className="w-4 h-4" />
+                            {member.email}
+                          </a>
+                        )}
+                        {member.phone && (
+                          <a href={`tel:${member.phone}`} className="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
+                            <Phone className="w-4 h-4" />
+                            {member.phone}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Responsibilities */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
-              {isArabic ? "المهام والمسؤوليات" : "Functions & Responsibilities"}
-            </h2>
-            <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {responsibilities.map((item, index) => (
-              <div
-                key={index}
-                className="bg-surface rounded-2xl p-6 border border-border hover:border-primary/30 transition-all group"
-              >
-                <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <item.icon className="w-7 h-7 text-primary" />
-                </div>
-                <h3 className="text-lg font-bold text-text mb-3">
-                  {item.title}
-                </h3>
-                <p className="text-text-secondary text-sm leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Departments */}
-      <section className="py-20 bg-surface">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
-              {isArabic ? "الأقسام الرئيسية" : "Main Departments"}
-            </h2>
-            <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {departments.map((dept, index) => (
-              <div
-                key={index}
-                className="bg-background rounded-2xl p-6 border border-border"
-              >
-                <h3 className="text-lg font-bold text-text mb-4 pb-3 border-b border-border">
-                  {dept.title}
-                </h3>
-                <ul className="space-y-3">
-                  {dept.items.map((item, itemIndex) => (
-                    <li key={itemIndex} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
-                      <span className="text-text-secondary text-sm">
-                        {item}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          )}
         </div>
       </section>
 
@@ -333,5 +201,5 @@ export default async function SecretariatPage({ params }: SecretariatPageProps) 
         </div>
       </section>
     </div>
-  );
+  )
 }
