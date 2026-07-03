@@ -10,22 +10,22 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
   const sections = [
     {
       icon: Camera,
-      title: isArabic ? "معرض الصور" : "Photo Gallery",
-      desc: isArabic ? "تصفح صور فعالياتنا وأحداثنا والحرم الجامعي" : "Browse photos of our events, activities, and campus",
-      href: `/${lang}/media/gallery`,
+      title: isArabic ? "الأخبار والأحداث" : "News & Events",
+      desc: isArabic ? "تابع آخر أخبارنا وأحداثنا وفعالياتنا" : "Follow our latest news, events, and activities",
+      href: `/${lang}/news`,
       color: "from-primary to-primary-light",
     },
     {
-      icon: Play,
-      title: isArabic ? "الفيديوهات" : "Videos",
-      desc: isArabic ? "شاهد فيديوهات المؤتمرات والمحاضرات والفعاليات" : "Watch videos of conferences, lectures, and events",
-      href: `/${lang}/media/videos`,
+      icon: Camera,
+      title: isArabic ? "المعرض والفيديوهات" : "Gallery & Videos",
+      desc: isArabic ? "تصفح صور وفيديوهات فعالياتنا والحرم الجامعي" : "Browse photos and videos of our events and campus",
+      href: `/${lang}/media/gallery`,
       color: "from-secondary to-secondary-light",
     },
     {
-      icon: FileText,
-      title: isArabic ? "المنشورات" : "Publications",
-      desc: isArabic ? "اطلع على المنشورات والتقارير الصادرة عن الرابطة" : "View publications and reports issued by the association",
+      icon: MessageSquare,
+      title: isArabic ? "المنشورات والتفاعل" : "Posts & Publications",
+      desc: isArabic ? "شارك وأتفاعل مع مجتمع الخريجين - منشورات تفاعلية ومنشورات رسمية" : "Share and interact with the alumni community - interactive and official posts",
       href: `/${lang}/media/publications`,
       color: "from-accent to-accent-light",
     },
@@ -35,13 +35,6 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
       desc: isArabic ? "تحميل التقارير السنوية وتقارير الفعاليات" : "Download annual reports and event reports",
       href: `/${lang}/media/reports`,
       color: "from-primary-dark to-primary",
-    },
-    {
-      icon: MessageSquare,
-      title: isArabic ? "المنشورات التفاعلية" : "Interactive Posts",
-      desc: isArabic ? "شارك وأتفاعل مع مجتمع الخريجين - نصوص، صور، فيديوهات، تعليقات" : "Share and interact with the alumni community - text, images, videos, comments",
-      href: `/${lang}/media/posts`,
-      color: "from-blue-600 to-indigo-600",
     },
   ];
 

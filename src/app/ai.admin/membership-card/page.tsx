@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
-import { useSession } from "next-auth/react"
 import { Printer, Loader2, CreditCard } from "lucide-react"
 import MembershipCard from "@/components/ui/membership-card"
 
@@ -24,40 +23,35 @@ interface MemberData {
 }
 
 function MembershipCardContent() {
-  const { data: session, status } = useSession()
   const [member, setMember] = useState<MemberData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
   useEffect(() => {
-    if (status === "loading") return
-
-    if (!session?.user?.id) {
-      setError("يجب تسجيل الدخول أولاً")
-      setLoading(false)
-      return
-    }
-
     const fetchMember = async () => {
       try {
-        const res = await fetch("/api/profile")
-        if (!res.ok) throw new Error("Failed to fetch profile")
+        const res = await fetch("/api/admin/members?limit=1")
+        if (!res.ok) throw new Error("Failed to fetch members")
         const data = await res.json()
-
-        setMember({
-          nameAr: data.name || "",
-          nameEn: data.name || "",
-          membershipNumber: data.membershipNumber || "",
-          memberType: data.memberStatus === "approved" ? "عضو مسجل" : "عضو مسجل",
-          photo: data.cardPhoto || data.image || "",
-          faculty: data.faculty || "",
-          department: data.department || "",
-          graduationYear: data.graduationYear || undefined,
-          phone: data.phone || "",
-          email: data.email || "",
-          city: "",
-          issueDate: data.memberSince || "",
-        })
+        if (data.members?.length > 0) {
+          const m = data.members[0]
+          setMember({
+            nameAr: m.nameAr || m.name || "",
+            nameEn: m.nameEn || m.name || "",
+            membershipNumber: m.membershipNumber || "",
+            memberType: m.memberType || "عضو مسجل",
+            photo: m.cardPhoto || m.photo || "",
+            faculty: m.faculty || "",
+            department: m.department || "",
+            graduationYear: m.graduationYear || undefined,
+            phone: m.phone || "",
+            email: m.email || "",
+            city: "",
+            issueDate: m.memberSince || "",
+          })
+        } else {
+          setError("لا توجد بيانات عضو")
+        }
       } catch {
         setError("خطأ في تحميل بيانات البطاقة")
       } finally {
@@ -66,13 +60,13 @@ function MembershipCardContent() {
     }
 
     fetchMember()
-  }, [session, status])
+  }, [])
 
   const handlePrint = () => {
     window.print()
   }
 
-  if (status === "loading" || loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-3">

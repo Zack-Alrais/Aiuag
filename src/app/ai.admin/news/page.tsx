@@ -5,7 +5,7 @@ import { Plus, Pencil, Trash2, Newspaper, Eye, EyeOff, Search, X } from "lucide-
 import ImageUpload from "@/components/admin/ImageUpload"
 
 interface NewsItem {
-  id: number
+  id: string
   titleAr: string
   titleEn: string
   contentAr: string
@@ -37,8 +37,8 @@ export default function NewsManagement() {
   const [filter, setFilter] = useState<"all" | "published" | "draft" | "archived">("all")
   const [search, setSearch] = useState("")
   const [modalOpen, setModalOpen] = useState(false)
-  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null)
-  const [editingId, setEditingId] = useState<number | null>(null)
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
 
@@ -124,7 +124,7 @@ export default function NewsManagement() {
     }
   }
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
       await fetch(`/api/admin/news/${id}`, { method: "DELETE" })
       await fetchNews()

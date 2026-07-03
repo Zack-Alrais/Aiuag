@@ -63,7 +63,7 @@ export default function AdminError({
             Try Again
           </button>
           <a
-            href="/admin"
+            href="/ai.admin"
             style={{
               display: "inline-block",
               padding: "0.75rem 1.5rem",

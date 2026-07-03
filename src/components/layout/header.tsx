@@ -42,13 +42,10 @@ function getNavItems(lang: string): NavItem[] {
       label: isArabic ? "المركز الإعلامي" : "Media",
       href: "/media",
       children: [
-        { label: isArabic ? "الأخبار" : "News", href: "/news" },
-        { label: isArabic ? "الأحداث" : "Events", href: "/events" },
-        { label: isArabic ? "المعرض" : "Gallery", href: "/media/gallery" },
-        { label: isArabic ? "الفيديوهات" : "Videos", href: "/media/videos" },
-        { label: isArabic ? "المنشورات" : "Publications", href: "/media/publications" },
+        { label: isArabic ? "الأخبار والأحداث" : "News & Events", href: "/news" },
+        { label: isArabic ? "المعرض والفيديوهات" : "Gallery & Videos", href: "/media/gallery" },
+        { label: isArabic ? "المنشورات والتفاعل" : "Posts & Publications", href: "/media/publications" },
         { label: isArabic ? "التقارير" : "Reports", href: "/media/reports" },
-        { label: isArabic ? "المنشورات التفاعلية" : "Interactive Posts", href: "/media/posts" },
       ],
     },
     {
@@ -64,7 +61,6 @@ function getNavItems(lang: string): NavItem[] {
       label: isArabic ? "الخدمات" : "Services",
       href: "/services",
       children: [
-        { label: isArabic ? "الخدمات" : "Services", href: "/services" },
         { label: isArabic ? "التطوع" : "Volunteer", href: "/volunteer" },
         { label: isArabic ? "التبرعات" : "Donations", href: "/donations" },
       ],
@@ -102,13 +98,6 @@ export default function Header({ lang }: HeaderProps) {
           if (child.href === "/membership/manage") return isLoggedIn;
           return true;
         }),
-      };
-    }
-    // Media: hide interactive posts when not logged in
-    if (item.href === "/media" && item.children && !isLoggedIn) {
-      return {
-        ...item,
-        children: item.children.filter((child) => child.href !== "/media/posts"),
       };
     }
     return item;
