@@ -206,7 +206,8 @@ export function middleware(request: NextRequest) {
   if (isMemberProtected && !pathname.startsWith("/api/") && !pathname.startsWith("/ai.")) {
     const sessionToken = request.cookies.get("next-auth.session-token")?.value
       || request.cookies.get("__Secure-next-auth.session-token")?.value
-      || request.cookies.get("authjs.session-token")?.value;
+      || request.cookies.get("authjs.session-token")?.value
+      || request.cookies.get("__Secure-authjs.session-token")?.value;
     if (!sessionToken) {
       const loginUrl = new URL("/auth/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
