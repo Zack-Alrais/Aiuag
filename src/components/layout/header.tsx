@@ -274,9 +274,7 @@ export default function Header({ lang }: HeaderProps) {
             </button>
             {searchOpen && <SearchOverlay lang={currentLang} onClose={() => setSearchOpen(false)} />}
 
-            <motion.button
-              whileHover={{ rotate: 180 }}
-              transition={{ duration: 0.3 }}
+            <button
               onClick={toggleTheme}
               className={`p-2.5 rounded-lg transition-colors ${
                 scrolled ? "text-text hover:bg-gray-100 dark:text-white dark:hover:bg-dark-card" : "text-white/80 hover:text-white hover:bg-white/10"
@@ -284,11 +282,9 @@ export default function Header({ lang }: HeaderProps) {
               title={theme === "light" ? "الوضع الليلي" : "الوضع النهاري"}
             >
               {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-            </motion.button>
+            </button>
 
-            <motion.button
-              whileHover={{ rotate: 180 }}
-              transition={{ duration: 0.3 }}
+            <button
               onClick={toggleLanguage}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
                 scrolled ? "text-text hover:bg-gray-100 dark:text-white dark:hover:bg-dark-card" : "text-white/80 hover:text-white hover:bg-white/10"
@@ -296,7 +292,7 @@ export default function Header({ lang }: HeaderProps) {
             >
               <Globe className="w-4 h-4" />
               {isArabic ? "EN" : "عربي"}
-            </motion.button>
+            </button>
 
             {!session?.user && (
               <Link
