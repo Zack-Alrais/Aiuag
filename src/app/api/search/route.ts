@@ -9,7 +9,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ results: [] })
     }
 
-    const search = `%${q}%`
     const isArabic = lang === "ar"
     const titleField = isArabic ? "titleAr" : "titleEn"
     const contentField = isArabic ? "contentAr" : "contentEn"
@@ -21,8 +20,10 @@ export async function GET(request: NextRequest) {
       prisma.news.findMany({
         where: {
           OR: [
-            { titleAr: { contains: q } }, { titleEn: { contains: q } },
-            { contentAr: { contains: q } }, { contentEn: { contains: q } },
+            { titleAr: { contains: q, mode: "insensitive" } },
+            { titleEn: { contains: q, mode: "insensitive" } },
+            { contentAr: { contains: q, mode: "insensitive" } },
+            { contentEn: { contains: q, mode: "insensitive" } },
           ],
           status: "published",
         },
@@ -32,8 +33,10 @@ export async function GET(request: NextRequest) {
       prisma.event.findMany({
         where: {
           OR: [
-            { titleAr: { contains: q } }, { titleEn: { contains: q } },
-            { descriptionAr: { contains: q } }, { descriptionEn: { contains: q } },
+            { titleAr: { contains: q, mode: "insensitive" } },
+            { titleEn: { contains: q, mode: "insensitive" } },
+            { descriptionAr: { contains: q, mode: "insensitive" } },
+            { descriptionEn: { contains: q, mode: "insensitive" } },
           ],
         },
         select: { slug: true, [titleField]: true, [descriptionField]: true },
@@ -42,8 +45,10 @@ export async function GET(request: NextRequest) {
       prisma.project.findMany({
         where: {
           OR: [
-            { titleAr: { contains: q } }, { titleEn: { contains: q } },
-            { descriptionAr: { contains: q } }, { descriptionEn: { contains: q } },
+            { titleAr: { contains: q, mode: "insensitive" } },
+            { titleEn: { contains: q, mode: "insensitive" } },
+            { descriptionAr: { contains: q, mode: "insensitive" } },
+            { descriptionEn: { contains: q, mode: "insensitive" } },
           ],
         },
         select: { slug: true, [titleField]: true, [descriptionField]: true },
@@ -63,12 +68,11 @@ export async function GET(request: NextRequest) {
       prisma.member.findMany({
         where: {
           OR: [
-            { name: { contains: q } },
-            { nameEn: { contains: q } },
-            { bio: { contains: q } },
+            { nameEn: { contains: q, mode: "insensitive" } },
+            { bio: { contains: q, mode: "insensitive" } },
           ],
         },
-        select: { id: true, name: true, nameEn: true, bio: true },
+        select: { id: true, nameEn: true, bio: true },
         take: 5,
       }),
     ])
@@ -116,7 +120,7 @@ export async function GET(request: NextRequest) {
 
     members.forEach((item) => {
       results.push({
-        title: isArabic ? item.name : (item.nameEn || item.name),
+        title: item.nameEn || "",
         description: item.bio || "",
         url: `/${lang}/organization/secretariat`,
         type: "member",
