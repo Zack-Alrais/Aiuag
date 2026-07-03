@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Calendar, Search, ChevronLeft, ChevronRight, ArrowLeft, ArrowRight, Tag } from "lucide-react";
 import Link from "next/link";
+import ScrollReveal from "@/components/ui/scroll-reveal";
 import HeroSection from "@/components/ui/hero-section";
 
 export default function NewsPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -85,7 +86,7 @@ export default function NewsPage({ params }: { params: Promise<{ lang: string }>
       />
 
       {/* Search & Categories */}
-      <section className="py-8 bg-background">
+      <ScrollReveal direction="up"><section className="py-8 bg-background">
         <div className="container mx-auto px-4">
           {/* Search Bar */}
           <div className="max-w-xl mx-auto mb-6">
@@ -115,11 +116,11 @@ export default function NewsPage({ params }: { params: Promise<{ lang: string }>
             ))}
           </div>
         </div>
-      </section>
+      </section></ScrollReveal>
 
       {/* Featured News */}
       {featuredNews && (
-        <section className="py-8 bg-background">
+        <ScrollReveal direction="up"><section className="py-8 bg-background">
           <div className="container mx-auto px-4">
             <article className="bg-surface rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group">
               <div className="grid md:grid-cols-2">
@@ -164,11 +165,11 @@ export default function NewsPage({ params }: { params: Promise<{ lang: string }>
               </div>
             </article>
           </div>
-        </section>
+        </section></ScrollReveal>
       )}
 
       {/* News Grid */}
-      <section className="py-12 bg-background">
+      <ScrollReveal direction="up"><section className="py-12 bg-background">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {remainingNews.map((news: any) => (
@@ -237,7 +238,7 @@ export default function NewsPage({ params }: { params: Promise<{ lang: string }>
             </button>
           </div>
         </div>
-      </section>
+        </section></ScrollReveal>
     </div>
   );
 }

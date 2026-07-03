@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Calendar, Clock, MapPin, ChevronLeft, ChevronRight, Users, Filter } from "lucide-react";
 import Link from "next/link";
+import ScrollReveal from "@/components/ui/scroll-reveal";
 import HeroSection from "@/components/ui/hero-section";
 
 export default function EventsPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -92,7 +93,7 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
       />
 
       {/* Filter & Calendar View */}
-      <section className="py-8 bg-background">
+      <ScrollReveal direction="up"><section className="py-8 bg-background">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex gap-2">
@@ -115,10 +116,10 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
             </button>
           </div>
         </div>
-      </section>
+      </section></ScrollReveal>
 
       {/* Calendar Placeholder */}
-      <section className="pb-8 bg-background">
+      <ScrollReveal direction="up"><section className="pb-8 bg-background">
         <div className="container mx-auto px-4">
           <div className="bg-surface rounded-2xl border border-border p-6">
             <div className="flex items-center justify-between mb-4">
@@ -153,10 +154,10 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
             </div>
           </div>
         </div>
-      </section>
+      </section></ScrollReveal>
 
       {/* Upcoming Events */}
-      <section className="py-8 bg-background">
+      <ScrollReveal direction="up"><section className="py-8 bg-background">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-text mb-6">
             {isArabic ? "الأحداث القادمة" : "Upcoming Events"}
@@ -214,10 +215,10 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
             })}
           </div>
         </div>
-      </section>
+      </section></ScrollReveal>
 
       {/* Past Events */}
-      <section className="py-8 bg-surface">
+      <ScrollReveal direction="up"><section className="py-8 bg-surface">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-text mb-6">
             {isArabic ? "الأحداث السابقة" : "Past Events"}
@@ -262,7 +263,7 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
             })}
           </div>
         </div>
-      </section>
+        </section></ScrollReveal>
     </div>
   );
 }

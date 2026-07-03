@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { motion } from "framer-motion"
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
@@ -10,77 +11,72 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   helperText?: string
   leftIcon?: React.ReactNode
   rightIcon?: React.ReactNode
-  dir?: "ltr" | "rtl" | "auto"
+  dir?: "rtl" | "ltr"
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type = "text", label, labelAr, error, helperText, leftIcon, rightIcon, id, dir, ...props }, ref) => {
+  ({ className, type, label, labelAr, error, helperText, leftIcon, rightIcon, dir = "ltr", id, ...props }, ref) => {
     const inputId = id || React.useId()
-    const isRtl = dir === "rtl"
-    const displayLabel = isRtl && labelAr ? labelAr : label
+    const errorId = `${inputId}-error`
+    const [focused, setFocused] = React.useState(false)
 
     return (
       <div className="w-full">
-        {displayLabel && (
+        {(label || labelAr) && (
           <label
             htmlFor={inputId}
-            className={cn(
-              "block text-sm font-medium text-gray-700 mb-1.5",
-              isRtl && "text-right"
-            )}
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
           >
-            {displayLabel}
+            {dir === "rtl" && labelAr ? labelAr : label}
           </label>
         )}
         <div className="relative">
           {leftIcon && (
-            <div className={cn(
-              "absolute top-1/2 -translate-y-1/2 text-gray-400",
-              isRtl ? "right-3" : "left-3"
-            )}>
+            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none text-gray-400 dark:text-gray-500">
               {leftIcon}
             </div>
           )}
           <input
-            type={type}
             id={inputId}
-            dir={dir}
+            type={type}
             className={cn(
-              "flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm transition-colors",
+              "flex h-10 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900",
               "placeholder:text-gray-400",
-              "focus:outline-none focus:ring-2 focus:ring-[#1A3A6B]/20 focus:border-[#1A3A6B]",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-              error
-                ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
-                : "border-gray-300",
-              leftIcon && (isRtl ? "pr-10" : "pl-10"),
-              rightIcon && (isRtl ? "pl-10" : "pr-10"),
-              isRtl && "text-right",
+              "transition-all duration-200",
+              "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary",
+              "dark:bg-dark-surface dark:border-dark-border dark:text-white dark:placeholder:text-gray-500",
+              "dark:focus:ring-primary/30 dark:focus:border-primary-light",
+              error && "border-red-500 focus:ring-red-200 focus:border-red-500 dark:border-red-400",
+              leftIcon && "ps-10",
+              rightIcon && "pe-10",
               className
             )}
+            aria-invalid={!!error}
+            aria-describedby={error ? errorId : undefined}
             ref={ref}
-            aria-invalid={error ? "true" : undefined}
-            aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
+            onFocus={(e) => { setFocused(true); props.onFocus?.(e) }}
+            onBlur={(e) => { setFocused(false); props.onBlur?.(e) }}
             {...props}
           />
           {rightIcon && (
-            <div className={cn(
-              "absolute top-1/2 -translate-y-1/2 text-gray-400",
-              isRtl ? "left-3" : "right-3"
-            )}>
+            <div className="absolute inset-y-0 end-0 flex items-center pe-3 pointer-events-none text-gray-400 dark:text-gray-500">
               {rightIcon}
             </div>
           )}
         </div>
         {error && (
-          <p id={`${inputId}-error`} className="mt-1.5 text-sm text-red-600" role="alert">
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            id={errorId}
+            role="alert"
+            className="mt-1 text-xs text-red-500 dark:text-red-400"
+          >
             {error}
-          </p>
+          </motion.p>
         )}
-        {!error && helperText && (
-          <p id={`${inputId}-helper`} className="mt-1.5 text-sm text-gray-500">
-            {helperText}
-          </p>
+        {helperText && !error && (
+          <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">{helperText}</p>
         )}
       </div>
     )

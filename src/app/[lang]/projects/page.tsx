@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { FolderOpen, Calendar, ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Clock, Users, Image } from "lucide-react";
 import Link from "next/link";
+import ScrollReveal from "@/components/ui/scroll-reveal";
 import HeroSection from "@/components/ui/hero-section";
 
 export default function ProjectsPage() {
@@ -81,7 +82,7 @@ export default function ProjectsPage() {
       />
 
       {/* Filter Tabs */}
-      <section className="py-8 bg-background">
+      <ScrollReveal direction="up"><section className="py-8 bg-background">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap gap-3 justify-center">
             {filterTabs.map((tab) => (
@@ -98,10 +99,10 @@ export default function ProjectsPage() {
             ))}
           </div>
         </div>
-      </section>
+      </section></ScrollReveal>
 
       {/* Projects Grid */}
-      <section className="py-16 bg-background">
+      <ScrollReveal direction="up"><section className="py-16 bg-background">
         <div className="container mx-auto px-4">
           {loading ? (
             <div>
@@ -189,10 +190,10 @@ export default function ProjectsPage() {
           </div>
           )}
         </div>
-      </section>
+      </section></ScrollReveal>
 
       {/* CTA */}
-      <section className="py-16 bg-surface">
+      <ScrollReveal direction="up"><section className="py-16 bg-surface">
         <div className="container mx-auto px-4">
           <div className="bg-gradient-to-r from-primary to-primary-light rounded-3xl p-8 md:p-12 text-center text-white">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
@@ -212,7 +213,7 @@ export default function ProjectsPage() {
             </Link>
           </div>
         </div>
-      </section>
+        </section></ScrollReveal>
     </div>
   );
 }

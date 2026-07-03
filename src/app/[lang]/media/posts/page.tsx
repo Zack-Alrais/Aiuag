@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import ScrollReveal from "@/components/ui/scroll-reveal";
 import {
   Heart,
   MessageCircle,
@@ -716,7 +717,7 @@ export default function MediaPostsPage() {
 
   return (
     <div className={`min-h-screen ${isAr ? "" : ""} bg-gray-50 dark:bg-[#0a0f1a]`} dir={isAr ? "rtl" : "ltr"}>
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+      <ScrollReveal direction="up"><div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
         <div className="mb-2">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{isAr ? "المنشورات" : "Posts"}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">{isAr ? "شارك وأتفاعل مع مجتمع الخريجين" : "Share and interact with the alumni community"}</p>
@@ -760,6 +761,7 @@ export default function MediaPostsPage() {
         )}
       </div>
 
+      </ScrollReveal>
       {repostPost && member && (
         <RepostModal post={repostPost} member={member} lang={lang} onClose={() => setRepostPost(null)} onPost={handleNewPost} />
       )}

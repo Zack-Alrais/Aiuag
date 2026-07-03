@@ -9,6 +9,7 @@ import {
   Briefcase, Award, ChevronDown, ChevronUp, Users,
 } from "lucide-react"
 import { Avatar } from "@/components/ui/avatar"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -160,7 +161,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
       }
     } catch (err) {
       console.error("Upload failed:", err)
-      alert(isArabic ? "فشل رفع الصورة" : "Image upload failed")
+      toast.error(isArabic ? "فشل رفع الصورة" : "Image upload failed")
     } finally {
       if (target === "avatar") setUploadingAvatar(false)
       else setUploadingCard(false)
@@ -433,7 +434,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
                         <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="hidden"
                           onChange={async (e) => {
                             const file = e.target.files?.[0]; if (!file) return
-                            if (file.size > 5 * 1024 * 1024) { alert(isArabic ? "الحد الأقصى 5 ميجابايت" : "Max 5MB"); return }
+                            if (file.size > 5 * 1024 * 1024) { toast.warning(isArabic ? "الحد الأقصى 5 ميجابايت" : "Max 5MB"); return }
                             const fd = new FormData(); fd.append("file", file); fd.append("folder", "certificates")
                             try {
                               const res = await fetch("/api/upload", { method: "POST", body: fd })
@@ -443,7 +444,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
                               if (!url) throw new Error("No URL returned")
                               await fetch("/api/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ graduationCertificate: url }) })
                               setProfile((p) => p ? { ...p, graduationCertificate: url } : null)
-                            } catch { alert(isArabic ? "فشل الرفع" : "Upload failed") }
+                            } catch { toast.error(isArabic ? "فشل الرفع" : "Upload failed") }
                           }} />
                       </label>
                     </div>

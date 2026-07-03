@@ -1,5 +1,6 @@
 import { Phone, Mail, MapPin, Clock, ExternalLink } from "lucide-react";
 import HeroSection from "@/components/ui/hero-section";
+import ScrollReveal from "@/components/ui/scroll-reveal";
 import ContactForm from "@/components/ui/contact-form";
 
 const GOOGLE_MAPS_URL = "https://maps.app.goo.gl/5QYUhErRpQXMsdSY8";
@@ -27,7 +28,7 @@ export default async function ContactPage({ params }: { params: Promise<{ lang: 
       />
 
       {/* Contact Info Cards */}
-      <section className="py-16 bg-background">
+      <ScrollReveal direction="up"><section className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {contactInfo.map((info, i) => (
@@ -41,10 +42,10 @@ export default async function ContactPage({ params }: { params: Promise<{ lang: 
             ))}
           </div>
         </div>
-      </section>
+      </section></ScrollReveal>
 
       {/* Form + Map */}
-      <section className="py-20 bg-surface">
+      <ScrollReveal direction="up"><section className="py-20 bg-surface">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Form */}
@@ -96,7 +97,7 @@ export default async function ContactPage({ params }: { params: Promise<{ lang: 
             </div>
           </div>
         </div>
-      </section>
+        </section></ScrollReveal>
     </div>
   );
 }

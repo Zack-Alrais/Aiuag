@@ -1,11 +1,12 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
-import { useState, useEffect } from "react";
+import Link from "next/link"
+import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from "lucide-react"
+import { useState, useEffect } from "react"
+import { toast } from "sonner"
 
 interface FooterProps {
-  lang: string;
+  lang: string
 }
 
 interface SiteSettings {
@@ -14,18 +15,18 @@ interface SiteSettings {
 }
 
 export default function Footer({ lang }: FooterProps) {
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-  const [settings, setSettings] = useState<SiteSettings>({});
+  const [email, setEmail] = useState("")
+  const [subscribing, setSubscribing] = useState(false)
+  const [settings, setSettings] = useState<SiteSettings>({})
 
-  const isArabic = lang === "ar";
+  const isArabic = lang === "ar"
 
   useEffect(() => {
     fetch("/api/settings")
       .then((r) => r.json())
       .then((d) => { if (d.data) setSettings(d.data) })
       .catch(() => {})
-  }, []);
+  }, [])
 
   const quickLinks = [
     { label: isArabic ? "من نحن" : "About Us", href: `/${lang}/about` },
@@ -34,23 +35,37 @@ export default function Footer({ lang }: FooterProps) {
     { label: isArabic ? "الأخبار" : "News", href: `/${lang}/news` },
     { label: isArabic ? "الأحداث" : "Events", href: `/${lang}/events` },
     { label: isArabic ? "طلب عضوية" : "Membership", href: `/${lang}/membership/apply` },
-  ];
+  ]
 
   const servicesLinks = [
     { label: isArabic ? "خدمات الخريجين" : "Alumni Services", href: `/${lang}/services` },
     { label: isArabic ? "التطوع" : "Volunteer", href: `/${lang}/volunteer` },
     { label: isArabic ? "التبرعات" : "Donations", href: `/${lang}/donations` },
     { label: isArabic ? "المنشورات" : "Publications", href: `/${lang}/publications` },
-  ];
+  ]
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setEmail("");
-      setTimeout(() => setSubscribed(false), 3000);
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email) return
+    setSubscribing(true)
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
+      if (res.ok) {
+        toast.success(isArabic ? "تم الاشتراك بنجاح ✓" : "Subscribed successfully ✓")
+        setEmail("")
+      } else {
+        toast.error(isArabic ? "فشل الاشتراك" : "Subscription failed")
+      }
+    } catch {
+      toast.error(isArabic ? "حدث خطأ" : "An error occurred")
+    } finally {
+      setSubscribing(false)
     }
-  };
+  }
 
   return (
     <footer className="bg-dark text-white" dir={isArabic ? "rtl" : "ltr"}>
@@ -77,9 +92,10 @@ export default function Footer({ lang }: FooterProps) {
               />
               <button
                 type="submit"
-                className="px-6 py-3 bg-secondary text-white rounded-lg font-bold text-sm hover:bg-secondary/90 transition-colors me-0 md:me-2 mt-2 md:mt-0"
+                disabled={subscribing}
+                className="px-6 py-3 bg-secondary text-primary-dark rounded-lg font-bold text-sm hover:bg-secondary-light transition-colors me-0 md:me-2 mt-2 md:mt-0 disabled:opacity-50"
               >
-                {subscribed ? (isArabic ? "تم الاشتراك ✓" : "Subscribed ✓") : (isArabic ? "اشترك" : "Subscribe")}
+                {subscribing ? (isArabic ? "جاري..." : "Sending...") : (isArabic ? "اشترك" : "Subscribe")}
               </button>
             </form>
           </div>
@@ -132,18 +148,18 @@ export default function Footer({ lang }: FooterProps) {
               )}
               {!settings.social?.facebook && !settings.social?.twitter && !settings.social?.instagram && !settings.social?.youtube && (
                 <>
-                  <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors">
+                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center opacity-50">
                     <Facebook className="w-5 h-5" />
-                  </a>
-                  <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors">
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center opacity-50">
                     <Twitter className="w-5 h-5" />
-                  </a>
-                  <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors">
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center opacity-50">
                     <Instagram className="w-5 h-5" />
-                  </a>
-                  <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors">
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center opacity-50">
                     <Youtube className="w-5 h-5" />
-                  </a>
+                  </div>
                 </>
               )}
             </div>
@@ -234,5 +250,5 @@ export default function Footer({ lang }: FooterProps) {
         </div>
       </div>
     </footer>
-  );
+  )
 }

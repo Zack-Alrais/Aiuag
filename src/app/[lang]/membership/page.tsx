@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Users, Check, ArrowLeft, ArrowRight, Award, BookOpen, Briefcase, Globe, Heart, Shield } from "lucide-react";
+import ScrollReveal from "@/components/ui/scroll-reveal";
 import HeroSection from "@/components/ui/hero-section";
 
 export default async function MembershipPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -32,7 +33,7 @@ export default async function MembershipPage({ params }: { params: Promise<{ lan
       />
 
       {/* Benefits */}
-      <section className="py-20 bg-background">
+      <ScrollReveal direction="up"><section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
@@ -52,10 +53,10 @@ export default async function MembershipPage({ params }: { params: Promise<{ lan
             ))}
           </div>
         </div>
-      </section>
+      </section></ScrollReveal>
 
       {/* Pricing */}
-      <section className="py-20 bg-surface">
+      <ScrollReveal direction="up"><section className="py-20 bg-surface">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
@@ -94,10 +95,10 @@ export default async function MembershipPage({ params }: { params: Promise<{ lan
             ))}
           </div>
         </div>
-      </section>
+      </section></ScrollReveal>
 
       {/* CTA */}
-      <section className="py-20 bg-primary">
+      <ScrollReveal direction="up"><section className="py-20 bg-primary">
         <div className="container mx-auto px-4 text-center">
           <Heart className="w-12 h-12 text-secondary mx-auto mb-6" />
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -114,7 +115,7 @@ export default async function MembershipPage({ params }: { params: Promise<{ lan
             {isArabic ? <ArrowLeft className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
           </Link>
         </div>
-      </section>
+        </section></ScrollReveal>
     </div>
   );
 }
