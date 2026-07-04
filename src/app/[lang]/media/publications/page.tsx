@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 import HeroSection from "@/components/ui/hero-section";
 import PublicationsFeedClient from "./feed-client";
 import { FileText } from "lucide-react";
@@ -14,6 +15,16 @@ export default async function PublicationsPage({ params }: Props) {
   const { lang } = await params;
   const isArabic = lang === "ar";
   const dir = isArabic ? "rtl" : "ltr";
+
+  const session = await auth();
+  let currentMemberId: string | null = null;
+  if (session?.user?.email) {
+    const member = await prisma.member.findFirst({
+      where: { user: { email: session.user.email } },
+      select: { id: true },
+    });
+    if (member) currentMemberId = member.id;
+  }
 
   const [posts, publications, news, events] = await Promise.all([
     prisma.post.findMany({
@@ -184,6 +195,7 @@ export default async function PublicationsPage({ params }: Props) {
         events={serializedEvents}
         isArabic={isArabic}
         lang={lang}
+        currentMemberId={currentMemberId}
       />
     </div>
   );

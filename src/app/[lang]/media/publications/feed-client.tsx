@@ -48,11 +48,11 @@ const REACTIONS = [
 type Tab = "feed" | "reports" | "publications" | "news" | "events"
 
 export default function PublicationsFeedClient({
-  initialPosts, reports, publications, news, events, isArabic, lang,
+  initialPosts, reports, publications, news, events, isArabic, lang, currentMemberId,
 }: {
   initialPosts: Post[]; reports: Publication[]; publications: Publication[]
   news: NewsItem[]; events: EventItem[]
-  isArabic: boolean; lang: string
+  isArabic: boolean; lang: string; currentMemberId?: string | null
 }) {
   const [activeTab, setActiveTab] = useState<Tab>("feed")
   const [posts, setPosts] = useState<Post[]>(initialPosts)
@@ -109,13 +109,13 @@ export default function PublicationsFeedClient({
   }, [page, loadingMore, hasMore])
 
   const handleCreatePost = async () => {
-    if (!newPostContent.trim()) return
+    if (!newPostContent.trim() || !currentMemberId) return
     setPosting(true)
     try {
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: newPostContent.trim() }),
+        body: JSON.stringify({ content: newPostContent.trim(), authorId: currentMemberId }),
       })
       if (res.ok) {
         const post = await res.json()
@@ -129,12 +129,13 @@ export default function PublicationsFeedClient({
   }
 
   const handleReact = async (postId: string, type: string) => {
+    if (!currentMemberId) return
     setReactingPost(postId)
     try {
       const res = await fetch(`/api/posts/${postId}/react`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type }),
+        body: JSON.stringify({ type, memberId: currentMemberId }),
       })
       if (res.ok) {
         const reactions = await res.json()
@@ -171,13 +172,13 @@ export default function PublicationsFeedClient({
 
   const handleComment = async (postId: string) => {
     const text = commentText[postId]?.trim()
-    if (!text) return
+    if (!text || !currentMemberId) return
     setSubmittingComment(postId)
     try {
       const res = await fetch(`/api/posts/${postId}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: text }),
+        body: JSON.stringify({ content: text, memberId: currentMemberId }),
       })
       if (res.ok) {
         const comment = await res.json()
@@ -201,7 +202,7 @@ export default function PublicationsFeedClient({
   }
 
   const tabs: { key: Tab; label: string; icon: typeof FileText; count: number; color: string }[] = [
-    { key: "feed", label: isArabic ? "ال_Thread" : "Feed", icon: Megaphone, count: posts.length, color: "text-blue-600" },
+    { key: "feed", label: isArabic ? "التفاعل" : "Feed", icon: Megaphone, count: posts.length, color: "text-blue-600" },
     { key: "reports", label: isArabic ? "التقارير" : "Reports", icon: BarChart3, count: reports.length, color: "text-emerald-600" },
     { key: "publications", label: isArabic ? "المنشورات" : "Publications", icon: BookOpen, count: publications.length, color: "text-amber-600" },
     { key: "news", label: isArabic ? "الأخبار" : "News", icon: Newspaper, count: news.length, color: "text-purple-600" },
