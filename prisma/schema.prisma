@@ -628,6 +628,7 @@ model Post {
   originalPostId String?  // for reposts
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  editedAt       DateTime?
 
   comments       PostComment[]
   reactions      PostReaction[]
@@ -644,10 +645,15 @@ model PostComment {
   memberId   String
   content    String
   isApproved Boolean  @default(false)
+  parentId   String?  // for replies
+  parent     PostComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies    PostComment[] @relation("CommentReplies")
   createdAt  DateTime @default(now())
+  editedAt   DateTime?
 
   @@index([postId])
   @@index([memberId])
+  @@index([parentId])
 }
 
 model PostReaction {

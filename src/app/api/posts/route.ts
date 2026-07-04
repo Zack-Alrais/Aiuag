@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
     const skip = (page - 1) * limit;
+    const memberId = searchParams.get("memberId");
 
     const [posts, total] = await Promise.all([
       prisma.post.findMany({
@@ -54,8 +55,10 @@ export async function GET(request: NextRequest) {
     const enriched = posts.map((post) => {
       const author = post.authorId ? authorMap.get(post.authorId) : null;
       const reactionSummary: Record<string, number> = {};
+      let myReaction: string | null = null;
       post.reactions.forEach((r) => {
         reactionSummary[r.type] = (reactionSummary[r.type] || 0) + 1;
+        if (memberId && r.memberId === memberId) myReaction = r.type;
       });
       return {
         ...post,
@@ -63,6 +66,7 @@ export async function GET(request: NextRequest) {
           ? { id: null, name: author.name, image: author.image }
           : null,
         reactionSummary,
+        myReaction,
         reactions: undefined,
         originalPost: post.originalPostId
           ? (() => {
@@ -156,6 +160,7 @@ export async function POST(request: NextRequest) {
       author: { id: null, name: member.user.name, image: member.user.image },
       _count: { comments: 0, reactions: 0, shares: 0 },
       reactionSummary: {},
+      myReaction: null,
       originalPost: null,
     }, { status: 201 });
   } catch (error) {
