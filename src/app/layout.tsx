@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Cairo } from 'next/font/google';
 import AuthProvider from '@/components/auth/provider';
 import ToasterProvider from '@/components/ui/toaster-provider';
+import LanguageSync from '@/components/ui/language-sync';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -27,6 +28,7 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" className={cairo.className}>
       <body className="antialiased">
         <AuthProvider>
+          <LanguageSync />
           {children}
           <ToasterProvider />
         </AuthProvider>

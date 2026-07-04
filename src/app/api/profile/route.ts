@@ -13,14 +13,17 @@ export async function GET() {
       console.error("Auth error:", authError);
       return NextResponse.json({ error: "Auth failed", detail: String(authError) }, { status: 401 });
     }
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized", detail: "No user id in session" }, { status: 401 });
+    if (!session?.user?.id && !session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized", detail: "No user id or email in session" }, { status: 401 });
     }
 
     let user;
     try {
+      const where = session.user.id
+        ? { id: session.user.id }
+        : { email: session.user.email! };
       user = await prisma.user.findUnique({
-        where: { id: session.user.id },
+        where,
         include: { member: true },
       });
     } catch (dbError) {
@@ -80,10 +83,20 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    let session;
+    try {
+      session = await auth();
+    } catch (authError) {
+      console.error("Auth error (PATCH):", authError);
+      return NextResponse.json({ error: "Auth failed" }, { status: 401 });
+    }
+    if (!session?.user?.id && !session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const where = session.user?.id
+      ? { id: session.user.id }
+      : { email: session.user.email! };
 
     const body = await request.json();
 
@@ -93,7 +106,7 @@ export async function PATCH(request: Request) {
     if (name !== undefined) userUpdate.name = stripHtml(name);
     if (image !== undefined) userUpdate.image = image;
     if (Object.keys(userUpdate).length > 0) {
-      await prisma.user.update({ where: { id: session.user.id }, data: userUpdate });
+      await prisma.user.update({ where, data: userUpdate });
     }
 
     // Fields that go to Member model
@@ -114,23 +127,26 @@ export async function PATCH(request: Request) {
     }
 
     if (Object.keys(memberUpdate).length > 0) {
-      const existing = await prisma.member.findUnique({ where: { userId: session.user.id } });
-      if (existing) {
-        await prisma.member.update({ where: { userId: session.user.id }, data: memberUpdate });
-      } else {
-        await prisma.member.create({
-          data: {
-            userId: session.user.id,
-            membershipNumber: await generateMembershipNumber(),
-            ...memberUpdate as any,
-          },
-        });
+      const resolvedUser = await prisma.user.findUnique({ where, select: { id: true } });
+      if (resolvedUser) {
+        const existing = await prisma.member.findUnique({ where: { userId: resolvedUser.id } });
+        if (existing) {
+          await prisma.member.update({ where: { userId: resolvedUser.id }, data: memberUpdate });
+        } else {
+          await prisma.member.create({
+            data: {
+              userId: resolvedUser.id,
+              membershipNumber: await generateMembershipNumber(),
+              ...memberUpdate as any,
+            },
+          });
+        }
       }
     }
 
     // Return updated profile
     const updatedUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where,
       include: { member: true },
     });
 

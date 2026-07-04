@@ -6,8 +6,14 @@ import { isStrongPassword } from "@/lib/sanitize";
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    let session;
+    try {
+      session = await auth();
+    } catch (authError) {
+      console.error("Auth error (password):", authError);
+      return NextResponse.json({ error: "Auth failed" }, { status: 401 });
+    }
+    if (!session?.user?.id && !session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -28,8 +34,12 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    const where = session.user?.id
+      ? { id: session.user.id }
+      : { email: session.user.email! };
+
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where,
       select: { password: true },
     });
 
@@ -48,7 +58,7 @@ export async function PUT(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(newPassword, 12);
 
     await prisma.user.update({
-      where: { id: session.user.id },
+      where,
       data: { password: hashedPassword },
     });
 
