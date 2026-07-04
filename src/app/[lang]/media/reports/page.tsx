@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { FileText, Download, Calendar, BarChart3, Activity, Building2 } from "lucide-react"
 import { useParams } from "next/navigation"
-import HeroSection from "@/components/ui/hero-section"
+import HeroSection from "@/components/ui/hero-section-client"
 
 interface Report {
   id: string

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Search, HelpCircle, Users, Calendar, Heart, Briefcase } from "lucide-react";
-import HeroSection from "@/components/ui/hero-section";
+import HeroSection from "@/components/ui/hero-section-client";
 
 export default function FaqPage({ params }: { params: Promise<{ lang: string }> }) {
   const [lang, setLang] = useState("ar");

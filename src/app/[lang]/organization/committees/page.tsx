@@ -18,7 +18,7 @@ import {
   ArrowRight,
   ArrowLeft,
 } from "lucide-react";
-import HeroSection from "@/components/ui/hero-section";
+import HeroSection from "@/components/ui/hero-section-client";
 
 const committeeIcons = [Users, Calendar, FolderOpen, Newspaper, BarChart3, BookOpen, Rocket];
 const committeeColors = [

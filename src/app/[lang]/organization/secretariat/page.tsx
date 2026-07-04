@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import {
   Building2, Mail, Phone, User, ChevronDown, ChevronUp, Loader2, Crown, Shield, Users
 } from "lucide-react"
-import HeroSection from "@/components/ui/hero-section"
+import HeroSection from "@/components/ui/hero-section-client"
 
 interface Member {
   id: string

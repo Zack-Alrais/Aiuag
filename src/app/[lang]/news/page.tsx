@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Calendar, Search, ChevronLeft, ChevronRight, ArrowLeft, ArrowRight, Tag } from "lucide-react";
 import Link from "next/link";
 import ScrollReveal from "@/components/ui/scroll-reveal";
-import HeroSection from "@/components/ui/hero-section";
+import HeroSection from "@/components/ui/hero-section-client";
 
 export default function NewsPage({ params }: { params: Promise<{ lang: string }> }) {
   const [newsItems, setNewsItems] = useState<any[]>([]);

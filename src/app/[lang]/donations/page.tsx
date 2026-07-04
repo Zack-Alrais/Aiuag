@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react"
 import { useParams } from "next/navigation"
 import { Heart, CreditCard, Loader2, CheckCircle, AlertCircle, Smartphone, Building, Shield } from "lucide-react"
-import HeroSection from "@/components/ui/hero-section"
+import HeroSection from "@/components/ui/hero-section-client"
 import {
   Currency,
   PaymentGateway,

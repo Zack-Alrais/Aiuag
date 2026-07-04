@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Handshake, Building2, Heart, Star, ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import HeroSection from "@/components/ui/hero-section";
+import HeroSection from "@/components/ui/hero-section-client";
 
 interface Partner {
   id: string | number;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { FileText, Download, Calendar, Search, Filter, Loader2 } from "lucide-react"
-import HeroSection from "@/components/ui/hero-section"
+import HeroSection from "@/components/ui/hero-section-client"
 
 interface Publication {
   id: string

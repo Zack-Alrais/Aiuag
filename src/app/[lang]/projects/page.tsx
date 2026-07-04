@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { FolderOpen, Calendar, ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Clock, Users, Image } from "lucide-react";
 import Link from "next/link";
 import ScrollReveal from "@/components/ui/scroll-reveal";
-import HeroSection from "@/components/ui/hero-section";
+import HeroSection from "@/components/ui/hero-section-client";
 
 export default function ProjectsPage() {
   const params = useParams();

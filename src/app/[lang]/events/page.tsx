@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Calendar, Clock, MapPin, ChevronLeft, ChevronRight, Users, Filter } from "lucide-react";
 import Link from "next/link";
 import ScrollReveal from "@/components/ui/scroll-reveal";
-import HeroSection from "@/components/ui/hero-section";
+import HeroSection from "@/components/ui/hero-section-client";
 
 export default function EventsPage({ params }: { params: Promise<{ lang: string }> }) {
   const [events, setEvents] = useState<any[]>([]);
