@@ -99,9 +99,10 @@ function NewsCard({ item, lang, isArabic }: { item: any; lang: string; isArabic:
 }
 
 function EventCard({ event, lang, isArabic }: { event: any; lang: string; isArabic: boolean }) {
-  const getMonthDay = (date: Date) => {
-    const d = date.getDate().toString().padStart(2, "0")
-    const m = date.toLocaleDateString(isArabic ? "ar" : "en", { month: "short" })
+  const getMonthDay = (date: Date | string) => {
+    const d2 = new Date(date)
+    const d = d2.getDate().toString().padStart(2, "0")
+    const m = d2.toLocaleDateString(isArabic ? "ar" : "en", { month: "short" })
     return { day: d, month: m }
   }
   const getStatusLabel = (status: string) => {
