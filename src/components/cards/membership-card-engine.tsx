@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useCallback, useState } from "react"
+import { useRef, useCallback, useState, useEffect, useMemo } from "react"
 import { QRCodeSVG } from "qrcode.react"
 import { Download, Printer, RotateCcw } from "lucide-react"
 
@@ -36,14 +36,53 @@ export function MembershipCardEngine({
   showBoth = false,
 }: Props) {
   const cardRef = useRef<HTMLDivElement>(null)
+  const barcodeRef = useRef<SVGSVGElement>(null)
   const [flipped, setFlipped] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
 
   const origin = typeof window !== "undefined" ? window.location.origin : ""
   const verificationUrl = `${origin}/ar/verify?id=${member.membershipNumber}`
   const joinDate = member.joinDate || new Date().toLocaleDateString("en-GB")
-  const expiryDate = member.expiryDate || ""
   const photoUrl = member.photo || ""
+
+  const expiryDate = useMemo(() => {
+    if (member.expiryDate) return member.expiryDate
+    const parts = joinDate.split("/")
+    if (parts.length === 3) {
+      const d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`)
+      d.setFullYear(d.getFullYear() + 2)
+      return d.toLocaleDateString("en-GB")
+    }
+    return ""
+  }, [member.expiryDate, joinDate])
+
+  const showBack = flipped || showBoth
+
+  useEffect(() => {
+    if (!showBack || !barcodeRef.current || typeof window === "undefined") return
+    let cancelled = false
+    import("jsbarcode").then((mod) => {
+      if (cancelled) return
+      const JsBarcode = (mod.default || mod) as typeof import("jsbarcode")
+      try {
+        JsBarcode(barcodeRef.current!, member.membershipNumber, {
+          format: "CODE128",
+          width: 2,
+          height: 40,
+          displayValue: true,
+          fontSize: 11,
+          margin: 0,
+          background: "#ffffff",
+          lineColor: "#000000",
+        })
+      } catch {
+        /* barcode might already be drawn */
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [showBack, member.membershipNumber])
 
   const handleDownload = useCallback(async () => {
     if (typeof window === "undefined") return
@@ -112,14 +151,19 @@ export function MembershipCardEngine({
       >
         {(!flipped || showBoth) && (
           <div
-            className="bg-white rounded-xl overflow-hidden"
             style={{
               width: "450px",
               height: "280px",
+              borderRadius: "12px",
               boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
               border: "1px solid #ddd",
               fontFamily: "'Cairo', sans-serif",
               direction: "rtl",
+              backgroundColor: "#ffffff",
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+              position: "relative",
             }}
           >
             {/* Front Header */}
@@ -132,10 +176,10 @@ export function MembershipCardEngine({
                 margin: "0 20px",
               }}
             >
-              <div style={{ margin: 0, fontSize: "15px", fontWeight: 700 }}>
+              <div style={{ fontSize: "15px", fontWeight: 700 }}>
                 رابطة خريجي جامعة إفريقيا العالمية
               </div>
-              <div style={{ margin: 0, fontSize: "11px", fontWeight: 600 }}>
+              <div style={{ fontSize: "11px", fontWeight: 600 }}>
                 Graduates IUA Association
               </div>
             </div>
@@ -144,8 +188,8 @@ export function MembershipCardEngine({
             <div
               style={{
                 display: "flex",
+                flex: 1,
                 padding: "8px 20px",
-                height: "180px",
               }}
             >
               {/* Photo */}
@@ -216,27 +260,25 @@ export function MembershipCardEngine({
                 <DataRow label="تاريخ الانضمام:" value={joinDate} />
               </div>
 
-              {/* QR Code & Watermark Logo */}
+              {/* QR Code + Watermark Logo */}
               <div
                 style={{
                   width: "25%",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  justifyContent: "flex-start",
-                  paddingTop: "12px",
                   position: "relative",
                 }}
               >
-                {/* Watermark logo */}
+                {/* Watermark logo - bigger & more visible */}
                 <div
                   style={{
                     position: "absolute",
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    width: "110px",
-                    opacity: 0.15,
+                    width: "140px",
+                    opacity: 0.25,
                     zIndex: 0,
                   }}
                 >
@@ -246,8 +288,16 @@ export function MembershipCardEngine({
                     style={{ width: "100%", height: "auto" }}
                   />
                 </div>
-                {/* QR Code */}
-                <div style={{ zIndex: 1, width: "75px", height: "75px" }}>
+                {/* QR Code pushed to bottom */}
+                <div
+                  style={{
+                    zIndex: 1,
+                    width: "75px",
+                    height: "75px",
+                    marginTop: "auto",
+                    marginBottom: "4px",
+                  }}
+                >
                   <QRCodeSVG
                     value={verificationUrl}
                     size={75}
@@ -259,6 +309,14 @@ export function MembershipCardEngine({
               </div>
             </div>
 
+            {/* Colored decorative bar */}
+            <div
+              style={{
+                height: "5px",
+                background: "linear-gradient(to right, #D4A843, #1A3A6B, #D4A843, #1A3A6B, #D4A843)",
+              }}
+            />
+
             {/* Front Footer */}
             <div
               style={{
@@ -267,9 +325,6 @@ export function MembershipCardEngine({
                 textAlign: "center",
                 padding: "6px",
                 fontSize: "10px",
-                position: "absolute",
-                bottom: 0,
-                width: "100%",
               }}
             >
               معاً من أجل تعليم متميز وتنمية مستدامة في إفريقيا
@@ -279,14 +334,18 @@ export function MembershipCardEngine({
 
         {(flipped || showBoth) && (
           <div
-            className="bg-white rounded-xl overflow-hidden"
             style={{
               width: "450px",
               height: "280px",
+              borderRadius: "12px",
               boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
               border: "1px solid #ddd",
               fontFamily: "'Cairo', sans-serif",
               direction: "rtl",
+              backgroundColor: "#ffffff",
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
               marginTop: showBoth ? "16px" : 0,
             }}
           >
@@ -296,16 +355,16 @@ export function MembershipCardEngine({
                 backgroundColor: "#3d85c6",
                 color: "white",
                 textAlign: "center",
-                padding: "8px",
-                borderBottomLeftRadius: "20px",
-                borderBottomRightRadius: "20px",
+                padding: "8px 0",
                 margin: "0 20px",
+                borderBottomLeftRadius: "16px",
+                borderBottomRightRadius: "16px",
               }}
             >
-              <div style={{ margin: 0, fontSize: "14px", fontWeight: 700 }}>
+              <div style={{ fontSize: "14px", fontWeight: 700 }}>
                 رابطة خريجي جامعة إفريقيا العالمية
               </div>
-              <div style={{ margin: 0, fontSize: "10px" }}>
+              <div style={{ fontSize: "10px" }}>
                 Graduates IUA Association
               </div>
             </div>
@@ -314,7 +373,8 @@ export function MembershipCardEngine({
             <div
               style={{
                 display: "flex",
-                padding: "12px 20px",
+                flex: 1,
+                padding: "10px 20px",
                 justifyContent: "space-between",
               }}
             >
@@ -324,6 +384,9 @@ export function MembershipCardEngine({
                   width: "48%",
                   paddingLeft: "10px",
                   borderLeft: "1px solid #ccc",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
                 }}
               >
                 <ul
@@ -348,10 +411,11 @@ export function MembershipCardEngine({
                   width: "30%",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "10px",
+                  gap: "8px",
                   color: "#073763",
                   fontWeight: 600,
                   fontSize: "11px",
+                  justifyContent: "center",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -381,7 +445,14 @@ export function MembershipCardEngine({
               </div>
 
               {/* Logo */}
-              <div style={{ width: "18%", textAlign: "center" }}>
+              <div
+                style={{
+                  width: "18%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <img
                   src="/uploads/شعار الرابطة.jpg"
                   alt="الشعار"
@@ -390,32 +461,36 @@ export function MembershipCardEngine({
               </div>
             </div>
 
-            {/* Back Footer */}
+            {/* Colored decorative bar (same as front) */}
+            <div
+              style={{
+                height: "5px",
+                background: "linear-gradient(to right, #D4A843, #1A3A6B, #D4A843, #1A3A6B, #D4A843)",
+              }}
+            />
+
+            {/* Back Footer (same size as front) */}
             <div
               style={{
                 backgroundColor: "#073763",
                 color: "white",
-                position: "absolute",
-                bottom: 0,
-                width: "100%",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "6px 20px",
-                boxSizing: "border-box",
               }}
             >
               <div
                 style={{
                   backgroundColor: "white",
-                  padding: "2px",
+                  padding: "2px 4px",
                   borderRadius: "4px",
-                  height: "30px",
+                  height: "36px",
                   display: "flex",
                   alignItems: "center",
                 }}
               >
-                <svg id="barcode" style={{ height: "26px" }} />
+                <svg ref={barcodeRef} style={{ height: "32px" }} />
               </div>
               <div
                 style={{
