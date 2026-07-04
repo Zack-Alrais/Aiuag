@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import {
@@ -84,16 +84,21 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
 
   useEffect(() => { params.then((p) => setLang(p.lang)) }, [params])
 
+  const fetchedRef = useRef(false)
+
   useEffect(() => {
     if (status === "unauthenticated") router.push("/auth/login")
   }, [status, router])
 
   useEffect(() => {
-    if (session?.user?.id) fetchProfile()
-    else if (status === "authenticated" && !session?.user?.id) {
+    if (status === "loading") return
+    if (session?.user?.id && !fetchedRef.current) {
+      fetchedRef.current = true
+      fetchProfile()
+    } else if (status === "authenticated" && !session?.user?.id) {
       router.push("/auth/login")
     }
-  }, [session, status, fetchProfile, router])
+  }, [session, status, router])
 
   const fetchProfile = useCallback(async () => {
     try {
