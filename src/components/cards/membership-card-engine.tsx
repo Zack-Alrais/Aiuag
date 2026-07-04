@@ -151,6 +151,7 @@ export function MembershipCardEngine({
       >
         {(!flipped || showBoth) && (
           <div
+            onClick={() => { if (!showBoth) setFlipped(true) }}
             style={{
               width: "450px",
               height: "280px",
@@ -164,6 +165,7 @@ export function MembershipCardEngine({
               display: "flex",
               flexDirection: "column",
               position: "relative",
+              cursor: showBoth ? "default" : "pointer",
             }}
           >
             {/* Front Header */}
@@ -334,6 +336,7 @@ export function MembershipCardEngine({
 
         {(flipped || showBoth) && (
           <div
+            onClick={() => { if (!showBoth) setFlipped(false) }}
             style={{
               width: "450px",
               height: "280px",
@@ -347,6 +350,7 @@ export function MembershipCardEngine({
               display: "flex",
               flexDirection: "column",
               marginTop: showBoth ? "16px" : 0,
+              cursor: showBoth ? "default" : "pointer",
             }}
           >
             {/* Back Header */}
@@ -513,7 +517,7 @@ export function MembershipCardEngine({
       <div className="flex gap-2 flex-wrap justify-center no-print">
         {showFlip && !showBoth && (
           <button
-            onClick={() => setFlipped(!flipped)}
+            onClick={(e) => { e.stopPropagation(); setFlipped(!flipped) }}
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary text-primary text-sm font-medium hover:bg-primary/5 transition-colors"
           >
             <RotateCcw className="w-4 h-4" />
@@ -523,7 +527,7 @@ export function MembershipCardEngine({
         {showDownload && (
           <>
             <button
-              onClick={handleDownload}
+              onClick={(e) => { e.stopPropagation(); handleDownload() }}
               disabled={isExporting}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-60"
             >
@@ -531,7 +535,7 @@ export function MembershipCardEngine({
               {isExporting ? "...جاري التحميل" : "تحميل PNG"}
             </button>
             <button
-              onClick={handlePrint}
+              onClick={(e) => { e.stopPropagation(); handlePrint() }}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-primary-dark text-sm font-medium hover:bg-secondary-light transition-colors"
             >
               <Printer className="w-4 h-4" />
