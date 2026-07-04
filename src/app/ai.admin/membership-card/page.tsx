@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { Printer, Loader2, CreditCard } from "lucide-react"
-import MembershipCard from "@/components/ui/membership-card"
+import { MembershipCardEngine } from "@/components/cards/membership-card-engine"
 
 interface MemberData {
   nameAr: string
@@ -106,8 +106,21 @@ function MembershipCardContent() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-        <MembershipCard member={member} showDownload />
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex justify-center">
+        <MembershipCardEngine
+          member={{
+            id: "",
+            nameAr: member.nameAr,
+            nameEn: member.nameEn,
+            membershipNumber: member.membershipNumber,
+            memberType: member.memberType,
+            photo: member.photo,
+            joinDate: member.issueDate,
+          }}
+          showDownload
+          showBoth
+          size="lg"
+        />
       </div>
 
       <style jsx global>{`
