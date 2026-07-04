@@ -1,10 +1,17 @@
 import Link from "next/link"
-import { Users, Calendar, FolderOpen, Award, ArrowLeft, ArrowRight, Heart, BookOpen, MapPin, Phone, Mail, ChevronLeft, ChevronRight, Clock, Star } from "lucide-react"
+import { ArrowLeft, ArrowRight } from "lucide-react"
 import HeroSection from "@/components/ui/hero-section"
 import prisma from "@/lib/prisma"
 import HomeClient from "./home-client"
 
 export const dynamic = "force-dynamic"
+
+interface StatDef {
+  icon: string
+  value: number
+  label: string
+  suffix?: string
+}
 
 interface HomeProps {
   params: Promise<{ lang: string }>
@@ -43,11 +50,11 @@ export default async function HomePage({ params }: HomeProps) {
     prisma.project.count().catch(() => 0),
   ])
 
-  const stats = [
-    { icon: Users, value: memberCount || 2500, label: isArabic ? "عضو مسجل" : "Registered Members" },
-    { icon: Calendar, value: eventCount || 50, label: isArabic ? "حدث وفعالية" : "Events & Activities" },
-    { icon: FolderOpen, value: projectCount || 100, label: isArabic ? "مشروع تنفيذي" : "Implemented Projects" },
-    { icon: Award, value: 10, label: isArabic ? "سنوات من العطاء" : "Years of Giving", suffix: "+" },
+  const stats: StatDef[] = [
+    { icon: "Users", value: memberCount || 2500, label: isArabic ? "عضو مسجل" : "Registered Members" },
+    { icon: "Calendar", value: eventCount || 50, label: isArabic ? "حدث وفعالية" : "Events & Activities" },
+    { icon: "FolderOpen", value: projectCount || 100, label: isArabic ? "مشروع تنفيذي" : "Implemented Projects" },
+    { icon: "Award", value: 10, label: isArabic ? "سنوات من العطاء" : "Years of Giving", suffix: "+" },
   ]
 
   const sections = [
@@ -105,10 +112,6 @@ export default async function HomePage({ params }: HomeProps) {
         stats={stats}
         sections={sections}
         galleryImages={galleryImages}
-        formatDate={(d: Date | null | undefined) => {
-          if (!d) return ""
-          return d.toLocaleDateString(isArabic ? "ar" : "en", { year: "numeric", month: "long", day: "numeric" })
-        }}
       />
     </div>
   )

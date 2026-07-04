@@ -9,10 +9,19 @@ import { Users, Calendar, FolderOpen, Award, ArrowLeft, ArrowRight, Heart, Chevr
 import ScrollReveal from "@/components/ui/scroll-reveal"
 import { staggerContainer, staggerItem } from "@/components/ui/motion"
 
+function formatDate(d: Date | null | undefined, locale: string): string {
+  if (!d) return ""
+  return new Date(d).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })
+}
+
+const iconMap: Record<string, React.ElementType> = {
+  Users, Calendar, FolderOpen, Award,
+}
+
 interface HomeClientProps {
   lang: string
   isArabic: boolean
-  stats: { icon: React.ElementType; value: number; label: string; suffix?: string }[]
+  stats: { icon: string; value: number; label: string; suffix?: string }[]
   sections: {
     key: string
     title: string
@@ -20,10 +29,10 @@ interface HomeClientProps {
     href: string
   }[]
   galleryImages: any[]
-  formatDate: (d: Date | null | undefined) => string
 }
 
-function StatCard({ icon: Icon, value, label, suffix = "+", index }: { icon: React.ElementType; value: number; label: string; suffix?: string; index: number }) {
+function StatCard({ icon, value, label, suffix = "+", index }: { icon: string; value: number; label: string; suffix?: string; index: number }) {
+  const Icon = iconMap[icon]
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true })
 
@@ -54,7 +63,7 @@ function StatCard({ icon: Icon, value, label, suffix = "+", index }: { icon: Rea
   )
 }
 
-function NewsCard({ item, lang, isArabic, formatDate }: { item: any; lang: string; isArabic: boolean; formatDate: (d: Date | null | undefined) => string }) {
+function NewsCard({ item, lang, isArabic }: { item: any; lang: string; isArabic: boolean }) {
   return (
     <motion.article variants={staggerItem} className="bg-surface dark:bg-dark-card rounded-2xl overflow-hidden shadow-soft hover:shadow-card-hover transition-all duration-300 group border border-gray-100 dark:border-dark-border">
       <motion.div className="h-48 bg-gradient-to-br from-primary to-primary-light relative overflow-hidden" whileHover={{ scale: 1.05 }} transition={{ duration: 0.4 }}>
@@ -69,7 +78,7 @@ function NewsCard({ item, lang, isArabic, formatDate }: { item: any; lang: strin
       <div className="p-6">
         <div className="flex items-center gap-2 text-text-secondary dark:text-gray-400 text-sm mb-3">
           <Calendar className="w-4 h-4" />
-          <span>{formatDate(item.publishedAt || item.createdAt)}</span>
+          <span>{formatDate(item.publishedAt || item.createdAt, isArabic ? "ar" : "en")}</span>
         </div>
         <h3 className="text-lg font-bold text-text dark:text-white mb-2 group-hover:text-primary dark:group-hover:text-primary-light transition-colors line-clamp-2">
           {isArabic ? item.titleAr : item.titleEn}
@@ -165,7 +174,7 @@ function ProjectCard({ project, lang, isArabic }: { project: any; lang: string; 
   )
 }
 
-export default function HomeClient({ lang, isArabic, stats, sections, galleryImages, formatDate }: HomeClientProps) {
+export default function HomeClient({ lang, isArabic, stats, sections, galleryImages }: HomeClientProps) {
   return (
     <>
       {/* Statistics Section */}
@@ -205,7 +214,7 @@ export default function HomeClient({ lang, isArabic, stats, sections, galleryIma
                 }`}
               >
                 {section.key === "news" && section.items.map((item: any) => (
-                  <NewsCard key={item.id} item={item} lang={lang} isArabic={isArabic} formatDate={formatDate} />
+                  <NewsCard key={item.id} item={item} lang={lang} isArabic={isArabic} />
                 ))}
                 {section.key === "events" && section.items.map((event: any) => (
                   <EventCard key={event.id} event={event} lang={lang} isArabic={isArabic} />
@@ -253,7 +262,7 @@ export default function HomeClient({ lang, isArabic, stats, sections, galleryIma
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="absolute bottom-0 inset-x-0 p-3 text-white opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 transition-all">
                       <p className="text-xs font-bold truncate">{image.title}</p>
-                      <p className="text-[10px] text-white/70">{formatDate(image.createdAt)}</p>
+                      <p className="text-[10px] text-white/70">{formatDate(image.createdAt, isArabic ? "ar" : "en")}</p>
                     </div>
                   </motion.div>
                 ))}
