@@ -86,10 +86,10 @@ export default async function PublicationsPage({ params }: Props) {
   const authors = authorIds.length
     ? await prisma.member.findMany({
         where: { id: { in: authorIds } },
-        select: { id: true, user: { select: { name: true, nameEn: true, image: true } } },
+        select: { id: true, nameEn: true, user: { select: { name: true, image: true } } },
       })
     : [];
-  const authorMap = new Map(authors.map((a) => [a.id, a.user]));
+  const authorMap = new Map(authors.map((a) => [a.id, { name: a.user?.name, nameEn: a.nameEn, image: a.user?.image }]));
 
   const serializedPosts = posts.map((post) => {
     const author = post.authorId ? authorMap.get(post.authorId) : null;
