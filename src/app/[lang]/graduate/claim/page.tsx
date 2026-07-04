@@ -104,7 +104,7 @@ export default function ClaimGraduatePage() {
   if (step === "done") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 relative">
-        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/uploads/Form_Back.png')", filter: "blur(2px)", opacity: 0.3 }} />
+        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${ASSETS.formBack}')`, filter: "blur(2px)", opacity: 0.3 }} />
         <div className="absolute inset-0 bg-gradient-to-br from-[#0f2547]/80 via-[#1A3A6B]/70 to-[#0f2547]/80" />
         <div className="w-full max-w-md relative z-10">
           <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
@@ -131,12 +131,12 @@ export default function ClaimGraduatePage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative">
-      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/uploads/Form_Back.png')", filter: "blur(2px)", opacity: 0.3 }} />
+      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${ASSETS.formBack}')`, filter: "blur(2px)", opacity: 0.3 }} />
       <div className="absolute inset-0 bg-gradient-to-br from-[#0f2547]/80 via-[#1A3A6B]/70 to-[#0f2547]/80" />
       <div className="w-full max-w-lg relative z-10">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           <div className="relative bg-gradient-to-r from-[#0f2547] to-[#1A3A6B] p-8 text-center overflow-hidden">
-            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/uploads/Form_Head.png')", opacity: 0.35 }} />
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${ASSETS.formHead}')`, opacity: 0.35 }} />
             <div className="relative z-10">
               <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <img src={ASSETS.logo} alt="Logo" className="w-12 h-12 rounded-lg object-cover" />

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Mail, Loader2, CheckCircle, AlertCircle, ArrowRight, RotateCcw } from "lucide-react"
+import { ASSETS } from "@/lib/assets"
 
 function VerifyContent() {
   const router = useRouter()
@@ -147,7 +148,7 @@ function VerifyContent() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('/uploads/Form_Back.png')",
+          backgroundImage: `url('${ASSETS.formBack}')`,
           filter: "blur(2px)",
           opacity: 0.3,
         }}
@@ -160,7 +161,7 @@ function VerifyContent() {
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{
-                backgroundImage: "url('/uploads/Form_Head.png')",
+                backgroundImage: `url('${ASSETS.formHead}')`,
                 opacity: 0.35,
               }}
             />

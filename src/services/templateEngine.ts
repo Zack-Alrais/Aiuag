@@ -61,7 +61,7 @@ class TemplateEngineClass {
     return `
 <div style="position:relative;width:${CANVAS_W}px;height:${CANVAS_H}px;overflow:hidden;direction:${isRtl ? "rtl" : "ltr"};">
   <!-- Background template -->
-  <img src="/uploads/Front.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;" />
+  <img src="https://2wn58psscop8hf2b.public.blob.vercel-storage.com/static/Front.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;" />
 
   ${member.photo ? `
   <!-- Member Photo: X=1343, Y=157, W=273, H=414 -->
@@ -94,7 +94,7 @@ class TemplateEngineClass {
     return `
 <div style="position:relative;width:${CANVAS_W}px;height:${CANVAS_H}px;overflow:hidden;">
   <!-- Background template -->
-  <img src="/uploads/Back.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;" />
+  <img src="https://2wn58psscop8hf2b.public.blob.vercel-storage.com/static/Back.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;" />
 
   ${qrDataURL ? `
   <!-- QR Code: X=365, Y=662, W=140, H=140 -->

@@ -4,6 +4,7 @@ import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { AlertCircle, ArrowRight } from "lucide-react"
+import { ASSETS } from "@/lib/assets"
 
 const errorMessages: Record<string, string> = {
   "invalid-token": "رابط التأكيد غير صالح",
@@ -25,7 +26,7 @@ function AuthErrorContent() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('/uploads/Form_Back.png')",
+          backgroundImage: `url('${ASSETS.formBack}')`,
           filter: "blur(2px)",
           opacity: 0.3,
         }}

@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('/uploads/Form_Back.png')",
+          backgroundImage: `url('${ASSETS.formBack}')`,
           filter: "blur(2px)",
           opacity: 0.3,
         }}
@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{
-                backgroundImage: "url('/uploads/Form_Head.png')",
+                backgroundImage: `url('${ASSETS.formHead}')`,
                 opacity: 0.35,
               }}
             />

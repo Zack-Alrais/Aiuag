@@ -46,23 +46,80 @@ async function main() {
     },
   });
 
-  // Create member profile
-  await prisma.member.upsert({
-    where: { userId: memberUser.id },
-    update: {},
-    create: {
-      userId: memberUser.id,
-      studentId: 'CS-2020-001',
-      membershipNumber: 'M-001',
-      graduationYear: 2020,
-      faculty: 'كلية الحاسوب',
-      phone: '+249123456789',
-      address: 'الخرطوم، السودان',
-      status: 'approved',
-      bio: 'خريج كلية الحاسوب',
+  // Create member profiles for ALL users
+  const memberProfiles = [
+    {
+      user: admin,
+      data: {
+        nameEn: 'System Admin',
+        membershipNumber: 'AIUAG-0000000001',
+        gender: 'male',
+        country: 'السودان',
+        state: 'الخرطوم',
+        city: 'الخرطوم',
+        phone: '+249900000001',
+        status: 'approved',
+        membershipType: 'عضو عامل',
+      },
     },
-  });
-  console.log('Member user created');
+    {
+      user: mod,
+      data: {
+        nameEn: 'Moderator User',
+        membershipNumber: 'AIUAG-0000000002',
+        gender: 'male',
+        country: 'السودان',
+        state: 'الخرطوم',
+        city: 'أم درمان',
+        phone: '+249900000002',
+        status: 'approved',
+        membershipType: 'عضو عامل',
+      },
+    },
+    {
+      user: memberUser,
+      data: {
+        nameEn: 'Ahmed Mohamed',
+        studentId: 'CS-2020-001',
+        membershipNumber: 'AIUAG-0000000003',
+        graduationYear: 2020,
+        faculty: 'كلية الحاسوب',
+        university: 'جامعة إفريقيا العالمية',
+        specialization: 'علوم الحاسوب',
+        degree: 'بكالوريوس',
+        employer: 'شركة التقنية',
+        jobTitle: 'مهندس برمجيات',
+        jobSector: 'تقنية المعلومات',
+        yearsOfExperience: 5,
+        gender: 'male',
+        birthDate: '1998-05-15',
+        country: 'السودان',
+        state: 'الخرطوم',
+        city: 'بحري',
+        phone: '+249123456789',
+        address: 'الخرطوم، السودان',
+        status: 'approved',
+        membershipType: 'عضو عامل',
+        bio: 'خريج كلية الحاسوب',
+      },
+    },
+  ];
+
+  for (const mp of memberProfiles) {
+    const user = mp.user;
+    const userEmail = user.email;
+    // Fetch fresh user to ensure we have the actual DB id
+    const freshUser = await prisma.user.findUnique({ where: { email: userEmail } });
+    if (freshUser) {
+      const existingMember = await prisma.member.findUnique({ where: { userId: freshUser.id } });
+      if (existingMember) {
+        await prisma.member.update({ where: { userId: freshUser.id }, data: mp.data });
+      } else {
+        await prisma.member.create({ data: { userId: freshUser.id, ...mp.data } });
+      }
+    }
+  }
+  console.log('Member profiles created for all users');
 
   // Create news
   const newsItems = [
@@ -332,6 +389,27 @@ async function main() {
     });
   }
   console.log('Projects created');
+
+  // Create sample posts
+  const memberRecord = await prisma.member.findFirst({ where: { userId: memberUser.id } });
+  if (memberRecord) {
+    const postContent = [
+      { content: 'يسعدني أن أكون جزءاً من رابطة خريجي جامعة إفريقيا العالمية. شكراً لكم على هذه المبادرة الرائعة!' },
+      { content: 'شاركت اليوم في فعالية الرابطة وكانت فرصة رائعة للقاء الزملاء الخريجين. نتطلع للمزيد من الفعاليات القادمة.' },
+    ];
+    const firstPost = await prisma.post.findFirst({ where: { authorId: memberRecord.id } });
+    if (!firstPost) {
+      for (const p of postContent) {
+        await prisma.post.create({
+          data: {
+            content: p.content,
+            authorId: memberRecord.id,
+          },
+        });
+      }
+      console.log('Sample posts created');
+    }
+  }
 
   console.log('Seeding complete!');
 }

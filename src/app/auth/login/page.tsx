@@ -60,13 +60,13 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative bg-background dark:bg-dark">
-      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/uploads/Form_Back.png')", filter: "blur(2px)", opacity: 0.2 }} />
+      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${ASSETS.formBack}')`, filter: "blur(2px)", opacity: 0.2 }} />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary-light/70 to-primary/80 dark:from-dark/90 dark:via-dark-surface/80 dark:to-dark/90" />
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="w-full max-w-md relative z-10">
         <div className="bg-white dark:bg-dark-surface rounded-2xl shadow-2xl overflow-hidden border border-gray-100 dark:border-dark-border">
           <div className="relative bg-gradient-to-r from-primary to-primary-light p-8 text-center overflow-hidden">
-            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/uploads/Form_Head.png')", opacity: 0.35 }} />
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${ASSETS.formHead}')`, opacity: 0.35 }} />
             <div className="relative z-10">
               <div className="w-16 h-16 bg-white dark:bg-dark-card rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <img src={ASSETS.logo} alt="Logo" className="w-12 h-12 rounded-full object-cover" />
