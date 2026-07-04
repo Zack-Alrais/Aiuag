@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import Link from "next/link"
-import { Plus, Pencil, Trash2, Users, CheckCircle, XCircle, Search, X, Mail, Phone, GraduationCap, CreditCard, Download, Square, CheckSquare, AlertTriangle } from "lucide-react"
+import { Plus, Pencil, Trash2, Users, CheckCircle, XCircle, Search, X, Mail, Phone, GraduationCap, CreditCard, Download, Square, CheckSquare, AlertTriangle, Barcode, QrCode } from "lucide-react"
 
 interface MemberRaw {
   id: string
@@ -182,6 +182,11 @@ export default function MembersManagement() {
   const [createError, setCreateError] = useState("")
   const [detailMember, setDetailMember] = useState<Member | null>(null)
 
+  // Barcode & QR code state
+  const [barcodeDataUrl, setBarcodeDataUrl] = useState<string | null>(null)
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null)
+  const barcodeSvgRef = useRef<SVGSVGElement>(null)
+
   const fetchMembers = useCallback(async () => {
     try {
       setLoading(true)
@@ -270,6 +275,8 @@ export default function MembersManagement() {
     setShowModal(false)
     setEditingMember(null)
     setForm(emptyForm)
+    setBarcodeDataUrl(null)
+    setQrCodeDataUrl(null)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -418,6 +425,73 @@ export default function MembersManagement() {
 
   const handleFieldChange = (field: keyof MemberFormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const generateBarcode = async () => {
+    if (!form.membershipNumber) return
+    setBarcodeDataUrl(null)
+    try {
+      const JsBarcode = (await import("jsbarcode")).default
+      if (barcodeSvgRef.current) {
+        JsBarcode(barcodeSvgRef.current, form.membershipNumber, {
+          format: "CODE128",
+          width: 2,
+          height: 60,
+          displayValue: true,
+          fontSize: 14,
+          margin: 10,
+          background: "#ffffff",
+          lineColor: "#000000",
+        })
+        setBarcodeDataUrl("generated")
+      }
+    } catch {}
+  }
+
+  const generateQrCode = async () => {
+    if (!form.membershipNumber) return
+    try {
+      const QRCode = (await import("qrcode")).default
+      const origin = typeof window !== "undefined" ? window.location.origin : ""
+      const url = `${origin}/ar/verify?id=${form.membershipNumber}`
+      const dataUrl = await QRCode.toDataURL(url, {
+        width: 200,
+        margin: 1,
+        color: { dark: "#1A3A6B", light: "#FFFFFF" },
+        errorCorrectionLevel: "M",
+      })
+      setQrCodeDataUrl(dataUrl)
+    } catch {}
+  }
+
+  const downloadBarcode = () => {
+    if (!barcodeSvgRef.current) return
+    const svg = barcodeSvgRef.current
+    const svgData = new XMLSerializer().serializeToString(svg)
+    const canvas = document.createElement("canvas")
+    canvas.width = svg.getBoundingClientRect().width || 300
+    canvas.height = svg.getBoundingClientRect().height || 100
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+    const img = new Image()
+    img.onload = () => {
+      ctx.fillStyle = "#ffffff"
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0)
+      const link = document.createElement("a")
+      link.download = `barcode-${form.membershipNumber}.png`
+      link.href = canvas.toDataURL("image/png")
+      link.click()
+    }
+    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)))
+  }
+
+  const downloadQrCode = () => {
+    if (!qrCodeDataUrl) return
+    const link = document.createElement("a")
+    link.download = `qrcode-${form.membershipNumber}.png`
+    link.href = qrCodeDataUrl
+    link.click()
   }
 
   const toggleSelectAll = () => {
@@ -913,8 +987,47 @@ export default function MembersManagement() {
                     </button>
                   </div>
                 </div>
-                <div></div>
+                <div className="flex gap-2 items-end">
+                  <button type="button" onClick={generateBarcode} disabled={!form.membershipNumber}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 text-white text-xs rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-40">
+                    <Barcode className="h-3.5 w-3.5" /> باركود
+                  </button>
+                  <button type="button" onClick={generateQrCode} disabled={!form.membershipNumber}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-violet-600 text-white text-xs rounded-lg hover:bg-violet-700 transition-colors font-medium disabled:opacity-40">
+                    <QrCode className="h-3.5 w-3.5" /> QR كود
+                  </button>
+                  {(barcodeDataUrl || qrCodeDataUrl) && (
+                    <button type="button" onClick={() => { setBarcodeDataUrl(null); setQrCodeDataUrl(null) }}
+                      className="px-2 py-1.5 text-gray-400 hover:text-gray-600 text-xs transition-colors">
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
               </div>
+
+              {/* Barcode / QR preview */}
+              {(barcodeDataUrl || qrCodeDataUrl) && (
+                <div className="flex gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 justify-center">
+                  {barcodeDataUrl && (
+                    <div className="text-center">
+                      <svg ref={barcodeSvgRef} className="mx-auto" />
+                      <button type="button" onClick={downloadBarcode}
+                        className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
+                        <Download className="h-3 w-3" /> تحميل الباركود
+                      </button>
+                    </div>
+                  )}
+                  {qrCodeDataUrl && (
+                    <div className="text-center">
+                      <img src={qrCodeDataUrl} alt="QR" className="w-28 h-28 mx-auto" />
+                      <button type="button" onClick={downloadQrCode}
+                        className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
+                        <Download className="h-3 w-3" /> تحميل QR
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>

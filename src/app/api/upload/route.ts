@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import os from "os";
+import { put } from "@vercel/blob";
 
 const ALLOWED_TYPES = [
   "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml",
@@ -9,7 +7,6 @@ const ALLOWED_TYPES = [
   "video/mp4", "video/webm",
 ];
 const MAX_SIZE = 50 * 1024 * 1024;
-const UPLOAD_DIR = path.join(os.tmpdir(), "aiuag-uploads");
 const MAX_FILES = 10;
 
 export async function POST(request: NextRequest) {
@@ -17,7 +14,6 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const folder = (formData.get("folder") as string) || "general";
 
-    // Collect all files from FormData
     const files: File[] = [];
     for (const [key, value] of formData.entries()) {
       if (key === "file" && value instanceof File) {
@@ -33,9 +29,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Max ${MAX_FILES} files allowed` }, { status: 400 });
     }
 
-    const uploadDir = path.join(UPLOAD_DIR, folder);
-    await mkdir(uploadDir, { recursive: true });
-
     const results: { url: string; filename: string; name: string }[] = [];
 
     for (const file of files) {
@@ -46,16 +39,16 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: `File too large: ${file.name}` }, { status: 400 });
       }
 
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
       const ext = file.name.split(".").pop() || "jpg";
-      const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const filePath = path.join(uploadDir, filename);
+      const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-      await writeFile(filePath, buffer);
+      const blob = await put(filename, file, {
+        access: "public",
+        addRandomSuffix: false,
+      });
 
       results.push({
-        url: `/api/files/${folder}/${filename}`,
+        url: blob.url,
         filename,
         name: file.name,
       });
