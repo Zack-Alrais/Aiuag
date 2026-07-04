@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, Globe, Search, ChevronDown, User, LogOut, ChevronUp, LogIn, Sun, Moon, ChevronLeft, ChevronRight } from "lucide-react"
 import SearchOverlay from "./search-overlay"
 import MobileMenu from "./mobile-menu"
+import { ASSETS } from "@/lib/assets"
 
 interface NavChild {
   label: string
@@ -190,7 +191,7 @@ export default function Header({ lang }: HeaderProps) {
         >
           <Link href={`/${currentLang}`} className="flex items-center gap-3 shrink-0">
             <img
-              src="/uploads/شعار الرابطة.jpg"
+              src={ASSETS.logo}
               alt="AIUAG Logo"
               className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover border-2 border-white/30"
             />

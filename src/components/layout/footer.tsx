@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from "lucide-react"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
+import { ASSETS } from "@/lib/assets"
 
 interface FooterProps {
   lang: string
@@ -109,7 +110,7 @@ export default function Footer({ lang }: FooterProps) {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">
               <img
-                src="/uploads/شعار الرابطة.jpg"
+                src={ASSETS.logo}
                 alt="AIUAG Logo"
                 className="w-12 h-12 rounded-full object-cover border border-white/30"
               />

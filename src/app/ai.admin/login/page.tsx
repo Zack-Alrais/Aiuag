@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react"
+import { ASSETS } from "@/lib/assets"
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -67,7 +68,7 @@ export default function AdminLoginPage() {
             />
             <div className="relative z-10">
               <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <img src="/uploads/شعار الرابطة.jpg" alt="Logo" className="w-12 h-12 rounded-lg object-cover" />
+                <img src={ASSETS.logo} alt="Logo" className="w-12 h-12 rounded-lg object-cover" />
               </div>
               <h1 className="text-2xl font-bold text-white">لوحة التحكم</h1>
               <p className="text-white/70 text-sm mt-2">تسجيل الدخول كمدير</p>

@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 import HeroSection from "@/components/ui/hero-section"
 import prisma from "@/lib/prisma"
 import HomeClient from "./home-client"
+import { ASSETS } from "@/lib/assets"
 
 export const dynamic = "force-dynamic"
 
@@ -75,7 +76,7 @@ export default async function HomePage({ params }: HomeProps) {
         <div className="max-w-3xl mx-auto text-center">
           <div className="mb-8">
             <img
-              src="/uploads/شعار الرابطة.jpg"
+              src={ASSETS.logo}
               alt="AIUAG Logo"
               className="w-28 h-28 mx-auto rounded-full object-cover border-2 border-white/30"
             />

@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Lock, Eye, EyeOff, Loader2, CheckCircle, AlertCircle } from "lucide-react"
+import { ASSETS } from "@/lib/assets"
 
 function ResetPasswordContent() {
   const router = useRouter()
@@ -89,7 +90,7 @@ function ResetPasswordContent() {
             />
             <div className="relative z-10">
               <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <img src="/uploads/شعار الرابطة.jpg" alt="Logo" className="w-12 h-12 rounded-full object-cover" />
+                <img src={ASSETS.logo} alt="Logo" className="w-12 h-12 rounded-full object-cover" />
               </div>
               <h1 className="text-2xl font-bold text-white">إعادة تعيين كلمة المرور</h1>
               <p className="text-white/70 text-sm mt-2">أدخل كلمة المرور الجديدة</p>

@@ -3,6 +3,7 @@
 import { useRef, useCallback, useState, useEffect, useMemo } from "react"
 import { QRCodeSVG } from "qrcode.react"
 import { Download, Printer, RotateCcw } from "lucide-react"
+import { ASSETS } from "@/lib/assets"
 
 interface MemberCardData {
   id: string
@@ -287,7 +288,7 @@ export function MembershipCardEngine({
                   }}
                 >
                   <img
-                    src="/uploads/شعار الرابطة.jpg"
+                    src={ASSETS.logo}
                     alt=""
                     style={{ width: "100%", height: "auto" }}
                   />
@@ -460,7 +461,7 @@ export function MembershipCardEngine({
                 }}
               >
                 <img
-                  src="/uploads/شعار الرابطة.jpg"
+                  src={ASSETS.logo}
                   alt="الشعار"
                   style={{ width: "60px", height: "auto", borderRadius: "50%" }}
                 />

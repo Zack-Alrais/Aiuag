@@ -48,6 +48,8 @@ next-env.d.ts
 .vercel
 .env*
 
+
+
 # uploads (managed by database)
 /public/uploads/
 

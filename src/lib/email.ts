@@ -44,7 +44,7 @@ export async function sendEmail({ to, subject, html, text }: EmailOptions) {
 }
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://aiuag.vercel.app";
-const LOGO_URL = `${BASE_URL}/uploads/شعار الرابطة.jpg`;
+const LOGO_URL = "https://2wn58psscop8hf2b.public.blob.vercel-storage.com/%D8%B4%D8%B9%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B1%D8%A7%D8%A8%D8%B7%D8%A9.jpg";
 const YEAR = new Date().getFullYear();
 
 function wrap(content: string, preheader: string): string {

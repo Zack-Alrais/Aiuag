@@ -7,6 +7,7 @@ import {
   CheckCircle, AlertCircle, Loader2, User, Globe, GraduationCap,
   BookOpen, Lock, EyeOff, Eye, Calendar, Phone, MapPin, Mail,
 } from "lucide-react"
+import { ASSETS } from "@/lib/assets"
 
 export default function ClaimGraduatePage() {
   const [lang, setLang] = useState("ar")
@@ -138,7 +139,7 @@ export default function ClaimGraduatePage() {
             <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/uploads/Form_Head.png')", opacity: 0.35 }} />
             <div className="relative z-10">
               <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <img src="/uploads/شعار الرابطة.jpg" alt="Logo" className="w-12 h-12 rounded-lg object-cover" />
+                <img src={ASSETS.logo} alt="Logo" className="w-12 h-12 rounded-lg object-cover" />
               </div>
               <h1 className="text-2xl font-bold text-white">تفعيل العضوية</h1>
               <p className="text-white/70 text-sm mt-2">للخريجين المسجلين مسبقاً في قاعدة البيانات</p>

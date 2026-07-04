@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Mail, Lock, User, Phone, GraduationCap, Building2, Loader2, CheckCircle, AlertCircle, Upload, FileCheck, Globe, Briefcase, Calendar } from "lucide-react"
 import { GENDERS, DEGREES, SECTORS, COUNTRIES, UNIVERSITIES, FACULTIES } from "@/lib/constants"
 import { SearchableSelect } from "@/components/ui/searchable-select"
+import { ASSETS } from "@/lib/assets"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -144,7 +145,7 @@ export default function RegisterPage() {
             <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/uploads/Form_Head.png')", opacity: 0.35 }} />
             <div className="relative z-10">
               <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <img src="/uploads/شعار الرابطة.jpg" alt="Logo" className="w-12 h-12 rounded-full object-cover" />
+                <img src={ASSETS.logo} alt="Logo" className="w-12 h-12 rounded-full object-cover" />
               </div>
               <h1 className="text-2xl font-bold text-white">إنشاء حساب جديد</h1>
               <p className="text-white/70 text-sm mt-2">انضم إلى رابطة خريجي الجامعة العالمية (AIUAG)</p>

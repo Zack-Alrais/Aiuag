@@ -46,6 +46,7 @@ import {
   FileEdit,
   User,
 } from "lucide-react"
+import { ASSETS } from "@/lib/assets"
 
 interface Notification {
   id: string
@@ -232,7 +233,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         {sidebarOpen && (
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl overflow-hidden">
-              <img src="/uploads/شعار الرابطة.jpg" alt="AIUAG" className="w-full h-full object-cover" loading="lazy" />
+              <img src={ASSETS.logo} alt="AIUAG" className="w-full h-full object-cover" loading="lazy" />
             </div>
             <div>
               <span className="text-lg font-bold text-white">AIUAG</span>
@@ -242,7 +243,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         )}
         {!sidebarOpen && (
           <div className="w-10 h-10 rounded-xl overflow-hidden mx-auto">
-            <img src="/uploads/شعار الرابطة.jpg" alt="AIUAG" className="w-full h-full object-cover" loading="lazy" />
+            <img src={ASSETS.logo} alt="AIUAG" className="w-full h-full object-cover" loading="lazy" />
           </div>
         )}
         <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-white/10 rounded-lg hidden lg:block transition-colors">
