@@ -8,9 +8,14 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const skip = (page - 1) * limit;
     const memberId = searchParams.get("memberId");
+    const authorId = searchParams.get("authorId");
+
+    const where: Record<string, unknown> = {};
+    if (authorId) where.authorId = authorId;
 
     const [posts, total] = await Promise.all([
       prisma.post.findMany({
+        where,
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
@@ -27,7 +32,7 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
-      prisma.post.count(),
+      prisma.post.count({ where }),
     ]);
 
     // Enrich with author data (name/image are on User model)

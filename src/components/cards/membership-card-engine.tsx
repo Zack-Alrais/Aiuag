@@ -26,6 +26,7 @@ interface Props {
   showFlip?: boolean
   size?: "sm" | "md" | "lg"
   showBoth?: boolean
+  showActions?: boolean
 }
 
 export function MembershipCardEngine({
@@ -34,6 +35,7 @@ export function MembershipCardEngine({
   showFlip = true,
   size = "md",
   showBoth = false,
+  showActions = true,
 }: Props) {
   const cardRef = useRef<HTMLDivElement>(null)
   const barcodeRef = useRef<SVGSVGElement>(null)
@@ -514,36 +516,38 @@ export function MembershipCardEngine({
       </div>
 
       {/* Action buttons */}
-      <div className="flex gap-2 flex-wrap justify-center no-print">
-        {showFlip && !showBoth && (
-          <button
-            onClick={(e) => { e.stopPropagation(); setFlipped(!flipped) }}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary text-primary text-sm font-medium hover:bg-primary/5 transition-colors"
-          >
-            <RotateCcw className="w-4 h-4" />
-            {flipped ? "الوجه الأمامي" : "الوجه الخلفي"}
-          </button>
-        )}
-        {showDownload && (
-          <>
+      {showActions && (
+        <div className="flex gap-2 flex-wrap justify-center no-print">
+          {showFlip && !showBoth && (
             <button
-              onClick={(e) => { e.stopPropagation(); handleDownload() }}
-              disabled={isExporting}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-60"
+              onClick={(e) => { e.stopPropagation(); setFlipped(!flipped) }}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary text-primary text-sm font-medium hover:bg-primary/5 transition-colors"
             >
-              <Download className="w-4 h-4" />
-              {isExporting ? "...جاري التحميل" : "تحميل PNG"}
+              <RotateCcw className="w-4 h-4" />
+              {flipped ? "الوجه الأمامي" : "الوجه الخلفي"}
             </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); handlePrint() }}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-primary-dark text-sm font-medium hover:bg-secondary-light transition-colors"
-            >
-              <Printer className="w-4 h-4" />
-              طباعة
-            </button>
-          </>
-        )}
-      </div>
+          )}
+          {showDownload && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); handleDownload() }}
+                disabled={isExporting}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-60"
+              >
+                <Download className="w-4 h-4" />
+                {isExporting ? "...جاري التحميل" : "تحميل PNG"}
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); handlePrint() }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-primary-dark text-sm font-medium hover:bg-secondary-light transition-colors"
+              >
+                <Printer className="w-4 h-4" />
+                طباعة
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }

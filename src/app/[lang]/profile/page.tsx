@@ -4,9 +4,9 @@ import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import {
-  User, Mail, Phone, Camera, Lock, CreditCard, Shield, Save, X, Check, Eye, EyeOff,
-  FileCheck, Loader2, LogOut, Upload, Building2, GraduationCap, Calendar,
-  Briefcase, Award, ChevronDown, ChevronUp, Users,
+  User, Mail, Phone, Camera, Lock, Save, X, Check,
+  FileCheck, Loader2, LogOut, Upload, GraduationCap,
+  Briefcase, Award, ChevronDown, ChevronUp, Heart, MessageCircle, Trash2,
 } from "lucide-react"
 import { Avatar } from "@/components/ui/avatar"
 import { toast } from "sonner"
@@ -59,13 +59,13 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState("")
-  const [activeTab, setActiveTab] = useState<"profile" | "card" | "security">("profile")
+  const [activeTab, setActiveTab] = useState<"profile" | "posts">("profile")
   const [editing, setEditing] = useState(false)
   const [editForm, setEditForm] = useState<Partial<ProfileData>>({})
 
   // Collapsible sections
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    personal: true, contact: false, academic: false, work: false,
+    personal: true, contact: false, academic: false, work: false, security: false,
   })
 
   // Password states
@@ -238,8 +238,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
 
   const tabs = [
     { id: "profile" as const, label: isArabic ? "الملف الشخصي" : "Profile", icon: User },
-    { id: "card" as const, label: isArabic ? "بطاقة العضوية" : "Card", icon: CreditCard },
-    { id: "security" as const, label: isArabic ? "الأمان" : "Security", icon: Shield },
+    { id: "posts" as const, label: isArabic ? "منشوراتي" : "My Posts", icon: FileCheck },
   ]
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
@@ -456,87 +455,89 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
                     </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
 
-        {/* === CARD TAB === */}
-        {activeTab === "card" && (
-          <div className="max-w-lg mx-auto space-y-6">
-            <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2 text-base"><Camera className="w-4 h-4" />{isArabic ? "صورة البطاقة" : "Card Photo"}</CardTitle></CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-4">
-                  <div className="relative group">
-                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center border-2 border-dashed border-primary/30">
-                      {profile.cardPhoto ? <img src={profile.cardPhoto} alt="" className="w-full h-full object-cover" loading="lazy" /> : <User className="w-8 h-8 text-primary/30" />}
+                {/* === Security / Change Password === */}
+                <div className="border border-border rounded-xl overflow-hidden">
+                  <button type="button" onClick={() => toggleSection("security")} className="w-full flex items-center justify-between p-4 bg-background/80 hover:bg-background transition-colors">
+                    <span className="flex items-center gap-2 font-semibold text-sm text-text"><Lock className="w-4 h-4 text-primary" />{isArabic ? "تغيير كلمة المرور" : "Change Password"}</span>
+                    {openSections.security ? <ChevronUp className="w-4 h-4 text-text-light" /> : <ChevronDown className="w-4 h-4 text-text-light" />}
+                  </button>
+                  {openSections.security && (
+                    <div className="p-4 space-y-4">
+                      <div>
+                        <label className="block text-xs font-medium text-text mb-1.5">{isArabic ? "كلمة المرور الحالية" : "Current Password"}</label>
+                        <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="w-full h-10 rounded-xl border border-gray-300 bg-white dark:bg-[#1a2332] px-3 py-2 text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-text mb-1.5">{isArabic ? "كلمة المرور الجديدة" : "New Password"}</label>
+                        <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full h-10 rounded-xl border border-gray-300 bg-white dark:bg-[#1a2332] px-3 py-2 text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-text mb-1.5">{isArabic ? "تأكيد كلمة المرور" : "Confirm Password"}</label>
+                        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full h-10 rounded-xl border border-gray-300 bg-white dark:bg-[#1a2332] px-3 py-2 text-sm" />
+                      </div>
+                      {passwordError && <p className="text-xs text-red-600">{passwordError}</p>}
+                      {passwordSuccess && <p className="text-xs text-green-600">{passwordSuccess}</p>}
+                      <Button onClick={handleChangePassword} disabled={changingPassword || !currentPassword || !newPassword}>
+                        {changingPassword ? <Loader2 className="w-3.5 h-3.5 animate-spin ml-1.5" /> : <Lock className="w-3.5 h-3.5 ml-1.5" />}
+                        {isArabic ? "تغيير كلمة المرور" : "Change Password"}
+                      </Button>
                     </div>
-                    <label className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                      <Camera className="w-5 h-5 text-white" /><input type="file" accept="image/*" className="hidden" onChange={handleCardPhotoSelect} disabled={uploadingCard} />
-                    </label>
-                    {uploadingCard && <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center"><Loader2 className="w-5 h-5 text-white animate-spin" /></div>}
+                  )}
+                </div>
+
+                {/* === Membership Card === */}
+                <div className="border border-border rounded-xl p-4">
+                  <p className="text-sm font-semibold text-text mb-3 flex items-center gap-2">
+                    <Camera className="w-4 h-4 text-primary" />
+                    {isArabic ? "صورة البطاقة" : "Card Photo"}
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className="relative group">
+                      <div className="w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center border-2 border-dashed border-primary/30">
+                        {profile.cardPhoto ? <img src={profile.cardPhoto} alt="" className="w-full h-full object-cover" loading="lazy" /> : <User className="w-8 h-8 text-primary/30" />}
+                      </div>
+                      <label className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                        <Camera className="w-5 h-5 text-white" /><input type="file" accept="image/*" className="hidden" onChange={handleCardPhotoSelect} disabled={uploadingCard} />
+                      </label>
+                      {uploadingCard && <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center"><Loader2 className="w-5 h-5 text-white animate-spin" /></div>}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs text-text-secondary mb-2">{isArabic ? "صورة شخصية لتظهر على البطاقة" : "Personal photo for the card"}</p>
+                      <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-lg cursor-pointer hover:bg-primary/20 transition-colors text-xs font-medium">
+                        <Camera className="w-3 h-3" />{profile.cardPhoto ? (isArabic ? "تغيير" : "Change") : (isArabic ? "إضافة" : "Add")}
+                        <input type="file" accept="image/*" className="hidden" onChange={handleCardPhotoSelect} disabled={uploadingCard} />
+                      </label>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-xs text-text-secondary mb-2">{isArabic ? "صورة شخصية لتظهر على البطاقة" : "Personal photo for the card"}</p>
-                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-lg cursor-pointer hover:bg-primary/20 transition-colors text-xs font-medium">
-                      <Camera className="w-3 h-3" />{profile.cardPhoto ? (isArabic ? "تغيير" : "Change") : (isArabic ? "إضافة" : "Add")}
-                      <input type="file" accept="image/*" className="hidden" onChange={handleCardPhotoSelect} disabled={uploadingCard} />
-                    </label>
-                  </div>
+                </div>
+                <div className="bg-white dark:bg-[#1a2332] rounded-2xl shadow-sm border border-gray-100 dark:border-[#2a3d56] p-6 flex justify-center">
+                  <MembershipCardEngine
+                    member={{
+                      id: profile.id,
+                      nameAr: profile.name,
+                      nameEn: profile.nameEn || profile.name,
+                      membershipNumber: profile.membershipNumber,
+                      memberType: profile.membershipType,
+                      title: profile.jobTitle || profile.membershipType,
+                      photo: profile.cardPhoto || profile.image || session?.user?.image || undefined,
+                      specialization: profile.specialization || profile.faculty || undefined,
+                      graduationYear: parseInt(profile.graduationYear) || undefined,
+                      phone: profile.phone,
+                      email: profile.email,
+                      joinDate: profile.memberSince,
+                    }}
+                    showBoth size="md"
+                  />
                 </div>
               </CardContent>
             </Card>
-            <div className="bg-white dark:bg-[#1a2332] rounded-2xl shadow-sm border border-gray-100 dark:border-[#2a3d56] p-6 flex justify-center">
-              <MembershipCardEngine
-                member={{
-                  id: profile.id,
-                  nameAr: profile.name,
-                  nameEn: profile.nameEn || profile.name,
-                  membershipNumber: profile.membershipNumber,
-                  memberType: profile.membershipType,
-                  title: profile.jobTitle || profile.membershipType,
-                  photo: profile.cardPhoto || profile.image || session?.user?.image || undefined,
-                  specialization: profile.specialization || profile.faculty || undefined,
-                  graduationYear: parseInt(profile.graduationYear) || undefined,
-                  phone: profile.phone,
-                  email: profile.email,
-                  joinDate: profile.memberSince,
-                }}
-                showDownload showBoth size="lg"
-              />
-            </div>
-            <p className="text-center text-text-secondary text-xs">{isArabic ? "هذه البطاقة خاصة بك فقط" : "This card is private to you"}</p>
           </div>
         )}
 
-        {/* === SECURITY TAB === */}
-        {activeTab === "security" && (
-          <div className="max-w-2xl mx-auto space-y-6">
-            <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2 text-base"><Lock className="w-4 h-4" />{isArabic ? "تغيير كلمة المرور" : "Change Password"}</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-text mb-1.5">{isArabic ? "كلمة المرور الحالية" : "Current Password"}</label>
-                  <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="w-full h-10 rounded-xl border border-gray-300 bg-white dark:bg-[#1a2332] px-3 py-2 text-sm" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-text mb-1.5">{isArabic ? "كلمة المرور الجديدة" : "New Password"}</label>
-                  <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full h-10 rounded-xl border border-gray-300 bg-white dark:bg-[#1a2332] px-3 py-2 text-sm" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-text mb-1.5">{isArabic ? "تأكيد كلمة المرور" : "Confirm Password"}</label>
-                  <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full h-10 rounded-xl border border-gray-300 bg-white dark:bg-[#1a2332] px-3 py-2 text-sm" />
-                </div>
-                {passwordError && <p className="text-xs text-red-600">{passwordError}</p>}
-                {passwordSuccess && <p className="text-xs text-green-600">{passwordSuccess}</p>}
-                <Button onClick={handleChangePassword} disabled={changingPassword || !currentPassword || !newPassword}>
-                  {changingPassword ? <Loader2 className="w-3.5 h-3.5 animate-spin ml-1.5" /> : <Lock className="w-3.5 h-3.5 ml-1.5" />}
-                  {isArabic ? "تغيير كلمة المرور" : "Change Password"}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+        {/* === POSTS TAB === */}
+        {activeTab === "posts" && (
+          <PostsTab memberId={profile.id} isArabic={isArabic} />
         )}
       </div>
 
@@ -550,6 +551,115 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
           title={isArabic ? (editorTarget === "card" ? "تعديل صورة البطاقة" : "تعديل الصورة الشخصية") : "Edit Image"}
         />
       )}
+    </div>
+  )
+}
+
+function PostsTab({ memberId, isArabic }: { memberId: string; isArabic: boolean }) {
+  const [posts, setPosts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchPosts()
+  }, [memberId])
+
+  const fetchPosts = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/posts?authorId=${memberId}&limit=50`)
+      const data = await res.json()
+      setPosts(data.data || [])
+    } catch { setPosts([]) }
+    finally { setLoading(false) }
+  }
+
+  const handleDelete = async (postId: string) => {
+    if (!confirm(isArabic ? "هل أنت متأكد من حذف هذا المنشور؟" : "Are you sure you want to delete this post?")) return
+    setDeletingId(postId)
+    try {
+      const res = await fetch(`/api/posts/${postId}`, { method: "DELETE" })
+      if (res.ok) {
+        setPosts((prev) => prev.filter((p) => p.id !== postId))
+        toast.success(isArabic ? "تم حذف المنشور" : "Post deleted")
+      } else {
+        toast.error(isArabic ? "فشل حذف المنشور" : "Failed to delete post")
+      }
+    } catch { toast.error(isArabic ? "خطأ في الاتصال" : "Connection error") }
+    finally { setDeletingId(null) }
+  }
+
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr)
+    return d.toLocaleDateString(isArabic ? "ar-SA" : "en-US", {
+      year: "numeric", month: "short", day: "numeric",
+    })
+  }
+
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+
+  if (posts.length === 0) return (
+    <div className="max-w-2xl mx-auto text-center py-12">
+      <FileCheck className="w-12 h-12 text-text-light mx-auto mb-4" />
+      <p className="text-text-secondary">{isArabic ? "لا توجد منشورات بعد" : "No posts yet"}</p>
+    </div>
+  )
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-4">
+      {posts.map((post) => (
+        <div key={post.id} className="bg-white dark:bg-[#1a2332] rounded-2xl shadow-sm border border-gray-100 dark:border-[#2a3d56] p-4">
+          {/* Post header */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+                {post.author?.image ? (
+                  <img src={post.author.image} alt="" className="w-full h-full object-cover" loading="lazy" />
+                ) : (
+                  <User className="w-4 h-4 text-primary" />
+                )}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-text">{post.author?.name || (isArabic ? "عضو" : "Member")}</p>
+                <p className="text-xs text-text-secondary">{formatDate(post.createdAt)}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => handleDelete(post.id)}
+              disabled={deletingId === post.id}
+              className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-text-light hover:text-red-500 transition-colors"
+            >
+              {deletingId === post.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+            </button>
+          </div>
+
+          {/* Post content */}
+          {post.content && (
+            <p className="text-sm text-text whitespace-pre-wrap mb-3 leading-relaxed">{post.content}</p>
+          )}
+
+          {/* Post images */}
+          {post.images && (() => {
+            let imgs: string[]
+            try { imgs = JSON.parse(post.images) } catch { imgs = [] }
+            if (imgs.length === 0) return null
+            return (
+              <div className={`grid gap-2 mb-3 ${imgs.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+                {imgs.map((img: string, i: number) => (
+                  <img key={i} src={img} alt="" className="w-full rounded-xl object-cover max-h-64" loading="lazy" />
+                ))}
+              </div>
+            )
+          })()}
+
+          {/* Post stats */}
+          <div className="flex items-center gap-4 pt-3 border-t border-border text-text-secondary text-xs">
+            <span className="flex items-center gap-1"><Heart className="w-3.5 h-3.5" />{post._count?.reactions || 0}</span>
+            <span className="flex items-center gap-1"><MessageCircle className="w-3.5 h-3.5" />{post._count?.comments || 0}</span>
+            <span className="flex items-center gap-1">{isArabic ? "مشاركة" : "Shares"}: {post._count?.shares || 0}</span>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
