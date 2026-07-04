@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import CountUp from "react-countup"
 import { useInView } from "framer-motion"
 import { useRef } from "react"
-import { Users, Calendar, FolderOpen, Award, ArrowLeft, ArrowRight, Heart, ChevronLeft, ChevronRight, Clock, MapPin } from "lucide-react"
+import { Users, Calendar, FolderOpen, Award, ArrowLeft, ArrowRight, Heart, ChevronLeft, ChevronRight, Clock, MapPin, Phone, Mail } from "lucide-react"
 import ScrollReveal from "@/components/ui/scroll-reveal"
 import { staggerContainer, staggerItem } from "@/components/ui/motion"
 
