@@ -69,19 +69,19 @@ export default function AdminCardsPage() {
           return {
             id: m.id as string,
             nameAr: (u.name as string) || "",
-            nameEn: (u.name as string) || "",
+            nameEn: (m.nameEn as string) || (u.name as string) || "",
             email: (u.email as string) || "",
             phone: (m.phone as string) || "",
             studentId: (m.studentId as string) || "",
             membershipNumber: (m.membershipNumber as string) || "",
             faculty: (m.faculty as string) || "",
-            department: (m.department as string) || "",
+            department: (m.specialization as string) || "",
             graduationYear: (m.graduationYear as number) || 0,
-            country: (m.address as string) || "",
-            membershipType: "عضوية",
+            country: (m.country as string) || "",
+            membershipType: (m.membershipType as string) || "عضو عامل",
             status: m.status === "approved" ? "active" : (m.status === "rejected" ? "inactive" : "active"),
             joinDate: (m.createdAt as string) || "",
-            photo: (u.image as string) || undefined,
+            photo: (m.cardPhoto as string) || (u.image as string) || undefined,
           };
         });
         setCards(mapped);

@@ -13,6 +13,7 @@ import { ASSETS } from "@/lib/assets"
 interface NavChild {
   label: string
   href: string
+  authRequired?: boolean
 }
 
 interface NavItem {
@@ -53,6 +54,7 @@ function getNavItems(lang: string): NavItem[] {
       children: [
         { label: isArabic ? "طلب عضوية" : "Apply", href: "/membership/apply" },
         { label: isArabic ? "مزايا العضوية" : "Benefits", href: "/membership/benefits" },
+        { label: isArabic ? "بطاقتي" : "My Card", href: "/cards", authRequired: true },
         { label: isArabic ? "إدارة العضوية" : "Manage", href: "/membership/manage" },
       ],
     },
@@ -95,7 +97,7 @@ export default function Header({ lang }: HeaderProps) {
         ...item,
         children: item.children.filter((child) => {
           if (child.href === "/membership/apply") return !isLoggedIn
-          if (child.href === "/membership/manage") return isLoggedIn
+          if ((child as any).authRequired) return isLoggedIn
           return true
         }),
       }

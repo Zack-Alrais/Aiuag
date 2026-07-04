@@ -198,7 +198,7 @@ export function middleware(request: NextRequest) {
 
   // === MEMBER PAGE PROTECTION ===
   // Protected pages that require member login
-  const memberPaths = ["/media/posts", "/profile", "/dashboard", "/membership/manage"];
+  const memberPaths = ["/media/posts", "/profile", "/dashboard", "/membership/manage", "/cards"];
   const isMemberProtected = memberPaths.some(p => {
     const pattern = new RegExp(`^/(ar|en)${p}`); // Match /ar/media/posts, /en/media/posts
     return pattern.test(pathname);
