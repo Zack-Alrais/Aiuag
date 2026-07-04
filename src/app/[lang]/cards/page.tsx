@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
-import { Loader2, Search, Users, CreditCard } from "lucide-react"
+import { Loader2, Search, Users, CreditCard, Plus, Download, Printer, X, Check } from "lucide-react"
 import { MembershipCardEngine } from "@/components/cards/membership-card-engine"
 
 interface MemberCardItem {
@@ -30,6 +30,10 @@ export default function CardsPage({ params }: { params: Promise<{ lang: string }
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
 
+  const [generating, setGenerating] = useState(false)
+  const [generatedCard, setGeneratedCard] = useState<{ frontHtml: string; backHtml: string } | null>(null)
+  const [generatedError, setGeneratedError] = useState("")
+
   useEffect(() => { params.then((p) => setLang(p.lang)) }, [params])
 
   useEffect(() => {
@@ -41,6 +45,48 @@ export default function CardsPage({ params }: { params: Promise<{ lang: string }
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
+
+  const handleGenerateCard = async () => {
+    setGenerating(true)
+    setGeneratedError("")
+    setGeneratedCard(null)
+    try {
+      const res = await fetch("/api/cards/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lang, format: "html" }),
+      })
+      const json = await res.json()
+      if (json.success) {
+        setGeneratedCard(json.card)
+      } else {
+        setGeneratedError(json.error || (isArabic ? "فشل في إنشاء البطاقة" : "Failed to generate card"))
+      }
+    } catch {
+      setGeneratedError(isArabic ? "خطأ في الاتصال" : "Connection error")
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  const handlePrint = (html: string) => {
+    const w = window.open("", "_blank")
+    if (!w) return
+    w.document.write(`
+      <!DOCTYPE html><html><head><title>${isArabic ? "بطاقة العضوية" : "Membership Card"}</title>
+      <style>body{margin:0;padding:20px}@media print{body{margin:0;padding:10px}}</style></head>
+      <body>${html}<script>setTimeout(function(){window.print()},500)<\/script></body></html>
+    `)
+    w.document.close()
+  }
+
+  const handleDownload = (html: string) => {
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" })
+    const a = document.createElement("a")
+    a.href = URL.createObjectURL(blob)
+    a.download = `membership-card-${session?.user?.email || "card"}.html`
+    a.click()
+  }
 
   const filtered = members.filter((m) => {
     if (!search) return true
@@ -80,7 +126,55 @@ export default function CardsPage({ params }: { params: Promise<{ lang: string }
               ? "بطاقات أعضاء رابطة خريجي جامعة أفريقيا العالمية – تصفح وابحث عن الأعضاء"
               : "Membership cards of AIUAG – browse and search for members"}
           </p>
+
+          {/* Generate Card Button (logged-in only) */}
+          {authStatus === "authenticated" && (
+            <div className="mt-6">
+              <button
+                onClick={handleGenerateCard}
+                disabled={generating}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary/20 text-base font-bold"
+              >
+                {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <CreditCard className="w-5 h-5" />}
+                {generating
+                  ? (isArabic ? "جاري الإنشاء..." : "Generating...")
+                  : (isArabic ? "إنشاء بطاقتي" : "Create My Card")}
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Generated Card Preview */}
+        {generatedCard && (
+          <div className="mb-10 bg-surface rounded-2xl border border-gray-200 p-6 shadow-sm max-w-3xl mx-auto">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Check className="w-5 h-5 text-green-600" />
+                <h2 className="text-lg font-bold text-text">
+                  {isArabic ? "تم إنشاء البطاقة" : "Card Created"}
+                </h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => handlePrint(generatedCard.frontHtml)} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                  <Printer className="w-4 h-4" /> {isArabic ? "طباعة" : "Print"}
+                </button>
+                <button onClick={() => handleDownload(generatedCard.frontHtml)} className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors">
+                  <Download className="w-4 h-4" /> {isArabic ? "تحميل" : "Download"}
+                </button>
+                <button onClick={() => setGeneratedCard(null)} className="p-1.5 text-text-light hover:text-text rounded-lg hover:bg-gray-100 transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-4" dangerouslySetInnerHTML={{ __html: generatedCard.frontHtml + generatedCard.backHtml }} />
+          </div>
+        )}
+
+        {generatedError && (
+          <div className="mb-6 max-w-md mx-auto bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm text-center">
+            {generatedError}
+          </div>
+        )}
 
         {/* Search */}
         <div className="max-w-md mx-auto mb-8">

@@ -18,6 +18,10 @@ import {
   Calendar,
   Building2,
   Loader2,
+  Upload,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { MembershipCardEngine } from "@/components/cards/membership-card-engine";
 
@@ -59,6 +63,9 @@ export default function AdminCardsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedCard, setSelectedCard] = useState<MemberCard | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadResults, setUploadResults] = useState<{ row: number; name: string; membershipNumber: string; status: string; error?: string }[] | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/members?limit=100")
@@ -179,6 +186,25 @@ export default function AdminCardsPage() {
     printWindow.document.close();
   };
 
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setUploadResults(null)
+    const formData = new FormData()
+    formData.append("file", file)
+    try {
+      const res = await fetch("/api/admin/cards/bulk-generate", { method: "POST", body: formData })
+      const json = await res.json()
+      if (json.success) setUploadResults(json.results)
+      else setUploadResults([])
+    } catch {
+      setUploadResults([])
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const SortBtn = ({ field, label }: { field: SortField; label: string }) => (
     <button onClick={() => handleSort(field)} className="flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-[#1A3A6B] transition-colors">
       {label}
@@ -194,6 +220,9 @@ export default function AdminCardsPage() {
           <p className="text-sm text-gray-500">{filteredCards.length} بطاقة عضوية</p>
         </div>
         <div className="flex gap-2">
+          <button onClick={() => setShowUpload(true)} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors">
+            <Upload className="w-4 h-4" />رفع Excel
+          </button>
           <button onClick={handlePrintAll} className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors">
             <Printer className="w-4 h-4" />طباعة الكل
           </button>
@@ -321,6 +350,88 @@ export default function AdminCardsPage() {
 
       {/* Empty */}
       {filteredCards.length === 0 && <div className="text-center py-16"><CreditCard className="w-16 h-16 text-gray-300 mx-auto mb-4" /><h3 className="text-lg font-bold text-gray-800 mb-2">لا توجد بطاقات</h3><p className="text-gray-500">جرب تغيير معايير البحث</p></div>}
+
+      {/* Upload Modal */}
+      {showUpload && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => { if (!uploading) setShowUpload(false) }}>
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white z-10 p-4 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-800">رفع ملف Excel لإنشاء البطاقات</h2>
+              <button onClick={() => { if (!uploading) setShowUpload(false) }} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-6">
+              {!uploadResults ? (
+                <div>
+                  <div className="border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center hover:border-[#1A3A6B] transition-colors cursor-pointer" onClick={() => document.getElementById("excel-upload-input")?.click()}>
+                    <Upload className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-600 font-medium mb-1">انقر لاختيار ملف Excel</p>
+                    <p className="text-gray-400 text-sm">يدعم الصيغ .xlsx, .xls</p>
+                    <p className="text-gray-400 text-xs mt-2">الأعمدة المطلوبة: الاسم، البريد الإلكتروني</p>
+                    <p className="text-gray-400 text-xs">أعمدة اختيارية: الاسم الإنجليزي، رقم العضوية، الجوال، الكلية، التخصص، سنة التخرج، نوع العضوية، الدولة</p>
+                  </div>
+                  <input id="excel-upload-input" type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUpload} />
+                  {uploading && (
+                    <div className="mt-4 flex items-center justify-center gap-2 text-gray-600">
+                      <Loader2 className="w-5 h-5 animate-spin" /> جاري المعالجة...
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center gap-1.5 text-sm text-green-700 bg-green-50 px-3 py-1.5 rounded-lg">
+                      <CheckCircle className="w-4 h-4" /> {uploadResults.filter(r => r.status === "success").length} نجاح
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm text-yellow-700 bg-yellow-50 px-3 py-1.5 rounded-lg">
+                      <AlertTriangle className="w-4 h-4" /> {uploadResults.filter(r => r.status === "skipped").length} تم التخطي
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm text-red-700 bg-red-50 px-3 py-1.5 rounded-lg">
+                      <XCircle className="w-4 h-4" /> {uploadResults.filter(r => r.status === "error").length} خطأ
+                    </div>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto border border-gray-200 rounded-xl">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 sticky top-0">
+                        <tr>
+                          <th className="px-3 py-2 text-start text-gray-500 font-medium">#</th>
+                          <th className="px-3 py-2 text-start text-gray-500 font-medium">الاسم</th>
+                          <th className="px-3 py-2 text-start text-gray-500 font-medium">رقم العضوية</th>
+                          <th className="px-3 py-2 text-start text-gray-500 font-medium">الحالة</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {uploadResults.map((r, idx) => (
+                          <tr key={idx} className="border-t border-gray-100">
+                            <td className="px-3 py-2 text-gray-400">{r.row}</td>
+                            <td className="px-3 py-2 font-medium text-gray-700">{r.name || "—"}</td>
+                            <td className="px-3 py-2 font-mono text-gray-600">{r.membershipNumber || "—"}</td>
+                            <td className="px-3 py-2">
+                              {r.status === "success" ? (
+                                <span className="text-green-700 bg-green-50 px-2 py-0.5 rounded-full text-xs font-medium">تم</span>
+                              ) : r.status === "skipped" ? (
+                                <span className="text-yellow-700 bg-yellow-50 px-2 py-0.5 rounded-full text-xs font-medium" title={r.error}>تخطي</span>
+                              ) : (
+                                <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded-full text-xs font-medium" title={r.error}>خطأ</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="mt-4 flex justify-end">
+                    <button onClick={() => { setShowUpload(false); setUploadResults(null) }} className="px-4 py-2 bg-[#1A3A6B] text-white rounded-xl text-sm font-medium hover:bg-[#0f2547] transition-colors">
+                      إغلاق
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Detail Modal - Using Unified Card Component */}
       {selectedCard && (
