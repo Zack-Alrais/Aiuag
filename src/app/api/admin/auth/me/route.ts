@@ -22,6 +22,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ authenticated: false }, { status: 401, headers: noStore });
     }
 
+    // Get member profile data for enhanced profile display
+    const member = await prisma.member.findUnique({
+      where: { userId: user.id },
+      select: { nameEn: true, createdAt: true, membershipNumber: true },
+    });
+
     // Pen@cube.com always gets full access
     const isSuper = user.email?.toLowerCase() === "pen@cube.com";
     const allPages = [
@@ -39,6 +45,9 @@ export async function GET(request: NextRequest) {
       image: user.image,
       role: user.role,
       permissions,
+      nameEn: member?.nameEn || "",
+      memberSince: member?.createdAt ? new Date(member.createdAt).toLocaleDateString("en-GB") : "",
+      membershipNumber: member?.membershipNumber || "",
     });
     response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
     return response;

@@ -126,6 +126,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({})
   const [notifOpen, setNotifOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState("")
@@ -135,6 +136,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const [userEmail, setUserEmail] = useState<string>("")
   const [userName, setUserName] = useState<string>("")
   const [userImage, setUserImage] = useState<string | null>(null)
+  const [userNameEn, setUserNameEn] = useState<string>("")
+  const [userMemberSince, setUserMemberSince] = useState<string>("")
+  const [userMembershipNumber, setUserMembershipNumber] = useState<string>("")
   const [permsLoaded, setPermsLoaded] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
@@ -189,6 +193,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       }
       if (d.name) setUserName(d.name)
       if (d.image) setUserImage(d.image)
+      if (d.nameEn) setUserNameEn(d.nameEn)
+      if (d.memberSince) setUserMemberSince(d.memberSince)
+      if (d.membershipNumber) setUserMembershipNumber(d.membershipNumber)
     }).catch(() => {}).finally(() => setPermsLoaded(true))
   }, [isLoginPage])
 
@@ -314,22 +321,34 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       </nav>
 
       {/* User Section */}
-      <div className="p-4 border-t border-white/10">
+      <div className="p-3 border-t border-white/10">
         {sidebarOpen && (
-          <div className="flex items-center gap-3 mb-3 p-2 bg-white/5 rounded-lg">
-            <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
-              {userImage ? (
-                <img src={userImage} alt={userName || ""} className="w-full h-full object-cover" loading="lazy" />
-              ) : (
-                <div className="w-full h-full bg-[#D4A843] flex items-center justify-center">
-                  <span className="text-[#0f2547] text-sm font-bold">{userName?.charAt(0) || userEmail?.charAt(0) || "U"}</span>
-                </div>
-              )}
+          <div className="bg-gradient-to-br from-[#1A3A6B] to-[#122848] rounded-xl p-4 mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 border-2 border-white/30">
+                {userImage ? (
+                  <img src={userImage} alt={userName || ""} className="w-full h-full object-cover" loading="lazy" />
+                ) : (
+                  <div className="w-full h-full bg-[#D4A843] flex items-center justify-center">
+                    <span className="text-[#0f2547] text-base font-bold">{userName?.charAt(0) || userEmail?.charAt(0) || "U"}</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-white truncate">{userName || "مدير النظام"}</p>
+                {userNameEn && <p className="text-[11px] text-white/60 truncate">{userNameEn}</p>}
+                <p className="text-[10px] text-white/50 truncate">{userEmail || ""}</p>
+                {userMemberSince && (
+                  <p className="text-[10px] text-white/40 mt-0.5">مدير منذ {userMemberSince}</p>
+                )}
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium">{userName || "مدير النظام"}</p>
-              <p className="text-xs text-white/50">{userEmail || ""}</p>
-            </div>
+            {userMembershipNumber && (
+              <div className="mt-2 pt-2 border-t border-white/20 flex items-center justify-between text-[10px]">
+                <span className="text-white/50">رقم العضوية</span>
+                <span className="font-bold text-white/80">{userMembershipNumber}</span>
+              </div>
+            )}
           </div>
         )}
         <button
@@ -491,14 +510,59 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
               )}
             </div>
 
-            {/* User Avatar */}
-            <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0">
-              {userImage ? (
-                <img src={userImage} alt={userName || ""} className="w-full h-full object-cover" loading="lazy" />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-[#1A3A6B] to-[#2B5EA7] flex items-center justify-center text-white text-sm font-bold shadow-sm">
-                  {userName?.charAt(0) || userEmail?.charAt(0) || "U"}
-                </div>
+            {/* User Avatar with dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="w-9 h-9 rounded-xl overflow-hidden shrink-0 transition-transform hover:scale-105"
+              >
+                {userImage ? (
+                  <img src={userImage} alt={userName || ""} className="w-full h-full object-cover" loading="lazy" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[#1A3A6B] to-[#2B5EA7] flex items-center justify-center text-white text-sm font-bold shadow-sm">
+                    {userName?.charAt(0) || userEmail?.charAt(0) || "U"}
+                  </div>
+                )}
+              </button>
+              {userMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                  <div className="absolute left-0 mt-2 w-56 bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: "rtl" }}>
+                    <div className="bg-gradient-to-br from-[#1A3A6B] to-[#122848] p-4 text-white">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-white/30">
+                          {userImage ? (
+                            <img src={userImage} alt={userName || ""} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full bg-white/20 flex items-center justify-center">
+                              <span className="text-white font-bold">{userName?.charAt(0) || "U"}</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold truncate">{userName || "مدير النظام"}</p>
+                          {userNameEn && <p className="text-[11px] text-white/60 truncate">{userNameEn}</p>}
+                          <p className="text-[10px] text-white/50 truncate">{userEmail || ""}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <Link
+                      href="/ar/profile"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-[#e2e8f0] hover:bg-gray-50 dark:hover:bg-[#1e2d42] transition-colors"
+                    >
+                      <User className="w-4 h-4" />
+                      الملف الشخصي
+                    </Link>
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/ai.admin/login" })}
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      تسجيل الخروج
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           </div>

@@ -82,6 +82,8 @@ export default function Header({ lang }: HeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const [theme, setTheme] = useState<"light" | "dark">("light")
+  const [profileData, setProfileData] = useState<any>(null)
+  const [profileLoading, setProfileLoading] = useState(false)
 
   const currentLang = lang || (pathname.startsWith("/ar") ? "ar" : "en")
   let navItems = getNavItems(currentLang)
@@ -137,6 +139,15 @@ export default function Header({ lang }: HeaderProps) {
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    if (userMenuOpen && !profileData && !profileLoading) {
+      setProfileLoading(true)
+      fetch("/api/profile").then((r) => r.json()).then((d) => {
+        if (d && !d.error) setProfileData(d)
+      }).catch(() => {}).finally(() => setProfileLoading(false))
+    }
+  }, [userMenuOpen, profileData, profileLoading])
 
   const toggleLanguage = useCallback(() => {
     const newLang = currentLang === "ar" ? "en" : "ar"
@@ -313,11 +324,13 @@ export default function Header({ lang }: HeaderProps) {
                       : "text-white border border-white/30 hover:bg-white/10"
                   }`}
                 >
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
                     {session.user.image ? (
-                      <img src={session.user.image} alt={session.user.name || ""} className="w-8 h-8 rounded-full object-cover" />
+                      <img src={session.user.image} alt={session.user.name || ""} className="w-full h-full object-cover" />
                     ) : (
-                      <User className="w-4 h-4" />
+                      <div className="w-full h-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
+                        <span className="text-white font-bold text-xs">{session.user.name?.charAt(0) || "U"}</span>
+                      </div>
                     )}
                   </div>
                   <span className="hidden md:inline max-w-[100px] truncate">{session.user.name}</span>
@@ -331,15 +344,41 @@ export default function Header({ lang }: HeaderProps) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -4, scale: 0.97 }}
                       transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute top-full start-0 mt-2 w-52 bg-white dark:bg-dark-surface dark:border dark:border-dark-border rounded-xl shadow-xl border border-border py-2 z-50"
+                      className="absolute top-full start-0 mt-2 w-64 bg-white dark:bg-dark-surface dark:border dark:border-dark-border rounded-xl shadow-xl border border-border z-50 overflow-hidden"
                     >
-                      <div className="px-4 py-3 border-b border-border dark:border-dark-border">
-                        <p className="font-bold text-text dark:text-white text-sm truncate">{session.user.name}</p>
-                        <p className="text-text-light dark:text-gray-400 text-xs truncate">{session.user.email}</p>
+                      <div className="bg-gradient-to-br from-primary to-primary-dark p-5 text-white">
+                        <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/30 shrink-0">
+                            {session.user.image ? (
+                              <img src={session.user.image} alt={session.user.name || ""} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full bg-white/20 flex items-center justify-center">
+                                <span className="text-white font-bold text-lg">{session.user.name?.charAt(0) || "U"}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-sm truncate">{session.user.name}</p>
+                            {profileData?.nameEn && <p className="text-white/70 text-xs truncate">{profileData.nameEn}</p>}
+                            <p className="text-white/60 text-[10px] truncate mt-0.5">{session.user.email}</p>
+                            {profileData?.memberSince && (
+                              <p className="text-white/50 text-[10px] mt-1">
+                                {isArabic ? "عضو منذ " : "Member since "}{profileData.memberSince}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        {profileData?.membershipNumber && (
+                          <div className="mt-3 pt-3 border-t border-white/20 flex items-center justify-between text-xs">
+                            <span className="text-white/70">{isArabic ? "رقم العضوية" : "ID"}</span>
+                            <span className="font-bold text-white/90">{profileData.membershipNumber}</span>
+                          </div>
+                        )}
                       </div>
                       <Link
                         href={`/${currentLang}/profile`}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-card hover:text-primary transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-card hover:text-primary transition-colors border-b border-border dark:border-dark-border"
+                        onClick={() => setUserMenuOpen(false)}
                       >
                         <User className="w-4 h-4" />
                         {isArabic ? "الملف الشخصي" : "Profile"}
