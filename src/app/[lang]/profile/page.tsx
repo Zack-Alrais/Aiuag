@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import {
@@ -90,11 +90,18 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
 
   useEffect(() => {
     if (session?.user?.id) fetchProfile()
-  }, [session])
+    else if (status === "authenticated" && !session?.user?.id) {
+      router.push("/auth/login")
+    }
+  }, [session, status, fetchProfile, router])
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const res = await fetch("/api/profile")
+      if (res.status === 401) {
+        router.push("/auth/login")
+        return
+      }
       if (res.ok) {
         const data = await res.json()
         setProfile(data)
@@ -102,7 +109,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
       }
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
-  }
+  }, [router])
 
   const handleSave = async () => {
     setSaving(true)
@@ -242,7 +249,17 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
   ]
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
-  if (!profile) return <div className="min-h-screen flex items-center justify-center"><p className="text-text-secondary">{isArabic ? "خطأ في تحميل البيانات" : "Error loading profile"}</p></div>
+  if (!profile) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center space-y-4">
+        <p className="text-text-secondary">{isArabic ? "خطأ في تحميل البيانات" : "Error loading profile"}</p>
+        <div className="flex gap-3 justify-center">
+          <button onClick={() => fetchProfile()} className="px-4 py-2 bg-primary text-white rounded-lg text-sm">{isArabic ? "إعادة المحاولة" : "Retry"}</button>
+          <button onClick={() => router.push("/auth/login")} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm">{isArabic ? "تسجيل الدخول" : "Login"}</button>
+        </div>
+      </div>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-background py-8">

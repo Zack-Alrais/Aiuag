@@ -443,7 +443,9 @@ export default function MembersManagement() {
           background: "#ffffff",
           lineColor: "#000000",
         })
-        setBarcodeDataUrl("generated")
+        const svgData = new XMLSerializer().serializeToString(barcodeSvgRef.current)
+        const dataUrl = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)))
+        setBarcodeDataUrl(dataUrl)
       }
     } catch {}
   }
@@ -465,25 +467,11 @@ export default function MembersManagement() {
   }
 
   const downloadBarcode = () => {
-    if (!barcodeSvgRef.current) return
-    const svg = barcodeSvgRef.current
-    const svgData = new XMLSerializer().serializeToString(svg)
-    const canvas = document.createElement("canvas")
-    canvas.width = svg.getBoundingClientRect().width || 300
-    canvas.height = svg.getBoundingClientRect().height || 100
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-    const img = new Image()
-    img.onload = () => {
-      ctx.fillStyle = "#ffffff"
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      ctx.drawImage(img, 0, 0)
-      const link = document.createElement("a")
-      link.download = `barcode-${form.membershipNumber}.png`
-      link.href = canvas.toDataURL("image/png")
-      link.click()
-    }
-    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)))
+    if (!barcodeDataUrl) return
+    const link = document.createElement("a")
+    link.download = `barcode-${form.membershipNumber}.png`
+    link.href = barcodeDataUrl
+    link.click()
   }
 
   const downloadQrCode = () => {
@@ -1005,12 +993,15 @@ export default function MembersManagement() {
                 </div>
               </div>
 
+              {/* Hidden SVG for barcode generation (always mounted) */}
+              <svg ref={barcodeSvgRef} style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }} />
+
               {/* Barcode / QR preview */}
               {(barcodeDataUrl || qrCodeDataUrl) && (
                 <div className="flex gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 justify-center">
                   {barcodeDataUrl && (
                     <div className="text-center">
-                      <svg ref={barcodeSvgRef} className="mx-auto" />
+                      <img src={barcodeDataUrl} alt="Barcode" className="mx-auto h-16" />
                       <button type="button" onClick={downloadBarcode}
                         className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
                         <Download className="h-3 w-3" /> تحميل الباركود

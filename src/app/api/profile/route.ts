@@ -6,15 +6,27 @@ import { generateMembershipNumber } from "@/lib/membership";
 
 export async function GET() {
   try {
-    const session = await auth();
+    let session;
+    try {
+      session = await auth();
+    } catch (authError) {
+      console.error("Auth error:", authError);
+      return NextResponse.json({ error: "Auth failed", detail: String(authError) }, { status: 401 });
+    }
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized", detail: "No user id in session" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      include: { member: true },
-    });
+    let user;
+    try {
+      user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        include: { member: true },
+      });
+    } catch (dbError) {
+      console.error("DB error:", dbError);
+      return NextResponse.json({ error: "Database error", detail: String(dbError) }, { status: 500 });
+    }
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
