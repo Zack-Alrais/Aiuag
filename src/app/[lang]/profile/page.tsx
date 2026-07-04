@@ -111,6 +111,8 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
         const data = await res.json()
         setProfile(data)
         setEditForm(data)
+      } else {
+        console.error("Profile fetch error:", res.status, await res.text())
       }
     } catch (e) { console.error(e) }
     finally { setLoading(false) }

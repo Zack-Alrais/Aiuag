@@ -9,6 +9,7 @@ import { Menu, X, Globe, Search, ChevronDown, User, LogOut, ChevronUp, LogIn, Su
 import SearchOverlay from "./search-overlay"
 import MobileMenu from "./mobile-menu"
 import { ASSETS } from "@/lib/assets"
+import { useTheme } from "@/components/theme/theme-provider"
 
 interface NavChild {
   label: string
@@ -84,7 +85,7 @@ export default function Header({ lang }: HeaderProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
-  const [theme, setTheme] = useState<"light" | "dark">("light")
+  const { theme, toggleTheme } = useTheme()
   const [profileData, setProfileData] = useState<any>(null)
   const [profileLoading, setProfileLoading] = useState(false)
 
@@ -105,21 +106,6 @@ export default function Header({ lang }: HeaderProps) {
     return item
   })
   const isArabic = currentLang === "ar"
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme") as "light" | "dark" | null
-    if (saved) {
-      setTheme(saved)
-      document.documentElement.classList.toggle("dark", saved === "dark")
-    }
-  }, [])
-
-  const toggleTheme = () => {
-    const next = theme === "light" ? "dark" : "light"
-    setTheme(next)
-    localStorage.setItem("theme", next)
-    document.documentElement.classList.toggle("dark", next === "dark")
-  }
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10)

@@ -19,13 +19,19 @@ export async function GET() {
 
     let user;
     try {
-      const where = session.user.id
-        ? { id: session.user.id }
-        : { email: session.user.email! };
-      user = await prisma.user.findUnique({
-        where,
-        include: { member: true },
-      });
+      // Try by ID first, fallback to email if ID lookup fails (stale JWT)
+      if (session.user.id) {
+        user = await prisma.user.findUnique({
+          where: { id: session.user.id },
+          include: { member: true },
+        });
+      }
+      if (!user && session.user.email) {
+        user = await prisma.user.findUnique({
+          where: { email: session.user.email },
+          include: { member: true },
+        });
+      }
     } catch (dbError) {
       console.error("DB error:", dbError);
       return NextResponse.json({ error: "Database error", detail: String(dbError) }, { status: 500 });
