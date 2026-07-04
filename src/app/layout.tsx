@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Cairo } from 'next/font/google';
 import AuthProvider from '@/components/auth/provider';
-import { Toaster } from 'sonner';
+import ToasterProvider from '@/components/ui/toaster-provider';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -28,15 +28,7 @@ export default function RootLayout({
       <body className="antialiased">
         <AuthProvider>
           {children}
-          <Toaster
-            position="top-left"
-            richColors
-            closeButton
-            dir="rtl"
-            toastOptions={{
-              className: 'dark:bg-dark-surface dark:text-white dark:border-dark-border',
-            }}
-          />
+          <ToasterProvider />
         </AuthProvider>
       </body>
     </html>
