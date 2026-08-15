@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { createNotification } from "@/lib/notifications";
 import { logAudit } from "@/lib/audit";
 import { generateMembershipNumber } from "@/lib/membership";
+import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   try {
@@ -83,6 +84,8 @@ export async function GET(request: NextRequest) {
         jobSector: u.member?.jobSector || null,
         yearsOfExperience: u.member?.yearsOfExperience || null,
         graduationCertificate: u.member?.graduationCertificate || null,
+        barcode: u.member?.barcode || null,
+        qrCode: u.member?.qrCode || null,
       };
     });
 
@@ -127,6 +130,8 @@ export async function POST(request: NextRequest) {
       jobSector,
       yearsOfExperience,
       graduationCertificate,
+      barcode,
+      qrCode,
     } = body;
 
     let finalUserId = userId;
@@ -139,7 +144,9 @@ export async function POST(request: NextRequest) {
       if (existingUser) {
         finalUserId = existingUser.id;
       } else {
-        const hashedPassword = password ? await (await import("bcryptjs")).default.hash(password, 12) : await (await import("bcryptjs")).default.hash("Temp1234!", 12);
+        const hashedPassword = password
+          ? await bcrypt.hash(password, 12)
+          : await bcrypt.hash("Temp1234!", 12);
         const userRole = (role === "admin" || role === "moderator") ? role : "member";
         const newUser = await prisma.user.create({
           data: { name, email, password: hashedPassword, role: userRole, emailVerified: new Date() },
@@ -179,6 +186,8 @@ export async function POST(request: NextRequest) {
         jobSector: jobSector || null,
         yearsOfExperience: yearsOfExperience ? parseInt(String(yearsOfExperience)) : null,
         graduationCertificate: graduationCertificate || null,
+        barcode: barcode || null,
+        qrCode: qrCode || null,
       },
       include: {
         user: { select: { id: true, name: true, email: true, image: true, role: true } },

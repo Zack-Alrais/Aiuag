@@ -33,6 +33,8 @@ interface MemberRaw {
   jobSector?: string | null
   yearsOfExperience?: number | null
   graduationCertificate?: string | null
+  barcode?: string | null
+  qrCode?: string | null
 }
 
 interface Member {
@@ -102,6 +104,8 @@ function flattenMember(raw: MemberRaw): Member {
     jobSector: raw.jobSector,
     yearsOfExperience: raw.yearsOfExperience,
     graduationCertificate: raw.graduationCertificate,
+    barcode: raw.barcode ?? null,
+    qrCode: raw.qrCode ?? null,
   }
 }
 
@@ -268,6 +272,8 @@ export default function MembersManagement() {
       yearsOfExperience: member.yearsOfExperience ? String(member.yearsOfExperience) : "",
       graduationCertificate: member.graduationCertificate ?? "",
     })
+    setBarcodeDataUrl(member.barcode ?? null)
+    setQrCodeDataUrl(member.qrCode ?? null)
     setShowModal(true)
   }
 
@@ -310,6 +316,8 @@ export default function MembersManagement() {
         jobSector: form.jobSector || null,
         yearsOfExperience: form.yearsOfExperience ? Number(form.yearsOfExperience) : null,
         graduationCertificate: form.graduationCertificate || null,
+        barcode: barcodeDataUrl || null,
+        qrCode: qrCodeDataUrl || null,
       }
 
       if (!editingMember && form.password) {

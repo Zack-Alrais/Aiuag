@@ -1,0 +1,280 @@
+   ▲ Next.js 15.5.19
+   - Local:        http://localhost:9000
+   - Network:      http://100.66.111.8:9000
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 3.4s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1335ms (115 modules)
+ ○ Compiling /api/admin/notifications ...
+ ✓ Compiled /api/admin/notifications in 3.4s (299 modules)
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+ GET /api/admin/notifications?limit=20 200 in 7447ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 818ms
+ ○ Compiling /[lang]/media/gallery ...
+
+
+Retrying 1/3...
+
+
+Retrying 2/3...
+
+
+Retrying 1/3...
+
+
+Retrying 1/3...
+
+
+Retrying 1/3...
+ ✓ Compiled /[lang]/media/gallery in 8.4s (1665 modules)
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 1604ms
+ ○ Compiling /api/public/gallery ...
+ ✓ Compiled /api/public/gallery in 1832ms (1650 modules)
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."createdAt" FROM "public"."Gallery" WHERE "public"."Gallery"."isActive" = $1 ORDER BY "public"."Gallery"."createdAt" DESC OFFSET $2
+prisma:query SELECT "public"."Video"."id", "public"."Video"."title", "public"."Video"."titleEn", "public"."Video"."url", "public"."Video"."description", "public"."Video"."category", "public"."Video"."thumbnail", "public"."Video"."createdAt" FROM "public"."Video" WHERE 1=1 ORDER BY "public"."Video"."createdAt" DESC OFFSET $1
+ GET /api/public/gallery 200 in 6100ms
+prisma:query SELECT "public"."HeroImage"."id", "public"."HeroImage"."imageUrl", "public"."HeroImage"."titleAr", "public"."HeroImage"."titleEn", "public"."HeroImage"."subtitleAr", "public"."HeroImage"."subtitleEn", "public"."HeroImage"."linkUrl", "public"."HeroImage"."pageSlugs" FROM "public"."HeroImage" WHERE "public"."HeroImage"."isActive" = $1 ORDER BY "public"."HeroImage"."order" ASC OFFSET $2
+ GET /ar/media/gallery 200 in 19971ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 1104ms
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 1080ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 773ms
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 524ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 273ms
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 451ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 277ms
+ ○ Compiling /ai.admin/videos ...
+ ✓ Compiled /ai.admin/videos in 1441ms (1239 modules)
+ GET /ai.admin/videos 200 in 2146ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /[lang]/media/gallery in 4.5s (1879 modules)
+ GET /api/admin/auth/me 200 in 4717ms
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+prisma:query SELECT "public"."Video"."id", "public"."Video"."title", "public"."Video"."titleEn", "public"."Video"."url", "public"."Video"."description", "public"."Video"."category", "public"."Video"."thumbnail", "public"."Video"."authorId", "public"."Video"."createdAt", "public"."Video"."updatedAt" FROM "public"."Video" WHERE 1=1 ORDER BY "public"."Video"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/videos 200 in 5980ms
+ GET /api/admin/auth/me 200 in 226ms
+ ○ Compiling /api/public/gallery ...
+ GET /api/auth/session 200 in 6575ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+ GET /api/admin/notifications?limit=20 200 in 6879ms
+prisma:query SELECT "public"."Event"."id", "public"."Event"."titleAr", "public"."Event"."titleEn", "public"."Event"."slug", "public"."Event"."date", "public"."Event"."time", "public"."Event"."location", "public"."Event"."status" FROM "public"."Event" WHERE "public"."Event"."status" IN ($1,$2) ORDER BY "public"."Event"."date" ASC LIMIT $3 OFFSET $4
+prisma:query SELECT "public"."News"."id", "public"."News"."titleAr", "public"."News"."titleEn", "public"."News"."slug", "public"."News"."excerptAr", "public"."News"."excerptEn", "public"."News"."featuredImage", "public"."News"."category", "public"."News"."publishedAt", "public"."News"."createdAt" FROM "public"."News" WHERE "public"."News"."status" = $1 ORDER BY "public"."News"."createdAt" DESC LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."authorId", "public"."Gallery"."isActive", "public"."Gallery"."createdAt", "public"."Gallery"."updatedAt" FROM "public"."Gallery" WHERE "public"."Gallery"."isActive" = $1 ORDER BY "public"."Gallery"."createdAt" DESC LIMIT $2 OFFSET $3
+ ✓ Compiled /api/public/gallery in 1261ms (1109 modules)
+ ✓ Compiled in 0ms (1109 modules)
+ ✓ Compiled in 0ms (1109 modules)
+ GET /api/auth/session 200 in 1171ms
+prisma:query SELECT "public"."Video"."id", "public"."Video"."title", "public"."Video"."titleEn", "public"."Video"."url", "public"."Video"."description", "public"."Video"."category", "public"."Video"."thumbnail", "public"."Video"."authorId", "public"."Video"."createdAt", "public"."Video"."updatedAt" FROM "public"."Video" WHERE 1=1 ORDER BY "public"."Video"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/videos 200 in 2448ms
+prisma:query SELECT "public"."Project"."id", "public"."Project"."titleAr", "public"."Project"."titleEn", "public"."Project"."slug", "public"."Project"."descriptionAr", "public"."Project"."descriptionEn", "public"."Project"."status", "public"."Project"."featuredImage" FROM "public"."Project" WHERE "public"."Project"."status" IN ($1,$2) ORDER BY "public"."Project"."createdAt" DESC LIMIT $3 OFFSET $4
+ ✓ Compiled in 1ms (1109 modules)
+ GET /api/admin/auth/me 200 in 2230ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."status" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Project"."id" FROM "public"."Project" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."createdAt" FROM "public"."Gallery" WHERE "public"."Gallery"."isActive" = $1 ORDER BY "public"."Gallery"."createdAt" DESC OFFSET $2
+ ✓ Compiled in 0ms (1109 modules)
+prisma:query SELECT "public"."HeroImage"."id", "public"."HeroImage"."imageUrl", "public"."HeroImage"."titleAr", "public"."HeroImage"."titleEn", "public"."HeroImage"."subtitleAr", "public"."HeroImage"."subtitleEn", "public"."HeroImage"."linkUrl", "public"."HeroImage"."pageSlugs" FROM "public"."HeroImage" WHERE "public"."HeroImage"."isActive" = $1 ORDER BY "public"."HeroImage"."order" ASC OFFSET $2
+ GET /favicon.ico 200 in 10000ms
+prisma:query SELECT "public"."Video"."id", "public"."Video"."title", "public"."Video"."titleEn", "public"."Video"."url", "public"."Video"."description", "public"."Video"."category", "public"."Video"."thumbnail", "public"."Video"."createdAt" FROM "public"."Video" WHERE 1=1 ORDER BY "public"."Video"."createdAt" DESC OFFSET $1
+ GET /api/public/gallery 200 in 3794ms
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+ GET /api/admin/notifications?limit=20 200 in 2751ms
+prisma:query SELECT "public"."HeroImage"."id", "public"."HeroImage"."imageUrl", "public"."HeroImage"."titleAr", "public"."HeroImage"."titleEn", "public"."HeroImage"."subtitleAr", "public"."HeroImage"."subtitleEn", "public"."HeroImage"."linkUrl", "public"."HeroImage"."pageSlugs" FROM "public"."HeroImage" WHERE "public"."HeroImage"."isActive" = $1 ORDER BY "public"."HeroImage"."order" ASC OFFSET $2
+ GET /ar/media/gallery 200 in 9192ms
+ ✓ Compiled in 1ms (1109 modules)
+ ✓ Compiled in 1ms (1109 modules)
+ GET /api/auth/session 200 in 2307ms
+prisma:query SELECT "public"."Video"."id", "public"."Video"."title", "public"."Video"."titleEn", "public"."Video"."url", "public"."Video"."description", "public"."Video"."category", "public"."Video"."thumbnail", "public"."Video"."authorId", "public"."Video"."createdAt", "public"."Video"."updatedAt" FROM "public"."Video" WHERE 1=1 ORDER BY "public"."Video"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/videos 200 in 2688ms
+ ✓ Compiled in 1ms (1109 modules)
+ GET /api/admin/auth/me 200 in 2354ms
+ ✓ Compiled in 1ms (1109 modules)
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+ GET /api/admin/notifications?limit=20 200 in 2050ms
+ ✓ Compiled in 1ms (1109 modules)
+ ✓ Compiled /api/settings in 1ms (1109 modules)
+ GET /api/auth/session 200 in 2498ms
+ ○ Compiling /api/files/[...path] ...
+ ✓ Compiled /api/files/[...path] in 1412ms (1888 modules)
+ GET /api/auth/session 200 in 1798ms
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Video"."id", "public"."Video"."title", "public"."Video"."titleEn", "public"."Video"."url", "public"."Video"."description", "public"."Video"."category", "public"."Video"."thumbnail", "public"."Video"."authorId", "public"."Video"."createdAt", "public"."Video"."updatedAt" FROM "public"."Video" WHERE 1=1 ORDER BY "public"."Video"."createdAt" DESC LIMIT $1 OFFSET $2
+prisma:query SELECT "public"."Settings"."id", "public"."Settings"."group", "public"."Settings"."key", "public"."Settings"."value" FROM "public"."Settings" WHERE 1=1 OFFSET $1
+prisma:query SELECT "public"."Event"."id", "public"."Event"."titleAr", "public"."Event"."titleEn", "public"."Event"."slug", "public"."Event"."date", "public"."Event"."time", "public"."Event"."location", "public"."Event"."status" FROM "public"."Event" WHERE "public"."Event"."status" IN ($1,$2) ORDER BY "public"."Event"."date" ASC LIMIT $3 OFFSET $4
+prisma:query SELECT "public"."News"."id", "public"."News"."titleAr", "public"."News"."titleEn", "public"."News"."slug", "public"."News"."excerptAr", "public"."News"."excerptEn", "public"."News"."featuredImage", "public"."News"."category", "public"."News"."publishedAt", "public"."News"."createdAt" FROM "public"."News" WHERE "public"."News"."status" = $1 ORDER BY "public"."News"."createdAt" DESC LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."authorId", "public"."Gallery"."isActive", "public"."Gallery"."createdAt", "public"."Gallery"."updatedAt" FROM "public"."Gallery" WHERE "public"."Gallery"."isActive" = $1 ORDER BY "public"."Gallery"."createdAt" DESC LIMIT $2 OFFSET $3
+ GET /api/admin/notifications?limit=20 200 in 4267ms
+ GET /api/admin/videos 200 in 5128ms
+ GET /api/settings 200 in 3803ms
+ GET /api/settings 200 in 354ms
+ GET /api/auth/session 200 in 325ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Project"."id", "public"."Project"."titleAr", "public"."Project"."titleEn", "public"."Project"."slug", "public"."Project"."descriptionAr", "public"."Project"."descriptionEn", "public"."Project"."status", "public"."Project"."featuredImage" FROM "public"."Project" WHERE "public"."Project"."status" IN ($1,$2) ORDER BY "public"."Project"."createdAt" DESC LIMIT $3 OFFSET $4
+ GET /api/auth/session 200 in 176ms
+ GET /api/files/hero/1783120693252-1bf49t.jpg 404 in 4025ms
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 719ms
+ GET /api/auth/session 200 in 218ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Project"."id" FROM "public"."Project" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."status" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT "public"."HeroImage"."id", "public"."HeroImage"."imageUrl", "public"."HeroImage"."titleAr", "public"."HeroImage"."titleEn", "public"."HeroImage"."subtitleAr", "public"."HeroImage"."subtitleEn", "public"."HeroImage"."linkUrl", "public"."HeroImage"."pageSlugs" FROM "public"."HeroImage" WHERE "public"."HeroImage"."isActive" = $1 ORDER BY "public"."HeroImage"."order" ASC OFFSET $2
+ GET /api/auth/session 200 in 669ms
+ GET /favicon.ico 200 in 6005ms
+ GET /api/auth/session 200 in 113ms
+ GET /api/auth/session 200 in 127ms
+ GET /api/auth/session 200 in 228ms
+ GET /api/auth/session 200 in 120ms
+ GET /api/auth/session 200 in 122ms
+ GET /api/auth/session 200 in 93ms
+prisma:query SELECT 1
+prisma:query SELECT "public"."Project"."id", "public"."Project"."titleAr", "public"."Project"."titleEn", "public"."Project"."slug", "public"."Project"."descriptionAr", "public"."Project"."descriptionEn", "public"."Project"."status", "public"."Project"."featuredImage" FROM "public"."Project" WHERE "public"."Project"."status" IN ($1,$2) ORDER BY "public"."Project"."createdAt" DESC LIMIT $3 OFFSET $4
+prisma:query SELECT 1
+prisma:query SELECT "public"."Event"."id", "public"."Event"."titleAr", "public"."Event"."titleEn", "public"."Event"."slug", "public"."Event"."date", "public"."Event"."time", "public"."Event"."location", "public"."Event"."status" FROM "public"."Event" WHERE "public"."Event"."status" IN ($1,$2) ORDER BY "public"."Event"."date" ASC LIMIT $3 OFFSET $4
+prisma:query SELECT "public"."News"."id", "public"."News"."titleAr", "public"."News"."titleEn", "public"."News"."slug", "public"."News"."excerptAr", "public"."News"."excerptEn", "public"."News"."featuredImage", "public"."News"."category", "public"."News"."publishedAt", "public"."News"."createdAt" FROM "public"."News" WHERE "public"."News"."status" = $1 ORDER BY "public"."News"."createdAt" DESC LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."authorId", "public"."Gallery"."isActive", "public"."Gallery"."createdAt", "public"."Gallery"."updatedAt" FROM "public"."Gallery" WHERE "public"."Gallery"."isActive" = $1 ORDER BY "public"."Gallery"."createdAt" DESC LIMIT $2 OFFSET $3
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Project"."id" FROM "public"."Project" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."status" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."HeroImage"."id", "public"."HeroImage"."imageUrl", "public"."HeroImage"."titleAr", "public"."HeroImage"."titleEn", "public"."HeroImage"."subtitleAr", "public"."HeroImage"."subtitleEn", "public"."HeroImage"."linkUrl", "public"."HeroImage"."pageSlugs" FROM "public"."HeroImage" WHERE "public"."HeroImage"."isActive" = $1 ORDER BY "public"."HeroImage"."order" ASC OFFSET $2
+ GET /favicon.ico 200 in 1568ms
+ GET /api/files/hero/1783120693252-1bf49t.jpg 404 in 152ms
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+ GET /api/admin/notifications?limit=20 200 in 465ms
+ ○ Compiling /ai.admin/gallery ...
+ ✓ Compiled /ai.admin/gallery in 2.4s (1927 modules)
+ GET /ai.admin/gallery 200 in 2643ms
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 1826ms
+ ○ Compiling /api/admin/gallery ...
+ ✓ Compiled /api/admin/gallery in 1360ms (1929 modules)
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT "public"."News"."id", "public"."News"."titleAr", "public"."News"."titleEn", "public"."News"."slug", "public"."News"."excerptAr", "public"."News"."excerptEn", "public"."News"."featuredImage", "public"."News"."category", "public"."News"."publishedAt", "public"."News"."createdAt" FROM "public"."News" WHERE "public"."News"."status" = $1 ORDER BY "public"."News"."createdAt" DESC LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Event"."id", "public"."Event"."titleAr", "public"."Event"."titleEn", "public"."Event"."slug", "public"."Event"."date", "public"."Event"."time", "public"."Event"."location", "public"."Event"."status" FROM "public"."Event" WHERE "public"."Event"."status" IN ($1,$2) ORDER BY "public"."Event"."date" ASC LIMIT $3 OFFSET $4
+prisma:query SELECT "public"."Project"."id", "public"."Project"."titleAr", "public"."Project"."titleEn", "public"."Project"."slug", "public"."Project"."descriptionAr", "public"."Project"."descriptionEn", "public"."Project"."status", "public"."Project"."featuredImage" FROM "public"."Project" WHERE "public"."Project"."status" IN ($1,$2) ORDER BY "public"."Project"."createdAt" DESC LIMIT $3 OFFSET $4
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."authorId", "public"."Gallery"."isActive", "public"."Gallery"."createdAt", "public"."Gallery"."updatedAt" FROM "public"."Gallery" WHERE "public"."Gallery"."isActive" = $1 ORDER BY "public"."Gallery"."createdAt" DESC LIMIT $2 OFFSET $3
+ GET /api/files/hero/1783120693252-1bf49t.jpg 404 in 636ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Project"."id" FROM "public"."Project" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."status" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."authorId", "public"."Gallery"."isActive", "public"."Gallery"."createdAt", "public"."Gallery"."updatedAt" FROM "public"."Gallery" WHERE 1=1 ORDER BY "public"."Gallery"."createdAt" DESC LIMIT $1 OFFSET $2
+prisma:query SELECT "public"."HeroImage"."id", "public"."HeroImage"."imageUrl", "public"."HeroImage"."titleAr", "public"."HeroImage"."titleEn", "public"."HeroImage"."subtitleAr", "public"."HeroImage"."subtitleEn", "public"."HeroImage"."linkUrl", "public"."HeroImage"."pageSlugs" FROM "public"."HeroImage" WHERE "public"."HeroImage"."isActive" = $1 ORDER BY "public"."HeroImage"."order" ASC OFFSET $2
+ GET /favicon.ico 200 in 2788ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Gallery"."id" FROM "public"."Gallery" WHERE 1=1 OFFSET $1) AS "sub"
+ GET /api/admin/gallery 200 in 2747ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Gallery"."id" FROM "public"."Gallery" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."authorId", "public"."Gallery"."isActive", "public"."Gallery"."createdAt", "public"."Gallery"."updatedAt" FROM "public"."Gallery" WHERE 1=1 ORDER BY "public"."Gallery"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/gallery 200 in 493ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 475ms
+ GET /api/files/hero/1783120693252-1bf49t.jpg 404 in 84ms
+ ○ Compiling /api/upload ...
+ ✓ Compiled /api/upload in 3.2s (2281 modules)
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 3259ms
+ POST /api/upload 201 in 9039ms
+ POST /api/upload 201 in 1984ms
+ GET /api/files/hero/1783120693252-1bf49t.jpg 404 in 101ms
+ POST /api/admin/gallery 400 in 85ms
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+ GET /api/admin/notifications?limit=20 200 in 273ms
+ POST /api/admin/gallery 400 in 59ms
+ POST /api/admin/gallery 400 in 84ms
+ POST /api/upload 201 in 1082ms
+prisma:query SELECT 1
+prisma:query BEGIN
+prisma:query INSERT INTO "public"."Gallery" ("id","title","description","type","imageUrl","fileUrl","thumbnailUrl","album","tags","authorId","isActive","createdAt","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING "public"."Gallery"."id"
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."authorId", "public"."Gallery"."isActive", "public"."Gallery"."createdAt", "public"."Gallery"."updatedAt" FROM "public"."Gallery" WHERE "public"."Gallery"."id" = $1 LIMIT $2 OFFSET $3
+prisma:query COMMIT
+ POST /api/admin/gallery 201 in 1659ms
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."authorId", "public"."Gallery"."isActive", "public"."Gallery"."createdAt", "public"."Gallery"."updatedAt" FROM "public"."Gallery" WHERE 1=1 ORDER BY "public"."Gallery"."createdAt" DESC LIMIT $1 OFFSET $2
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Gallery"."id" FROM "public"."Gallery" WHERE 1=1 OFFSET $1) AS "sub"
+ GET /api/admin/gallery 200 in 524ms
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Notification"."id" FROM "public"."Notification" WHERE "public"."Notification"."isRead" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Notification"."id", "public"."Notification"."titleAr", "public"."Notification"."titleEn", "public"."Notification"."messageAr", "public"."Notification"."messageEn", "public"."Notification"."type", "public"."Notification"."entityType", "public"."Notification"."entityId", "public"."Notification"."isRead", "public"."Notification"."isGlobal", "public"."Notification"."targetUserId", "public"."Notification"."createdAt" FROM "public"."Notification" WHERE 1=1 ORDER BY "public"."Notification"."createdAt" DESC LIMIT $1 OFFSET $2
+ GET /api/admin/notifications?limit=20 200 in 370ms
+ ○ Compiling /api/public/gallery ...
+ ✓ Compiled /api/public/gallery in 1292ms (1345 modules)
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."createdAt" FROM "public"."Gallery" WHERE "public"."Gallery"."isActive" = $1 ORDER BY "public"."Gallery"."createdAt" DESC OFFSET $2
+prisma:query SELECT "public"."Video"."id", "public"."Video"."title", "public"."Video"."titleEn", "public"."Video"."url", "public"."Video"."description", "public"."Video"."category", "public"."Video"."thumbnail", "public"."Video"."createdAt" FROM "public"."Video" WHERE 1=1 ORDER BY "public"."Video"."createdAt" DESC OFFSET $1
+ GET /api/public/gallery 200 in 2724ms
+prisma:query SELECT "public"."HeroImage"."id", "public"."HeroImage"."imageUrl", "public"."HeroImage"."titleAr", "public"."HeroImage"."titleEn", "public"."HeroImage"."subtitleAr", "public"."HeroImage"."subtitleEn", "public"."HeroImage"."linkUrl", "public"."HeroImage"."pageSlugs" FROM "public"."HeroImage" WHERE "public"."HeroImage"."isActive" = $1 ORDER BY "public"."HeroImage"."order" ASC OFFSET $2
+ ○ Compiling /api/auth/[...nextauth] ...
+ GET /ar/media/gallery 200 in 3925ms
+ ✓ Compiled /api/auth/[...nextauth] in 1394ms (1347 modules)
+ ✓ Compiled /[lang] in 0ms (1473 modules)
+ ✓ Compiled in 1ms (1490 modules)
+ ✓ Compiled in 1ms (1490 modules)
+prisma:query SELECT "public"."Settings"."id", "public"."Settings"."group", "public"."Settings"."key", "public"."Settings"."value" FROM "public"."Settings" WHERE 1=1 OFFSET $1
+ GET /api/settings 200 in 4376ms
+ ✓ Compiled in 1ms (1490 modules)
+ GET /api/auth/session 200 in 4911ms
+ GET /api/files/hero/1783120693252-1bf49t.jpg 404 in 2832ms
+ ✓ Compiled in 1ms (1490 modules)
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT "public"."Gallery"."id", "public"."Gallery"."title", "public"."Gallery"."description", "public"."Gallery"."type", "public"."Gallery"."imageUrl", "public"."Gallery"."fileUrl", "public"."Gallery"."thumbnailUrl", "public"."Gallery"."album", "public"."Gallery"."tags", "public"."Gallery"."authorId", "public"."Gallery"."isActive", "public"."Gallery"."createdAt", "public"."Gallery"."updatedAt" FROM "public"."Gallery" WHERE "public"."Gallery"."isActive" = $1 ORDER BY "public"."Gallery"."createdAt" DESC LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Project"."id", "public"."Project"."titleAr", "public"."Project"."titleEn", "public"."Project"."slug", "public"."Project"."descriptionAr", "public"."Project"."descriptionEn", "public"."Project"."status", "public"."Project"."featuredImage" FROM "public"."Project" WHERE "public"."Project"."status" IN ($1,$2) ORDER BY "public"."Project"."createdAt" DESC LIMIT $3 OFFSET $4
+prisma:query SELECT "public"."News"."id", "public"."News"."titleAr", "public"."News"."titleEn", "public"."News"."slug", "public"."News"."excerptAr", "public"."News"."excerptEn", "public"."News"."featuredImage", "public"."News"."category", "public"."News"."publishedAt", "public"."News"."createdAt" FROM "public"."News" WHERE "public"."News"."status" = $1 ORDER BY "public"."News"."createdAt" DESC LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Event"."id", "public"."Event"."titleAr", "public"."Event"."titleEn", "public"."Event"."slug", "public"."Event"."date", "public"."Event"."time", "public"."Event"."location", "public"."Event"."status" FROM "public"."Event" WHERE "public"."Event"."status" IN ($1,$2) ORDER BY "public"."Event"."date" ASC LIMIT $3 OFFSET $4
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."status" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) AS "_count$_all" FROM (SELECT "public"."Project"."id" FROM "public"."Project" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT "public"."HeroImage"."id", "public"."HeroImage"."imageUrl", "public"."HeroImage"."titleAr", "public"."HeroImage"."titleEn", "public"."HeroImage"."subtitleAr", "public"."HeroImage"."subtitleEn", "public"."HeroImage"."linkUrl", "public"."HeroImage"."pageSlugs" FROM "public"."HeroImage" WHERE "public"."HeroImage"."isActive" = $1 ORDER BY "public"."HeroImage"."order" ASC OFFSET $2
+ GET /favicon.ico 200 in 6141ms
+ GET /api/auth/session 200 in 3086ms
+ GET /api/auth/session 200 in 111ms
+ GET /api/auth/session 200 in 123ms
+ GET /api/files/hero/1783120693252-1bf49t.jpg 404 in 102ms
+ GET /api/files/hero/1783120693252-1bf49t.jpg 404 in 109ms
+ GET /api/files/hero/1783120693252-1bf49t.jpg 404 in 90ms
+ GET /api/files/hero/1783120693252-1bf49t.jpg 404 in 91ms

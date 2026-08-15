@@ -4,6 +4,11 @@ import { prisma } from "@/lib/prisma"
 import { TemplateEngine } from "@/services/templateEngine"
 import { MemberCardData } from "@/templates/membership-card/types"
 
+function fmtDate(d: Date | undefined): string {
+  if (!d) return new Date().toISOString().slice(0, 10)
+  return d.toISOString().slice(0, 10)
+}
+
 export async function POST(req: NextRequest) {
   try {
     const session = await auth()
@@ -48,8 +53,8 @@ export async function POST(req: NextRequest) {
       graduationYear: member?.graduationYear || undefined,
       phone: member?.phone || undefined,
       email: user.email || undefined,
-      joinDate: member?.createdAt ? new Date(member.createdAt).toLocaleDateString("en-GB") : new Date().toLocaleDateString("en-GB"),
-      expiryDate: new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000).toLocaleDateString("en-GB"),
+      joinDate: member?.createdAt ? fmtDate(member.createdAt) : fmtDate(undefined),
+      expiryDate: fmtDate(new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000)),
     }
 
     const origin = req.headers.get("origin") || "http://localhost:9000"
@@ -60,6 +65,14 @@ export async function POST(req: NextRequest) {
       origin,
       format: body.format || "html",
     })
+
+    // Save QR code to member record for persistence
+    if (member?.id && result.qrDataURL) {
+      await prisma.member.update({
+        where: { id: member.id },
+        data: { qrCode: result.qrDataURL },
+      }).catch(() => {})
+    }
 
     return NextResponse.json({
       success: true,
@@ -124,8 +137,8 @@ export async function GET(req: NextRequest) {
       graduationYear: member?.graduationYear || undefined,
       phone: member?.phone || undefined,
       email: user.email || undefined,
-      joinDate: member?.createdAt ? new Date(member.createdAt).toLocaleDateString("en-GB") : new Date().toLocaleDateString("en-GB"),
-      expiryDate: new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000).toLocaleDateString("en-GB"),
+      joinDate: member?.createdAt ? fmtDate(member.createdAt) : fmtDate(undefined),
+      expiryDate: fmtDate(new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000)),
     }
 
     return NextResponse.json({ success: true, member: memberData })

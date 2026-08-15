@@ -27,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" dir="rtl" className={cairo.className}>
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning>
         <AuthProvider>
           <ThemeProvider>
             <LanguageSync fontAr={cairo.className} fontEn={inter.className} />

@@ -60,6 +60,8 @@ model Member {
   bio              String?
   linkedin         String?
   cardPhoto        String?
+  barcode          String?     // Generated barcode data URL (CODE128)
+  qrCode           String?     // Generated QR code data URL (verification link)
   graduationCertificate String?
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt

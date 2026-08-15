@@ -45,16 +45,16 @@ export function MembershipCardEngine({
 
   const origin = typeof window !== "undefined" ? window.location.origin : ""
   const verificationUrl = `${origin}/ar/verify?id=${member.membershipNumber}`
-  const joinDate = member.joinDate || new Date().toLocaleDateString("en-GB")
+  const joinDate = member.joinDate || new Date().toISOString().slice(0, 10)
   const photoUrl = member.photo || ""
 
   const expiryDate = useMemo(() => {
     if (member.expiryDate) return member.expiryDate
-    const parts = joinDate.split("/")
+    const parts = joinDate.split("-")
     if (parts.length === 3) {
-      const d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`)
+      const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
       d.setFullYear(d.getFullYear() + 2)
-      return d.toLocaleDateString("en-GB")
+      return d.toISOString().slice(0, 10)
     }
     return ""
   }, [member.expiryDate, joinDate])

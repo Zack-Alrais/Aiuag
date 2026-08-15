@@ -3,19 +3,20 @@
 import { useState, useEffect } from "react";
 import {
   Heart, MessageCircle, Share2, ChevronLeft, ChevronRight, X, Play,
-  Send, Loader2, User, Calendar, ArrowRight, ArrowLeft,
+  Send, Loader2, User, Calendar, ArrowRight, ArrowLeft, Pencil, Trash2, Check,
 } from "lucide-react";
 import Link from "next/link";
 import CustomVideoPlayer from "@/components/ui/custom-video-player";
 import { SkeletonLine, SkeletonCircle } from "@/components/ui/skeleton";
+import ReactionIcon from "@/components/shared/reaction-icon";
 
 const REACTIONS = [
-  { type: "like", emoji: "👍", labelAr: "إعجاب", labelEn: "Like" },
-  { type: "love", emoji: "❤️", labelAr: "حب", labelEn: "Love" },
-  { type: "haha", emoji: "😂", labelAr: "هاها", labelEn: "Haha" },
-  { type: "wow", emoji: "😮", labelAr: "واو", labelEn: "Wow" },
-  { type: "sad", emoji: "😢", labelAr: "حزين", labelEn: "Sad" },
-  { type: "angry", emoji: "😡", labelAr: "غاضب", labelEn: "Angry" },
+  { type: "like", labelAr: "إعجاب", labelEn: "Like" },
+  { type: "love", labelAr: "حب", labelEn: "Love" },
+  { type: "haha", labelAr: "هاها", labelEn: "Haha" },
+  { type: "wow", labelAr: "واو", labelEn: "Wow" },
+  { type: "sad", labelAr: "حزين", labelEn: "Sad" },
+  { type: "angry", labelAr: "غاضب", labelEn: "Angry" },
 ] as const;
 
 interface Post {
@@ -85,6 +86,8 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
   const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null);
   const [currentReaction, setCurrentReaction] = useState<string | null>(null);
   const [reactionCounts, setReactionCounts] = useState<Record<string, number>>({});
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editCommentText, setEditCommentText] = useState("");
 
   const isArabic = lang === "ar";
 
@@ -160,6 +163,37 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
       }
     } catch {}
     setSubmitting(false);
+  };
+
+  const handleEditComment = async (commentId: string) => {
+    const text = editCommentText.trim();
+    if (!text || !member || !post) return;
+    try {
+      const res = await fetch(`/api/posts/${post.id}/comments/${commentId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberId: member.id, content: text }),
+      });
+      if (res.ok) {
+        setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, content: text } : c)));
+        setEditingCommentId(null);
+        setEditCommentText("");
+      }
+    } catch {}
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!member || !post) return;
+    try {
+      const res = await fetch(`/api/posts/${post.id}/comments/${commentId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberId: member.id }),
+      });
+      if (res.ok) {
+        setComments((prev) => prev.filter((c) => c.id !== commentId));
+      }
+    } catch {}
   };
 
   if (loading) {
@@ -289,7 +323,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
                   <>
                     <div className="flex -space-x-1 rtl:space-x-reverse">
                       {REACTIONS.filter((r) => (reactionCounts[r.type] || 0) > 0).slice(0, 5).map((r) => (
-                        <span key={r.type} className="text-base">{r.emoji}</span>
+                        <span key={r.type} className="inline-flex"><ReactionIcon type={r.type} size={18} /></span>
                       ))}
                     </div>
                     <span>{totalReactions}</span>
@@ -316,7 +350,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
                         : "text-text-secondary hover:bg-black/5 dark:hover:bg-white/5"
                     } ${!member ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
-                    <span className="text-xl">{r.emoji}</span>
+                    <span className="inline-flex"><ReactionIcon type={r.type} size={22} /></span>
                     <span>{isArabic ? r.labelAr : r.labelEn}</span>
                     {reactionCounts[r.type] > 0 && (
                       <span className="text-[10px] font-bold">{reactionCounts[r.type]}</span>
@@ -400,18 +434,61 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
                     <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center shrink-0 mt-0.5">
                       <User className="w-4 h-4 text-primary/60" />
                     </div>
-                    <div className="flex-1">
-                      <div className="bg-background rounded-2xl px-4 py-2.5">
-                        <p className="text-xs font-semibold text-text">
-                          {c.memberName || (isArabic ? "عضو" : "Member")}
+                    <div className="flex-1 min-w-0">
+                      {editingCommentId === c.id ? (
+                        <div className="bg-background rounded-2xl px-4 py-2.5">
+                          <textarea
+                            value={editCommentText}
+                            onChange={(e) => setEditCommentText(e.target.value)}
+                            rows={2}
+                            className="w-full bg-transparent text-sm text-text outline-none resize-none"
+                          />
+                          <div className="flex justify-end gap-2 mt-2">
+                            <button
+                              onClick={() => { setEditingCommentId(null); setEditCommentText(""); }}
+                              className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleEditComment(c.id)}
+                              className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-primary"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-background rounded-2xl px-4 py-2.5">
+                          <p className="text-xs font-semibold text-text">
+                            {c.memberName || (isArabic ? "عضو" : "Member")}
+                          </p>
+                          <p className="text-sm text-text-secondary mt-1">{c.content}</p>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 mt-1 px-1">
+                        <p className="text-[10px] text-text-light">
+                          {new Date(c.createdAt).toLocaleDateString(isArabic ? "ar-SA" : "en-US", {
+                            day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+                          })}
                         </p>
-                        <p className="text-sm text-text-secondary mt-1">{c.content}</p>
+                        {member && c.memberId === member.id && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => { setEditingCommentId(c.id); setEditCommentText(c.content); }}
+                              className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 text-text-light hover:text-text-secondary transition-colors"
+                            >
+                              <Pencil className="w-3 h-3" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteComment(c.id)}
+                              className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 text-text-light hover:text-red-500 transition-colors"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                        )}
                       </div>
-                      <p className="text-[10px] text-text-light mt-1 px-1">
-                        {new Date(c.createdAt).toLocaleDateString(isArabic ? "ar-SA" : "en-US", {
-                          day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
-                        })}
-                      </p>
                     </div>
                   </div>
                 ))}

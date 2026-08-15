@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import prisma from "@/lib/prisma";
 import HeroSection from "@/components/ui/hero-section";
 import GalleryClient from "./gallery-client";
 import { Image } from "lucide-react";
@@ -15,29 +14,13 @@ export default async function GalleryPage({ params }: Props) {
   const isArabic = lang === "ar";
   const dir = isArabic ? "rtl" : "ltr";
 
-  const items = await prisma.gallery.findMany({
-    where: { isActive: true },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      type: true,
-      imageUrl: true,
-      fileUrl: true,
-      thumbnailUrl: true,
-      album: true,
-      tags: true,
-      createdAt: true,
-    },
-    orderBy: { createdAt: "desc" },
-    take: 100,
+  // Fetch from API which combines Gallery + Video tables
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `http://localhost:9000`;
+  const res = await fetch(`${baseUrl}/api/public/gallery`, {
+    next: { revalidate: 60 },
+    headers: { "Content-Type": "application/json" },
   });
-
-  const serialized = items.map((item) => ({
-    ...item,
-    id: String(item.id),
-    createdAt: item.createdAt?.toISOString() || null,
-  }));
+  const items = res.ok ? await res.json() : [];
 
   return (
     <div dir={dir}>
@@ -60,7 +43,7 @@ export default async function GalleryPage({ params }: Props) {
         />
       </Suspense>
 
-      <GalleryClient items={serialized} isArabic={isArabic} />
+      <GalleryClient items={items} isArabic={isArabic} />
     </div>
   );
 }

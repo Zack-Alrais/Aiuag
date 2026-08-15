@@ -8,14 +8,9 @@ import {
 import Link from "next/link";
 import CustomVideoPlayer from "@/components/ui/custom-video-player";
 import { PostSkeleton } from "@/components/ui/skeleton";
+import ReactionIcon from "@/components/shared/reaction-icon";
 
-const REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "😡"] as const;
-const REACTION_MAP: Record<string, string> = {
-  like: "👍", love: "❤️", haha: "😂", wow: "😮", sad: "😢", angry: "😡",
-};
-const REVERSE_MAP: Record<string, string> = {
-  "👍": "like", "❤️": "love", "😂": "haha", "😮": "wow", "😢": "sad", "😡": "angry",
-};
+const REACTIONS = ["like", "love", "haha", "wow", "sad", "angry"] as const;
 
 interface Post {
   id: string;
@@ -257,13 +252,13 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                     </button>
                     {reactionPopover === post.id && (
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-surface border border-border rounded-xl shadow-lg p-2 flex gap-1 z-50" dir="ltr">
-                        {REACTIONS.map((emoji) => (
+                        {REACTIONS.map((type) => (
                           <button
-                            key={emoji}
-                            onClick={() => { handleReaction(post.id, REVERSE_MAP[emoji]); setReactionPopover(null); }}
-                            className="w-9 h-9 flex items-center justify-center text-xl rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all hover:scale-125"
+                            key={type}
+                            onClick={() => { handleReaction(post.id, type); setReactionPopover(null); }}
+                            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all hover:scale-125"
                           >
-                            {emoji}
+                            <ReactionIcon type={type} size={22} />
                           </button>
                         ))}
                       </div>

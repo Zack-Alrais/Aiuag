@@ -1,6 +1,12 @@
 import { MemberCardData, ExportFormat, BackCardData } from "@/templates/membership-card/types"
 import { generateQRDataURL } from "./qrCode"
 
+function fmtDate(d: Date | string | undefined): string {
+  if (!d) return new Date().toISOString().slice(0, 10)
+  const date = typeof d === "string" ? new Date(d) : d
+  return date.toISOString().slice(0, 10)
+}
+
 const CANVAS_W = 1750
 const CANVAS_H = 863
 
@@ -14,6 +20,7 @@ export interface RenderOptions {
 export interface RenderResult {
   frontHtml: string
   backHtml: string
+  qrDataURL?: string
   png?: string
   pdf?: string
 }
@@ -32,7 +39,7 @@ class TemplateEngineClass {
     const frontHtml = this.buildFrontHtml(member, isRtl)
     const backHtml = this.buildBackHtml(qrDataURL)
 
-    return { frontHtml, backHtml }
+    return { frontHtml, backHtml, qrDataURL }
   }
 
   /**
@@ -49,7 +56,7 @@ class TemplateEngineClass {
   private buildFrontHtml(member: MemberCardData, isRtl: boolean): string {
     const nameValue = isRtl ? member.nameAr : member.nameEn
     const positionText = member.title || member.memberType || (isRtl ? "عضو" : "Member")
-    const joinDate = member.joinDate || member.issueDate || new Date().toLocaleDateString("en-GB")
+    const joinDate = fmtDate(member.joinDate || member.issueDate)
 
     const nameSize = this.fitText(nameValue, 200, 32)
     const positionSize = this.fitText(positionText, 250, 30)

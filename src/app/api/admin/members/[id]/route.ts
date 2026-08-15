@@ -58,6 +58,8 @@ export async function PUT(
       jobSector,
       yearsOfExperience,
       graduationCertificate,
+      barcode,
+      qrCode,
     } = body;
 
     const existing = await prisma.member.findUnique({ where: { id }, include: { user: true } });
@@ -117,6 +119,8 @@ export async function PUT(
         ...(jobSector !== undefined && { jobSector }),
         ...(yearsOfExperience !== undefined && { yearsOfExperience: yearsOfExperience !== null ? parseInt(String(yearsOfExperience)) : null }),
         ...(graduationCertificate !== undefined && { graduationCertificate }),
+        ...(barcode !== undefined && { barcode }),
+        ...(qrCode !== undefined && { qrCode }),
       },
       include: {
         user: { select: { id: true, name: true, email: true, image: true, role: true } },

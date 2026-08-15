@@ -3,6 +3,12 @@ import prisma from "@/lib/prisma"
 import ExcelJS from "exceljs"
 import { TemplateEngine } from "@/services/templateEngine"
 
+function fmtDate(d: Date | string | undefined): string {
+  if (!d) return new Date().toISOString().slice(0, 10)
+  const date = typeof d === "string" ? new Date(d) : d
+  return date.toISOString().slice(0, 10)
+}
+
 function normalizeHeader(h: string) {
   return h.replace(/^\uFEFF/, "")
     .replace(/[ًٌٍَُِّْ]/g, "")
@@ -122,10 +128,8 @@ export async function POST(request: NextRequest) {
           graduationYear: parseInt(getVal(colGraduationYear)) || user.member?.graduationYear || undefined,
           phone: getVal(colPhone) || user.member?.phone || undefined,
           email: user.email || undefined,
-          joinDate: user.member?.createdAt
-            ? new Date(user.member.createdAt).toLocaleDateString("en-GB")
-            : new Date().toLocaleDateString("en-GB"),
-          expiryDate: new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000).toLocaleDateString("en-GB"),
+          joinDate: fmtDate(user.member?.createdAt),
+          expiryDate: fmtDate(new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000)),
         }
 
         const origin = request.headers.get("origin") || "http://localhost:9000"
