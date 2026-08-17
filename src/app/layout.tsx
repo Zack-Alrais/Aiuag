@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Cairo } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import AuthProvider from '@/components/auth/provider';
 import ToasterProvider from '@/components/ui/toaster-provider';
 import LanguageSync from '@/components/ui/language-sync';
@@ -35,6 +36,7 @@ export default function RootLayout({
             <ToasterProvider />
           </ThemeProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
