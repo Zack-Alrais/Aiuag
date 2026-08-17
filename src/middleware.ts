@@ -1,6 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+const locales = ["ar", "en"];
+const defaultLocale = "ar";
+
+function getLocale(request: NextRequest): string {
+  const acceptLanguage = request.headers.get("accept-language");
+  if (acceptLanguage) {
+    const preferred = acceptLanguage
+      .split(",")
+      .map((lang) => lang.split(";")[0].trim().substring(0, 2))
+      .find((lang) => locales.includes(lang));
+    if (preferred) return preferred;
+  }
+  return defaultLocale;
+}
+
 // In-memory rate limiter store (resets on server restart)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
@@ -40,10 +55,6 @@ function getAdminToken(request: NextRequest): AdminToken | null {
   }
 }
 
-function checkAdminAuth(request: NextRequest): boolean {
-  return getAdminToken(request) !== null;
-}
-
 const PAGE_TO_PERM: Record<string, string> = {
   "notifications": "notifications",
   "news": "news",
@@ -77,6 +88,23 @@ function hasPagePermission(token: AdminToken, page: string): boolean {
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
+
+  // === LOCALE REDIRECT ===
+  if (!pathname.startsWith("/api") &&
+      !pathname.startsWith("/admin") &&
+      !pathname.startsWith("/ai.admin") &&
+      !pathname.startsWith("/_next") &&
+      !pathname.startsWith("/favicon") &&
+      pathname !== "/sitemap.xml" &&
+      pathname !== "/robots.txt") {
+    const pathnameHasLocale = locales.some(
+      (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+    );
+    if (!pathnameHasLocale) {
+      const locale = getLocale(request);
+      return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
+    }
+  }
 
   // Skip middleware entirely for NextAuth internal routes
   if (pathname.startsWith("/api/auth/")) {

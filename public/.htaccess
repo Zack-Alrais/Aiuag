@@ -1,0 +1,42 @@
+# .htaccess for Next.js on cPanel (Apache reverse proxy)
+# Place this in /public folder
+
+RewriteEngine On
+
+# Handle Node.js app via Passenger/Apache proxy
+# This assumes cPanel sets up Passenger or similar
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+</IfModule>
+
+# Cache static assets
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/avif "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript application/json application/xml
+    AddOutputFilterByType DEFLATE application/x-javascript text/x-js
+</IfModule>
+
+# Prevent access to sensitive files
+<FilesMatch "^\.|server\.js|\.env|package\.json|package-lock\.json|\.git">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

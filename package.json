@@ -4,11 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 9000",
-    "build": "next build",
-    "start": "next start -p 9000",
+    "build": "npx prisma generate && next build",
+    "start": "next start",
     "lint": "next lint",
-    "db:generate": "npx prisma generate",
-    "db:push": "npx prisma db push",
+    "postinstall": "npx prisma generate",
     "db:seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
@@ -52,7 +51,9 @@
     "react-easy-crop": "^6.0.2",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "prisma": "^6.19.3",
+    "tsx": "^4.19.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.8",
@@ -65,7 +66,6 @@
     "@types/react-dom": "^19.1.2",
     "eslint": "^9.27.0",
     "eslint-config-next": "^15.5.19",
-    "prisma": "^6.19.3",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3"
   }

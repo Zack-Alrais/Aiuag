@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
 
 const ALLOWED_TYPES = [
   "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml",
@@ -29,7 +28,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Max ${MAX_FILES} files allowed` }, { status: 400 });
     }
 
+    const isVercel = !!process.env.VERCEL;
+
+    if (isVercel) {
+      const { put } = await import("@vercel/blob");
+      const results: { url: string; filename: string; name: string }[] = [];
+
+      for (const file of files) {
+        if (!ALLOWED_TYPES.includes(file.type)) {
+          return NextResponse.json({ error: `File type not allowed: ${file.type}` }, { status: 400 });
+        }
+        if (file.size > MAX_SIZE) {
+          return NextResponse.json({ error: `File too large: ${file.name}` }, { status: 400 });
+        }
+
+        const ext = file.name.split(".").pop() || "jpg";
+        const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+        const blob = await put(filename, file, {
+          access: "public",
+          addRandomSuffix: false,
+        });
+
+        results.push({ url: blob.url, filename, name: file.name });
+      }
+
+      return NextResponse.json({ urls: results.map(r => r.url), files: results }, { status: 201 });
+    }
+
+    const { writeFile, mkdir } = await import("fs/promises");
+    const path = await import("path");
+    const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
+    await mkdir(uploadDir, { recursive: true });
+
     const results: { url: string; filename: string; name: string }[] = [];
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://aiuag.com";
 
     for (const file of files) {
       if (!ALLOWED_TYPES.includes(file.type)) {
@@ -40,18 +73,14 @@ export async function POST(request: NextRequest) {
       }
 
       const ext = file.name.split(".").pop() || "jpg";
-      const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const filepath = path.join(uploadDir, filename);
 
-      const blob = await put(filename, file, {
-        access: "public",
-        addRandomSuffix: false,
-      });
+      const buffer = Buffer.from(await file.arrayBuffer());
+      await writeFile(filepath, buffer);
 
-      results.push({
-        url: blob.url,
-        filename,
-        name: file.name,
-      });
+      const url = `${appUrl}/uploads/${folder}/${filename}`;
+      results.push({ url, filename: `${folder}/${filename}`, name: file.name });
     }
 
     return NextResponse.json({ urls: results.map(r => r.url), files: results }, { status: 201 });

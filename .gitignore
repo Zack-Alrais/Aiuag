@@ -33,9 +33,11 @@ nul
 .env.development.local
 .env.test.local
 .env.production.local
+.env.vercel
 
 # vercel
 .vercel
+vercel.json
 
 # typescript
 *.tsbuildinfo
@@ -45,13 +47,12 @@ next-env.d.ts
 *.db
 *.db-journal
 
-.vercel
-.env*
-
-
-
 # uploads (managed by database)
 /public/uploads/
 
 # debug scripts
 /prisma/check-*
+
+# deployment files
+deploy-cpanel.ps1
+aiuag-deploy.zip
