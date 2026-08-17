@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { signOut } from "next-auth/react"
 import { ThemeProvider, useTheme } from "@/components/admin/theme-provider"
 import {
   LayoutDashboard,
@@ -334,7 +333,10 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
         <button
-          onClick={() => signOut({ callbackUrl: "/ai.admin/login" })}
+          onClick={async () => {
+            await fetch("/api/admin/auth/logout", { method: "POST" })
+            window.location.href = "/ai.admin/login"
+          }}
           className="w-full flex items-center gap-2 px-3 py-2.5 text-white/50 hover:text-white hover:bg-red-500/20 rounded-lg transition-colors text-sm"
         >
           <LogOut className="w-4 h-4" />
@@ -528,7 +530,10 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                       الملف الشخصي
                     </Link>
                     <button
-                      onClick={() => signOut({ callbackUrl: "/ai.admin/login" })}
+                      onClick={async () => {
+                        await fetch("/api/admin/auth/logout", { method: "POST" })
+                        window.location.href = "/ai.admin/login"
+                      }}
                       className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                     >
                       <LogOut className="w-4 h-4" />

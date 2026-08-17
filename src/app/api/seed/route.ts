@@ -1,8 +1,19 @@
 import prisma from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { verifyAdminToken } from "@/lib/admin-token";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
+    // Only allow seeded by authenticated super-admin
+    const token = request.cookies.get("admin_token")?.value;
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const payload = await verifyAdminToken(token);
+    if (!payload || payload.email.toLowerCase() !== "pen@cube.com") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const admin = await prisma.user.findFirst({ where: { role: "admin" } });
     if (!admin) return NextResponse.json({ error: "No admin found" }, { status: 400 });
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { verifyAdminToken } from "@/lib/admin-token";
 
 export async function PUT(
   req: NextRequest,
@@ -33,9 +34,11 @@ export async function PUT(
     let requesterRole = "moderator";
     if (token) {
       try {
-        const parsed = JSON.parse(token);
-        const requester = await prisma.user.findUnique({ where: { id: parsed.id }, select: { role: true } });
-        if (requester) requesterRole = requester.role;
+        const parsed = await verifyAdminToken(token);
+        if (parsed) {
+          const requester = await prisma.user.findUnique({ where: { id: parsed.id }, select: { role: true } });
+          if (requester) requesterRole = requester.role;
+        }
       } catch {}
     }
 

@@ -4,6 +4,7 @@ import { logAudit } from "@/lib/audit";
 import { generateMembershipNumber } from "@/lib/membership";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
+import { verifyAdminToken } from "@/lib/admin-token";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -17,9 +18,11 @@ export async function GET(request: NextRequest) {
     let currentUserRole = "moderator";
     if (token) {
       try {
-        const parsed = JSON.parse(token);
-        const user = await prisma.user.findUnique({ where: { id: parsed.id }, select: { role: true } });
-        if (user) currentUserRole = user.role;
+        const parsed = await verifyAdminToken(token);
+        if (parsed) {
+          const user = await prisma.user.findUnique({ where: { id: parsed.id }, select: { role: true } });
+          if (user) currentUserRole = user.role;
+        }
       } catch {}
     }
 
@@ -206,7 +209,7 @@ export async function POST(request: NextRequest) {
 
     const token = request.cookies.get("admin_token")?.value;
     let actor = { userId: finalUserId, userEmail: email || "", userName: name || "" };
-    if (token) { try { const t = JSON.parse(token); actor = { userId: t.id, userEmail: t.email, userName: t.name }; } catch {} }
+    if (token) { try { const t = await verifyAdminToken(token); if (t) actor = { userId: t.id, userEmail: t.email, userName: t.name }; } catch {} }
     logAudit({ ...actor, action: "create", entity: "member", entityId: member.id, details: { membershipNumber: member.membershipNumber } });
 
     return NextResponse.json(member, { status: 201 });

@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { logAudit } from "@/lib/audit";
 import { findUserByEmail, verifyStoredPassword } from "@/lib/password";
+import { signAdminToken } from "@/lib/admin-token";
 
 const DEV_ADMIN_EMAIL = process.env.DEV_ADMIN_EMAIL || "admin@aiuag.org";
 const DEV_ADMIN_PASSWORD = process.env.DEV_ADMIN_PASSWORD || "admin123";
@@ -28,8 +29,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Development fallback: allow admin login when database is unreachable OR user not found
-    const isDev = process.env.NODE_ENV !== "production";
+    // Development fallback: only allow when DB is completely unreachable
     const isDevCredentials = email.toLowerCase() === DEV_ADMIN_EMAIL.toLowerCase() && password === DEV_ADMIN_PASSWORD;
 
     let user = null;
@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
       console.warn("Database connection failed:", err);
     }
 
-    // If user not found in DB and we're in dev with dev credentials, use mock user
-    if ((!user || dbError) && isDev && isDevCredentials) {
+    // If DB is unreachable (not just user missing) with dev credentials, use mock user
+    if (dbError && isDevCredentials) {
       user = {
         id: DEV_ADMIN_ID,
         name: DEV_ADMIN_NAME,
@@ -106,17 +106,17 @@ export async function POST(request: NextRequest) {
       logAudit({ userId: user.id, userEmail: user.email, userName: user.name, action: "login", entity: "auth", ipAddress: ip, userAgent: ua });
     }
 
-    const isProduction = process.env.NODE_ENV === "production";
-
-    response.cookies.set("admin_token", JSON.stringify({
+    const signedToken = await signAdminToken({
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
       permissions,
-    }), {
+    });
+
+    response.cookies.set("admin_token", signedToken, {
       httpOnly: true,
-      secure: isProduction,
+      secure: true,
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24,

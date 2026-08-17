@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { verifyAdminToken } from "@/lib/admin-token";
 
 const noStore = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 const DEV_ADMIN_ID = "dev-admin-id";
@@ -21,7 +22,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const parsed = JSON.parse(token);
+    const parsed = await verifyAdminToken(token);
+    if (!parsed) {
+      return NextResponse.json({ authenticated: false }, { status: 401, headers: noStore });
+    }
 
     // Handle dev admin mock user
     if (parsed.id === DEV_ADMIN_ID) {

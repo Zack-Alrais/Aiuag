@@ -22,7 +22,10 @@ export default function HeroSectionClient({
   children,
   badge,
 }: HeroSectionClientProps) {
-  const [images, setImages] = useState<any[]>([])
+  const [images, setImages] = useState<{
+    id: string; imageUrl: string; titleAr: string | null; titleEn: string | null;
+    subtitleAr: string | null; subtitleEn: string | null; linkUrl: string | null;
+  }[]>([])
 
   useEffect(() => {
     fetch("/api/public/hero-images")

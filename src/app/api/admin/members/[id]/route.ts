@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
 import { NextRequest, NextResponse } from "next/server";
+import { verifyAdminToken } from "@/lib/admin-token";
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -72,9 +73,11 @@ export async function PUT(
     let requesterRole = "moderator";
     if (token) {
       try {
-        const parsed = JSON.parse(token);
-        const requester = await prisma.user.findUnique({ where: { id: parsed.id }, select: { role: true } });
-        if (requester) requesterRole = requester.role;
+        const parsed = await verifyAdminToken(token);
+        if (parsed) {
+          const requester = await prisma.user.findUnique({ where: { id: parsed.id }, select: { role: true } });
+          if (requester) requesterRole = requester.role;
+        }
       } catch {}
     }
 
@@ -130,8 +133,8 @@ export async function PUT(
     const auditToken = request.cookies.get("admin_token")?.value;
     if (auditToken) {
       try {
-        const t = JSON.parse(auditToken);
-        logAudit({ userId: t.id, userEmail: t.email, userName: t.name, action: "update", entity: "member", entityId: id, details: { updatedFields: Object.keys(body).filter((k) => body[k] !== undefined) } });
+        const t = await verifyAdminToken(auditToken);
+        if (t) logAudit({ userId: t.id, userEmail: t.email, userName: t.name, action: "update", entity: "member", entityId: id, details: { updatedFields: Object.keys(body).filter((k) => body[k] !== undefined) } });
       } catch {}
     }
 
@@ -153,9 +156,11 @@ export async function DELETE(
     let requesterRole = "moderator";
     if (token) {
       try {
-        const parsed = JSON.parse(token);
-        const requester = await prisma.user.findUnique({ where: { id: parsed.id }, select: { role: true } });
-        if (requester) requesterRole = requester.role;
+        const parsed = await verifyAdminToken(token);
+        if (parsed) {
+          const requester = await prisma.user.findUnique({ where: { id: parsed.id }, select: { role: true } });
+          if (requester) requesterRole = requester.role;
+        }
       } catch {}
     }
 
@@ -196,8 +201,8 @@ export async function DELETE(
     const auditToken = request.cookies.get("admin_token")?.value;
     if (auditToken) {
       try {
-        const t = JSON.parse(auditToken);
-        logAudit({ userId: t.id, userEmail: t.email, userName: t.name, action: "delete", entity: "member", entityId: id });
+        const t = await verifyAdminToken(auditToken);
+        if (t) logAudit({ userId: t.id, userEmail: t.email, userName: t.name, action: "delete", entity: "member", entityId: id });
       } catch {}
     }
 

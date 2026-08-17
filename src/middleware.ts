@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifyAdminToken } from "@/lib/admin-token";
 
 const locales = ["ar", "en"];
 const defaultLocale = "ar";
@@ -43,16 +44,12 @@ interface AdminToken {
   permissions: string[];
 }
 
-function getAdminToken(request: NextRequest): AdminToken | null {
+async function getAdminToken(request: NextRequest): Promise<AdminToken | null> {
   const adminToken = request.cookies.get("admin_token")?.value;
   if (!adminToken) return null;
-  try {
-    const parsed = JSON.parse(adminToken);
-    if (parsed && parsed.email && parsed.role) return parsed;
-    return null;
-  } catch {
-    return null;
-  }
+  const payload = await verifyAdminToken(adminToken);
+  if (!payload) return null;
+  return { id: payload.id, email: payload.email, role: payload.role, permissions: payload.permissions };
 }
 
 const PAGE_TO_PERM: Record<string, string> = {
@@ -190,7 +187,7 @@ export function middleware(request: NextRequest) {
 
   // === ADMIN API PROTECTION ===
   if (pathname.startsWith("/api/admin/") && !pathname.startsWith("/api/admin/auth/")) {
-    const token = getAdminToken(request);
+    const token = await getAdminToken(request);
     if (!token) {
       return NextResponse.json(
         { error: "غير مصرح. يرجى تسجيل الدخول كمدير." },
@@ -212,7 +209,7 @@ export function middleware(request: NextRequest) {
 
   // === ADMIN PAGES PROTECTION (server-side redirect) ===
   if (pathname.startsWith("/ai.admin") && !pathname.startsWith("/ai.admin/login")) {
-    const token = getAdminToken(request);
+    const token = await getAdminToken(request);
     if (!token) {
       return NextResponse.redirect(new URL("/ai.admin/login", request.url));
     }
