@@ -15,7 +15,7 @@ export default async function ContactPage({ params }: { params: Promise<{ lang: 
     { icon: Phone, title: isArabic ? "الهاتف" : "Phone", value: "+249 11 421 0853", link: "tel:+249114210853" },
     { icon: Mail, title: isArabic ? "البريد الإلكتروني" : "Email", value: "aiuagho@gmail.com", link: "mailto:aiuagho@gmail.com" },
     { icon: MapPin, title: isArabic ? "العنوان" : "Address", value: isArabic ? "الخرطوم - السودان" : "Khartoum - Sudan", link: GOOGLE_MAPS_URL },
-    { icon: Clock, title: isArabic ? "ساعات العمل" : "Working Hours", value: isArabic ? "الأحد - الخميس: 8 ص - 4 م" : "Sun - Thu: 8 AM - 4 PM", link: "#" },
+    { icon: Clock, title: isArabic ? "ساعات العمل" : "Working Hours", value: isArabic ? "الأحد - الخميس: 8 ص - 4 م" : "Sun - Thu: 8 AM - 4 PM", link: "" },
   ];
 
   return (
@@ -32,13 +32,23 @@ export default async function ContactPage({ params }: { params: Promise<{ lang: 
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {contactInfo.map((info, i) => (
-              <a key={i} href={info.link} target={info.link.startsWith("http") ? "_blank" : undefined} rel={info.link.startsWith("http") ? "noopener noreferrer" : undefined} className="bg-surface rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-all hover:border-primary/30 border border-border">
-                <div className="w-14 h-14 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-                  <info.icon className="w-7 h-7 text-primary" />
+              info.link ? (
+                <a key={i} href={info.link} target={info.link.startsWith("http") ? "_blank" : undefined} rel={info.link.startsWith("http") ? "noopener noreferrer" : undefined} className="bg-surface rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-all hover:border-primary/30 border border-border">
+                  <div className="w-14 h-14 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                    <info.icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <h3 className="font-bold text-text mb-2">{info.title}</h3>
+                  <p className="text-text-secondary text-sm">{info.value}</p>
+                </a>
+              ) : (
+                <div key={i} className="bg-surface rounded-2xl p-6 text-center shadow-sm border border-border">
+                  <div className="w-14 h-14 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                    <info.icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <h3 className="font-bold text-text mb-2">{info.title}</h3>
+                  <p className="text-text-secondary text-sm">{info.value}</p>
                 </div>
-                <h3 className="font-bold text-text mb-2">{info.title}</h3>
-                <p className="text-text-secondary text-sm">{info.value}</p>
-              </a>
+              )
             ))}
           </div>
         </div>

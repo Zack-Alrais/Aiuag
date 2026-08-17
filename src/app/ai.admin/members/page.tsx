@@ -420,7 +420,6 @@ export default function MembersManagement() {
         body: JSON.stringify({ userId, status: "pending" }),
       })
       const data = await res.json()
-      console.log("Create member response:", res.status, data)
       if (res.ok) {
         await fetchMembers()
       } else {

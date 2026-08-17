@@ -14,6 +14,7 @@ export default function ProjectsPage() {
   const dir = isArabic ? "rtl" : "ltr";
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
     fetch("/api/public/projects")
@@ -47,6 +48,7 @@ export default function ProjectsPage() {
                 : "",
               progress: 0,
               team: 0,
+              originalStatus: p.status,
             }))
           );
         }
@@ -55,7 +57,9 @@ export default function ProjectsPage() {
       .finally(() => setLoading(false));
   }, [isArabic]);
 
-
+  const filteredProjects = filter === "all"
+    ? projects
+    : projects.filter(p => p.originalStatus === filter);
 
   const filterTabs = [
     { id: "all", label: isArabic ? "الكل" : "All" },
@@ -88,8 +92,9 @@ export default function ProjectsPage() {
             {filterTabs.map((tab) => (
               <button
                 key={tab.id}
+                onClick={() => setFilter(tab.id)}
                 className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all ${
-                  tab.id === "all"
+                  filter === tab.id
                     ? "bg-primary text-white"
                     : "bg-surface text-text-secondary hover:bg-primary/10 hover:text-primary border border-border"
                 }`}
@@ -126,7 +131,7 @@ export default function ProjectsPage() {
             </div>
           ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project) => (
+            {filteredProjects.map((project) => (
               <div
                 key={project.id}
                 className="bg-surface rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group"

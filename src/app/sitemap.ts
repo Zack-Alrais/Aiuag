@@ -1,22 +1,38 @@
 import { MetadataRoute } from "next";
 
-const BASE_URL = "https://aiuag.edu";
+const BASE_URL = "https://aiuag.com";
 const locales = ["ar", "en"];
 
 const staticPages = [
   "",
   "/about",
-  "/programs",
-  "/admission",
-  "/student-life",
-  "/research",
+  "/services",
   "/contact",
   "/news",
   "/events",
-  "/faculty",
+  "/projects",
   "/faq",
-  "/privacy-policy",
+  "/privacy",
   "/terms",
+  "/membership",
+  "/membership/benefits",
+  "/membership/apply",
+  "/organization",
+  "/organization/board",
+  "/organization/committees",
+  "/organization/secretariat",
+  "/organization/branches",
+  "/media",
+  "/media/gallery",
+  "/media/publications",
+  "/media/reports",
+  "/media/videos",
+  "/publications",
+  "/partners",
+  "/donations",
+  "/volunteer",
+  "/support",
+  "/verify",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

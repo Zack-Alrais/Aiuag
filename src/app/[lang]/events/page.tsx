@@ -10,6 +10,7 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState("ar");
+  const [filter, setFilter] = useState<string>("upcoming");
 
   useEffect(() => {
     params.then(({ lang: l }) => setLang(l));
@@ -28,6 +29,7 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
 
   const upcomingEvents = events.filter((e: any) => e.status === "upcoming" || e.status === "ongoing");
   const pastEvents = events.filter((e: any) => e.status === "completed" || e.status === "cancelled");
+  const filteredEvents = filter === "upcoming" ? upcomingEvents : filter === "past" ? pastEvents : events;
 
   const filterTabs = [
     { id: "upcoming", label: isArabic ? "القادمة" : "Upcoming" },
@@ -100,8 +102,9 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
               {filterTabs.map((tab) => (
                 <button
                   key={tab.id}
+                  onClick={() => setFilter(tab.id)}
                   className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${
-                    tab.id === "upcoming"
+                    filter === tab.id
                       ? "bg-primary text-white"
                       : "bg-surface text-text-secondary hover:bg-primary/10 hover:text-primary border border-border"
                   }`}
@@ -110,15 +113,11 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
                 </button>
               ))}
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-surface border border-border rounded-lg text-text-secondary hover:text-primary hover:border-primary/30 transition-all text-sm">
-              <Calendar className="w-4 h-4" />
-              {isArabic ? "عرض التقويم" : "Calendar View"}
-            </button>
           </div>
         </div>
       </section></ScrollReveal>
 
-      {/* Calendar Placeholder */}
+      {/* Calendar View (Visual Only) */}
       <ScrollReveal direction="up"><section className="pb-8 bg-background">
         <div className="container mx-auto px-4">
           <div className="bg-surface rounded-2xl border border-border p-6">
@@ -126,14 +125,9 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
               <h3 className="font-bold text-text">
                 {isArabic ? "يونيو 2026" : "June 2026"}
               </h3>
-              <div className="flex gap-2">
-                <button className="w-8 h-8 rounded-lg bg-background flex items-center justify-center text-text-secondary hover:text-primary transition-colors">
-                  {isArabic ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-                </button>
-                <button className="w-8 h-8 rounded-lg bg-background flex items-center justify-center text-text-secondary hover:text-primary transition-colors">
-                  {isArabic ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                </button>
-              </div>
+              <span className="text-xs text-text-secondary px-2 py-1 bg-primary/10 text-primary rounded-full">
+                {isArabic ? "عرض تجريبي" : "Demo View"}
+              </span>
             </div>
             <div className="grid grid-cols-7 gap-1 text-center text-xs">
               {(isArabic ? ["أحد", "إثن", "ثلا", "أرب", "خمي", "جمع", "سبت"] : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]).map((day) => (
@@ -142,10 +136,10 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
               {Array.from({ length: 30 }, (_, i) => (
                 <div
                   key={i}
-                  className={`py-2 rounded-lg cursor-pointer transition-colors ${
+                  className={`py-2 rounded-lg transition-colors ${
                     i + 1 === 22
                       ? "bg-primary text-white font-bold"
-                      : "hover:bg-primary/10 text-text"
+                      : "text-text"
                   }`}
                 >
                   {i + 1}
@@ -160,10 +154,12 @@ export default function EventsPage({ params }: { params: Promise<{ lang: string 
       <ScrollReveal direction="up"><section className="py-8 bg-background">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-text mb-6">
-            {isArabic ? "الأحداث القادمة" : "Upcoming Events"}
+            {filter === "upcoming" ? (isArabic ? "الأحداث القادمة" : "Upcoming Events")
+              : filter === "past" ? (isArabic ? "الأحداث السابقة" : "Past Events")
+              : (isArabic ? "جميع الأحداث" : "All Events")}
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {upcomingEvents.map((event: any) => {
+            {filteredEvents.map((event: any) => {
               const eventDate = new Date(event.date);
               const day = eventDate.getDate().toString().padStart(2, "0");
               const month = months[eventDate.getMonth()];

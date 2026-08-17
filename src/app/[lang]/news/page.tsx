@@ -10,6 +10,10 @@ export default function NewsPage({ params }: { params: Promise<{ lang: string }>
   const [newsItems, setNewsItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState("ar");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
 
   useEffect(() => {
     params.then(({ lang: l }) => setLang(l));
@@ -26,8 +30,18 @@ export default function NewsPage({ params }: { params: Promise<{ lang: string }>
       .finally(() => setLoading(false));
   }, []);
 
-  const featuredNews = newsItems.length > 0 ? newsItems[0] : null;
-  const remainingNews = newsItems.length > 1 ? newsItems.slice(1) : [];
+  const filteredNews = newsItems.filter((news: any) => {
+    const matchesSearch = searchQuery === "" || 
+      (isArabic ? (news.titleAr || "").toLowerCase().includes(searchQuery.toLowerCase()) : (news.titleEn || "").toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (isArabic ? (news.excerptAr || "").toLowerCase().includes(searchQuery.toLowerCase()) : (news.excerptEn || "").toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory = selectedCategory === "all" || news.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const featuredNews = filteredNews.length > 0 ? filteredNews[0] : null;
+  const remainingNews = filteredNews.length > 1 ? filteredNews.slice(1) : [];
+  const paginatedNews = remainingNews.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(remainingNews.length / itemsPerPage);
 
   const categories = [
     { id: "all", label: isArabic ? "الكل" : "All" },
@@ -94,6 +108,8 @@ export default function NewsPage({ params }: { params: Promise<{ lang: string }>
               <Search className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary ${isArabic ? "right-4" : "left-4"}`} />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                 placeholder={isArabic ? "ابحث في الأخبار..." : "Search news..."}
                 className={`w-full py-3 px-12 bg-surface border border-border rounded-xl focus:outline-none focus:border-primary transition-colors text-text`}
               />
@@ -105,8 +121,9 @@ export default function NewsPage({ params }: { params: Promise<{ lang: string }>
             {categories.map((cat) => (
               <button
                 key={cat.id}
+                onClick={() => { setSelectedCategory(cat.id); setCurrentPage(1); }}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  cat.id === "all"
+                  selectedCategory === cat.id
                     ? "bg-primary text-white"
                     : "bg-surface text-text-secondary hover:bg-primary/10 hover:text-primary border border-border"
                 }`}
@@ -172,7 +189,7 @@ export default function NewsPage({ params }: { params: Promise<{ lang: string }>
       <ScrollReveal direction="up"><section className="py-12 bg-background">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {remainingNews.map((news: any) => (
+            {paginatedNews.map((news: any) => (
               <article
                 key={news.id}
                 className="bg-surface rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group"
@@ -217,26 +234,45 @@ export default function NewsPage({ params }: { params: Promise<{ lang: string }>
           </div>
 
           {/* Pagination */}
-          <div className="flex justify-center items-center gap-2 mt-12">
-            <button className="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center">
-              {isArabic ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-            </button>
-            {[1, 2, 3].map((page) => (
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-12">
               <button
-                key={page}
-                className={`w-10 h-10 rounded-lg flex items-center justify-center font-medium transition-all ${
-                  page === 1
-                    ? "bg-primary text-white"
-                    : "bg-surface text-text-secondary hover:bg-primary/10 border border-border"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                  currentPage === 1
+                    ? "bg-surface text-text-secondary"
+                    : "bg-primary text-white hover:bg-primary/90"
                 }`}
               >
-                {page}
+                {isArabic ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
               </button>
-            ))}
-            <button className="w-10 h-10 rounded-lg bg-surface text-text-secondary hover:bg-primary/10 border border-border flex items-center justify-center">
-              {isArabic ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-            </button>
-          </div>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center font-medium transition-all ${
+                    page === currentPage
+                      ? "bg-primary text-white"
+                      : "bg-surface text-text-secondary hover:bg-primary/10 border border-border"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                  currentPage === totalPages
+                    ? "bg-surface text-text-secondary"
+                    : "bg-primary text-white hover:bg-primary/90"
+                }`}
+              >
+                {isArabic ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+              </button>
+            </div>
+          )}
         </div>
         </section></ScrollReveal>
     </div>

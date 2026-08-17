@@ -254,18 +254,20 @@ export default function HomeClient({ lang, isArabic, stats, sections, galleryIma
               </div>
               <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {galleryImages.slice(0, 8).map((image: any) => (
-                  <motion.div key={image.id} variants={staggerItem} className="aspect-square bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden relative group cursor-pointer">
-                    <img
-                      src={image.imageUrl}
-                      alt={image.title || ""}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="absolute bottom-0 inset-x-0 p-3 text-white opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 transition-all">
-                      <p className="text-xs font-bold truncate">{image.title}</p>
-                      <p className="text-[10px] text-white/70">{formatDate(image.createdAt, isArabic ? "ar" : "en")}</p>
-                    </div>
-                  </motion.div>
+                  <Link key={image.id} href={`/${lang}/media/gallery`} className="block">
+                    <motion.div variants={staggerItem} className="aspect-square bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden relative group">
+                      <img
+                        src={image.imageUrl}
+                        alt={image.title || ""}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute bottom-0 inset-x-0 p-3 text-white opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 transition-all">
+                        <p className="text-xs font-bold truncate">{image.title}</p>
+                        <p className="text-[10px] text-white/70">{formatDate(image.createdAt, isArabic ? "ar" : "en")}</p>
+                      </div>
+                    </motion.div>
+                  </Link>
                 ))}
               </motion.div>
               <div className="text-center mt-8">

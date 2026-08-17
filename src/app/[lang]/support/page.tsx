@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Search, HelpCircle, BookOpen, Users, CreditCard, Headphones, MessageCircle, Phone, Mail } from "lucide-react";
+import Link from "next/link";
 import HeroSection from "@/components/ui/hero-section-client";
 
 export default function SupportPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -76,14 +77,14 @@ export default function SupportPage({ params }: { params: Promise<{ lang: string
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {helpCategories.map((cat, i) => (
-              <div key={i} className="bg-surface rounded-2xl p-6 text-center shadow-sm hover:shadow-lg transition-all cursor-pointer hover:border-primary/30 border border-border group">
+              <Link key={i} href={`/${lang}/faq`} className="bg-surface rounded-2xl p-6 text-center shadow-sm hover:shadow-lg transition-all cursor-pointer hover:border-primary/30 border border-border group block">
                 <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
                   <cat.icon className="w-8 h-8 text-primary group-hover:text-white" />
                 </div>
                 <h3 className="font-bold text-text mb-2">{cat.title}</h3>
                 <p className="text-text-secondary text-sm mb-3">{cat.desc}</p>
                 <span className="text-primary text-sm font-medium">{isArabic ? `${cat.count} مقال` : `${cat.count} articles`}</span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -100,13 +101,13 @@ export default function SupportPage({ params }: { params: Promise<{ lang: string
           </div>
           <div className="max-w-3xl mx-auto space-y-3">
             {quickLinks.map((link, i) => (
-              <div key={i} className="flex items-center gap-4 bg-background rounded-xl p-4 border border-border hover:border-primary/30 transition-all cursor-pointer">
+              <Link key={i} href={`/${lang}/faq`} className="flex items-center gap-4 bg-background rounded-xl p-4 border border-border hover:border-primary/30 transition-all cursor-pointer block">
                 <HelpCircle className="w-5 h-5 text-primary shrink-0" />
                 <div className="flex-1">
                   <p className="font-medium text-text text-sm">{link.title}</p>
                 </div>
                 <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-medium rounded shrink-0">{link.category}</span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -123,10 +124,10 @@ export default function SupportPage({ params }: { params: Promise<{ lang: string
             {isArabic ? "فريق الدعم لدينا جاهز لمساعدتك. تواصل معنا وسنرد في أقرب وقت ممكن." : "Our support team is ready to help. Contact us and we'll respond as soon as possible."}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href={`/${lang}/contact`} className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-secondary text-white rounded-xl text-lg font-bold hover:bg-secondary/90 transition-all">
+            <Link href={`/${lang}/contact`} className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-secondary text-white rounded-xl text-lg font-bold hover:bg-secondary/90 transition-all">
               <Mail className="w-5 h-5" />
               {isArabic ? "تواصل معنا" : "Contact Us"}
-            </a>
+            </Link>
             <a href="tel:+249114210853" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 text-white border-2 border-white/30 rounded-xl text-lg font-bold hover:bg-white/20 transition-all">
               <Phone className="w-5 h-5" />
               +249 11 421 0853

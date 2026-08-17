@@ -30,7 +30,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ lang:
         <div className="container mx-auto px-4">
           <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, i) => (
-              <div key={i} className="bg-surface rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all group">
+              <Link key={i} href={`/${lang}/contact`} className="bg-surface rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all group block hover:border-primary/30 border border-border">
                 <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
                   <service.icon className="w-8 h-8 text-primary group-hover:text-white" />
                 </div>
@@ -44,7 +44,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ lang:
                     </li>
                   ))}
                 </ul>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
