@@ -82,7 +82,7 @@ function hasPagePermission(token: AdminToken, page: string): boolean {
   return token.permissions.includes(required);
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
 
