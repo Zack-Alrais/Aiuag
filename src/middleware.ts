@@ -90,6 +90,7 @@ export async function middleware(request: NextRequest) {
   if (!pathname.startsWith("/api") &&
       !pathname.startsWith("/admin") &&
       !pathname.startsWith("/ai.admin") &&
+      !pathname.startsWith("/auth") &&
       !pathname.startsWith("/_next") &&
       !pathname.startsWith("/favicon") &&
       pathname !== "/sitemap.xml" &&
