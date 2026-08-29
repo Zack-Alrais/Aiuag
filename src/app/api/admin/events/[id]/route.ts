@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { clearCache } from "@/lib/cache";
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -81,6 +82,8 @@ export async function PUT(
       },
     });
 
+    clearCache("events");
+
     return NextResponse.json(event);
   } catch (error) {
     return NextResponse.json({ error: "Failed to update event" }, { status: 500 });
@@ -99,6 +102,7 @@ export async function DELETE(
     }
 
     await prisma.event.delete({ where: { id } });
+    clearCache("events");
     return NextResponse.json({ message: "Event deleted successfully" });
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete event" }, { status: 500 });

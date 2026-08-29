@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useParams } from "next/navigation"
 import { CheckCircle, ArrowRight, Home, Receipt, Copy, Loader2 } from "lucide-react"
 import Link from "next/link"
 
@@ -15,6 +15,7 @@ interface DonationResult {
 
 function DonationSuccessContent() {
   const searchParams = useSearchParams()
+  const { lang } = useParams()
   const donationId = searchParams.get("donationId")
   const paymentId = searchParams.get("paymentId")
   const [donation, setDonation] = useState<DonationResult | null>(null)
@@ -101,14 +102,14 @@ function DonationSuccessContent() {
 
           <div className="flex flex-col gap-3 pt-4">
             <Link
-              href="/"
+              href={`/${lang}`}
               className="flex items-center justify-center gap-2 bg-[#1A3A6B] text-white py-3 rounded-xl font-bold hover:bg-[#0f2547] transition-colors"
             >
               <Home className="w-5 h-5" />
               العودة للرئيسية
             </Link>
             <Link
-              href="/donations"
+              href={`/${lang}/donations`}
               className="flex items-center justify-center gap-2 border-2 border-[#1A3A6B] text-[#1A3A6B] py-3 rounded-xl font-bold hover:bg-[#1A3A6B]/5 transition-colors"
             >
               تبرع جديد

@@ -146,6 +146,7 @@ export default function PublicationsPage({ params }: { params: Promise<{ lang: s
                           href={pub.fileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
+                          download
                           className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary-light transition-colors"
                         >
                           <Download className="w-3.5 h-3.5" />

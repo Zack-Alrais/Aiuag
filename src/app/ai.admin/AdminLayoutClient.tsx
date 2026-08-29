@@ -522,7 +522,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                       </div>
                     </div>
                     <Link
-                      href="/ar/profile"
+                      href={`/${lang}/profile`}
                       onClick={() => setUserMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-[#e2e8f0] hover:bg-gray-50 dark:hover:bg-[#1e2d42] transition-colors"
                     >

@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { clearCache } from "@/lib/cache";
 function generateSlug(text: string): string {
   return text
     .toLowerCase()
@@ -93,6 +94,8 @@ export async function POST(request: NextRequest) {
         category: category || null,
       },
     });
+
+    clearCache("events");
 
     return NextResponse.json(event, { status: 201 });
   } catch (error) {

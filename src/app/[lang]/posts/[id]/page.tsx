@@ -11,12 +11,12 @@ import { SkeletonLine, SkeletonCircle } from "@/components/ui/skeleton";
 import ReactionIcon from "@/components/shared/reaction-icon";
 
 const REACTIONS = [
-  { type: "like", labelAr: "إعجاب", labelEn: "Like" },
-  { type: "love", labelAr: "حب", labelEn: "Love" },
-  { type: "haha", labelAr: "هاها", labelEn: "Haha" },
-  { type: "wow", labelAr: "واو", labelEn: "Wow" },
-  { type: "sad", labelAr: "حزين", labelEn: "Sad" },
-  { type: "angry", labelAr: "غاضب", labelEn: "Angry" },
+  { type: "like", labelAr: "إعجاب", labelEn: "Like", emoji: "👍" },
+  { type: "love", labelAr: "حب", labelEn: "Love", emoji: "❤️" },
+  { type: "haha", labelAr: "هاها", labelEn: "Haha", emoji: "😂" },
+  { type: "wow", labelAr: "واو", labelEn: "Wow", emoji: "😮" },
+  { type: "sad", labelAr: "حزين", labelEn: "Sad", emoji: "😢" },
+  { type: "angry", labelAr: "غاضب", labelEn: "Angry", emoji: "😡" },
 ] as const;
 
 interface Post {
@@ -322,9 +322,9 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
                 {totalReactions > 0 && (
                   <>
                     <div className="flex -space-x-1 rtl:space-x-reverse">
-                      {REACTIONS.filter((r) => (reactionCounts[r.type] || 0) > 0).slice(0, 5).map((r) => (
-                        <span key={r.type} className="inline-flex"><ReactionIcon type={r.type} size={18} /></span>
-                      ))}
+                    {REACTIONS.filter((r) => (reactionCounts[r.type] || 0) > 0).slice(0, 5).map((r) => (
+                      <span key={r.type} className="inline-flex text-base">{r.emoji}</span>
+                    ))}
                     </div>
                     <span>{totalReactions}</span>
                   </>
@@ -337,20 +337,21 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
 
             {/* Reactions Bar */}
             <div className="flex items-center border-t border-border">
-              {REACTIONS.map((r) => {
+              {REACTIONS.map((r, i) => {
                 const isActive = currentReaction === r.type;
                 return (
                   <button
                     key={r.type}
                     onClick={() => member ? handleReact(r.type) : null}
                     disabled={!member}
-                    className={`flex-1 flex flex-col items-center gap-0.5 py-3 text-xs transition-all ${
+                    className={`flex-1 flex flex-col items-center gap-0.5 py-3 text-xs transition-all hover:scale-105 active:scale-95 ${
                       isActive
                         ? "text-primary bg-primary/5"
                         : "text-text-secondary hover:bg-black/5 dark:hover:bg-white/5"
                     } ${!member ? "opacity-50 cursor-not-allowed" : ""}`}
+                    style={{ animation: `bounce-in 0.3s ease-out ${i * 60}ms both` }}
                   >
-                    <span className="inline-flex"><ReactionIcon type={r.type} size={22} /></span>
+                    <span className="text-2xl transition-transform hover:scale-110">{r.emoji}</span>
                     <span>{isArabic ? r.labelAr : r.labelEn}</span>
                     {reactionCounts[r.type] > 0 && (
                       <span className="text-[10px] font-bold">{reactionCounts[r.type]}</span>
@@ -406,7 +407,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
                   {isArabic ? "يجب تسجيل الدخول للتعليق" : "You must log in to comment"}
                 </p>
                 <Link
-                  href={`/${lang}/login`}
+                  href="/auth/login"
                   className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-dark transition-colors"
                 >
                   {isArabic ? "تسجيل الدخول" : "Log in"}

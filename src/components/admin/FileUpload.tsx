@@ -71,7 +71,7 @@ export default function FileUpload({
 
   const isVideo = (url: string) => /\.(mp4|webm|ogg)$/i.test(url) || /^data:video\//.test(url)
   const isPdf = (url: string) => /\.pdf$/i.test(url)
-  const isImage = (url: string) => /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url)
+  const isImage = (url: string) => /\.(jpg|jpeg|png|gif|webp|svg|bmp|avif|tiff)(\?|$)/i.test(url) || /image\//i.test(url) || url.includes('blob.vercel-storage.com') && /\.(jpg|jpeg|png|gif|webp|svg|bmp|avif)/i.test(url)
 
   return (
     <div className={className}>

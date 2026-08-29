@@ -2,8 +2,10 @@
 
 import { XCircle, ArrowRight, Home, RefreshCw } from "lucide-react"
 import Link from "next/link"
+import { useParams } from "next/navigation"
 
 export default function DonationCancelPage() {
+  const { lang } = useParams()
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
@@ -20,14 +22,14 @@ export default function DonationCancelPage() {
 
           <div className="flex flex-col gap-3 pt-4">
             <Link
-              href="/donations"
+              href={`/${lang}/donations`}
               className="flex items-center justify-center gap-2 bg-[#1A3A6B] text-white py-3 rounded-xl font-bold hover:bg-[#0f2547] transition-colors"
             >
               <RefreshCw className="w-5 h-5" />
               المحاولة مرة أخرى
             </Link>
             <Link
-              href="/"
+              href={`/${lang}`}
               className="flex items-center justify-center gap-2 border-2 border-[#1A3A6B] text-[#1A3A6B] py-3 rounded-xl font-bold hover:bg-[#1A3A6B]/5 transition-colors"
             >
               <Home className="w-5 h-5" />

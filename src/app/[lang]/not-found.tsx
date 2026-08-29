@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function LangNotFound() {
+  const pathname = usePathname();
+  const lang = pathname.split("/")[1] === "en" ? "en" : "ar";
   return (
     <div
       style={{
@@ -50,7 +53,7 @@ export default function LangNotFound() {
           Page Not Found
         </p>
         <Link
-          href="/ar"
+          href={`/${lang}`}
           style={{
             display: "inline-block",
             padding: "0.875rem 2rem",

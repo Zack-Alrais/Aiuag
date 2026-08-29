@@ -372,15 +372,16 @@ function ImageCropper({ src, onSave, onCancel, lang }: { src: string; onSave: (u
 function ReactionsPopover({ onReact, currentReaction, lang }: { onReact: (type: string) => void; currentReaction?: string; lang: string }) {
   const isAr = lang === "ar";
   return (
-    <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-[#1e2d42] rounded-full shadow-xl border border-gray-200 dark:border-[#3b4f6b] px-2 py-1 flex gap-1 z-50" style={{ animation: "fadeInUp 0.2s ease" }}>
-      {REACTIONS.map((r) => (
+    <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-[#1e2d42] rounded-2xl shadow-xl border border-gray-200 dark:border-[#3b4f6b] px-2 py-1.5 flex gap-0.5 z-50 animate-slide-up">
+      {REACTIONS.map((r, i) => (
         <button
           key={r.type}
           onClick={() => onReact(r.type)}
-          className={`w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-[#2a3f5f] transition-all hover:scale-125 text-xl ${currentReaction === r.type ? "bg-blue-50 dark:bg-blue-900/30 scale-110" : ""}`}
+          className={`w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-[#2a3f5f] transition-all active:scale-90 ${currentReaction === r.type ? "bg-blue-50 dark:bg-blue-900/30 scale-110" : ""}`}
+          style={{ animation: `bounce-in 0.3s ease-out ${i * 50}ms both` }}
           title={isAr ? r.labelAr : r.labelEn}
         >
-          {r.emoji}
+          <span className="text-2xl transition-transform hover:scale-125">{r.emoji}</span>
         </button>
       ))}
     </div>

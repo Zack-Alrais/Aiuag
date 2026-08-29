@@ -251,14 +251,15 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                       {isArabic ? "إعجاب" : "Like"}
                     </button>
                     {reactionPopover === post.id && (
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-surface border border-border rounded-xl shadow-lg p-2 flex gap-1 z-50" dir="ltr">
-                        {REACTIONS.map((type) => (
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-surface border border-border rounded-2xl shadow-xl p-1.5 flex gap-0.5 z-50 animate-slide-up" dir="ltr">
+                        {REACTIONS.map((type, i) => (
                           <button
                             key={type}
                             onClick={() => { handleReaction(post.id, type); setReactionPopover(null); }}
-                            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all hover:scale-125"
+                            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all hover:scale-125 active:scale-95"
+                            style={{ animationDelay: `${i * 50}ms`, animation: `bounce-in 0.3s ease-out ${i * 50}ms both` }}
                           >
-                            <ReactionIcon type={type} size={22} />
+                            <ReactionIcon type={type} size={26} />
                           </button>
                         ))}
                       </div>
@@ -331,7 +332,7 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                       </div>
                     ) : (
                       <div className="px-4 pb-4">
-                        <Link href={`/${lang}/login`} className="block text-center text-xs text-primary hover:underline py-2">
+                        <Link href="/auth/login" className="block text-center text-xs text-primary hover:underline py-2">
                           {isArabic ? "سجل الدخول للتعليق" : "Log in to comment"}
                         </Link>
                       </div>

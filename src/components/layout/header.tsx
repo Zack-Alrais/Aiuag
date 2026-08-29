@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { createPortal } from "react-dom"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Globe, Search, ChevronDown, User, LogOut, ChevronUp, LogIn, Sun, Moon, ChevronLeft, ChevronRight } from "lucide-react"
+import { Menu, X, Globe, Search, ChevronDown, User, LogOut, ChevronUp, LogIn, Sun, Moon, ChevronLeft, ChevronRight, LayoutDashboard } from "lucide-react"
 import SearchOverlay from "./search-overlay"
 import MobileMenu from "./mobile-menu"
 import { ASSETS } from "@/lib/assets"
@@ -46,6 +47,7 @@ function getNavItems(lang: string): NavItem[] {
         { label: isArabic ? "الأخبار والأحداث" : "News & Events", href: "/news" },
         { label: isArabic ? "المعرض والفيديوهات" : "Gallery & Videos", href: "/media/gallery" },
         { label: isArabic ? "المنشورات والتفاعل" : "Posts & Publications", href: "/media/publications" },
+        { label: isArabic ? "منشورات المجتمع" : "Community Posts", href: "/posts" },
         { label: isArabic ? "التقارير" : "Reports", href: "/media/reports" },
       ],
     },
@@ -272,7 +274,10 @@ export default function Header({ lang }: HeaderProps) {
             >
               <Search className="w-5 h-5" />
             </button>
-            {searchOpen && <SearchOverlay lang={currentLang} onClose={() => setSearchOpen(false)} />}
+            {searchOpen && typeof window !== "undefined" && createPortal(
+              <SearchOverlay lang={currentLang} onClose={() => setSearchOpen(false)} />,
+              document.body
+            )}
 
             <button
               onClick={toggleTheme}
@@ -371,6 +376,14 @@ export default function Header({ lang }: HeaderProps) {
                       >
                         <User className="w-4 h-4" />
                         {isArabic ? "الملف الشخصي" : "Profile"}
+                      </Link>
+                      <Link
+                        href={`/${currentLang}/dashboard`}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-card hover:text-primary transition-colors border-b border-border dark:border-dark-border"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                        {isArabic ? "لوحة التحكم" : "Dashboard"}
                       </Link>
                       <button
                         onClick={() => signOut({ callbackUrl: `/${currentLang}` })}

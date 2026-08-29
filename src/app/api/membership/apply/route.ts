@@ -16,19 +16,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
     }
 
-    // Check if email already exists
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) {
+    // Check if email already exists in members
+    const existingMember = await prisma.member.findFirst({
+      where: { user: { email } },
+    });
+    if (existingMember) {
       return NextResponse.json({ error: "Email already registered" }, { status: 409 });
     }
 
-    // Create user
+    // Create user account with random password (admin will set up real access)
+    const randomPassword = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const bcrypt = await import("bcryptjs");
+    const hashedPassword = await bcrypt.hash(randomPassword, 12);
+
     const user = await prisma.user.create({
       data: {
         name,
         email,
-        password: "pending", // Will be set when account is activated
+        password: hashedPassword,
         role: "member",
+        emailVerified: new Date(), // Auto-verify for membership applications
       },
     });
 

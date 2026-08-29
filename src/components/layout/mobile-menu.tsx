@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Globe, LogIn, LogOut, User, ChevronDown } from "lucide-react"
+import { Globe, LogIn, LogOut, User, ChevronDown, LayoutDashboard } from "lucide-react"
 import { useState, type ReactNode } from "react"
 import { signOut } from "next-auth/react"
 
@@ -162,6 +162,14 @@ export default function MobileMenu({ lang, navItems, pathname, session, onClose,
               >
                 <User className="w-4 h-4" />
                 {isArabic ? "الملف الشخصي" : "Profile"}
+              </Link>
+              <Link
+                href={`/${lang}/dashboard`}
+                onClick={onClose}
+                className="flex items-center gap-3 w-full px-5 py-3 bg-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/20 transition-colors"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                {isArabic ? "لوحة التحكم" : "Dashboard"}
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: `/${lang}` })}

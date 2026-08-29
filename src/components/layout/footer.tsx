@@ -35,6 +35,7 @@ export default function Footer({ lang }: FooterProps) {
     { label: isArabic ? "المشاريع" : "Projects", href: `/${lang}/projects` },
     { label: isArabic ? "الأخبار" : "News", href: `/${lang}/news` },
     { label: isArabic ? "الأحداث" : "Events", href: `/${lang}/events` },
+    { label: isArabic ? "الشركاء" : "Partners", href: `/${lang}/partners` },
     { label: isArabic ? "طلب عضوية" : "Membership", href: `/${lang}/membership/apply` },
   ]
 
@@ -43,6 +44,7 @@ export default function Footer({ lang }: FooterProps) {
     { label: isArabic ? "التطوع" : "Volunteer", href: `/${lang}/volunteer` },
     { label: isArabic ? "التبرعات" : "Donations", href: `/${lang}/donations` },
     { label: isArabic ? "المنشورات" : "Publications", href: `/${lang}/publications` },
+    { label: isArabic ? "الموارد" : "Resources", href: `/${lang}/resources` },
   ]
 
   const handleSubscribe = async (e: React.FormEvent) => {

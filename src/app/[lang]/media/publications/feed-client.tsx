@@ -362,7 +362,7 @@ export default function PublicationsFeedClient({
 
   const handleCopyLink = async (postId: string) => {
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/${lang}/media/posts/${postId}`)
+      await navigator.clipboard.writeText(`${window.location.origin}/${lang}/posts/${postId}`)
       setCopiedPost(postId)
       setTimeout(() => setCopiedPost(null), 2000)
     } catch {}
@@ -578,17 +578,19 @@ export default function PublicationsFeedClient({
               <span>{myReaction ? (isArabic ? REACTIONS.find((r) => r.type === myReaction)?.labelAr : REACTIONS.find((r) => r.type === myReaction)?.labelEn) : (isArabic ? "إعجاب" : "Like")}</span>
             </button>
             {showReactionPicker === post.id && (
-              <div className={`absolute bottom-full ${isArabic ? "right-0" : "left-0"} mb-2 flex items-center gap-1 bg-surface rounded-full shadow-lg border border-border px-3 py-2 z-10 animate-slide-up`}>
+              <div className={`absolute bottom-full ${isArabic ? "right-0" : "left-0"} mb-2 flex items-center gap-0.5 bg-surface rounded-2xl shadow-xl border border-border px-2 py-1.5 z-10 animate-slide-up`}
+                onMouseLeave={() => setShowReactionPicker(null)}
+              >
                 {REACTIONS.map((r, i) => (
                   <button
                     key={r.type}
-                    onClick={() => { handleReact(post.id, myReaction === r.type ? "" : r.type); if (myReaction === r.type) setMyReaction(post.id, ""); else setMyReaction(post.id, r.type) }}
+                    onClick={() => { handleReact(post.id, myReaction === r.type ? "" : r.type); if (myReaction === r.type) setMyReaction(post.id, ""); else setMyReaction(post.id, r.type); setShowReactionPicker(null); }}
                     disabled={reactingPost === post.id}
-                    className={`text-2xl hover:scale-125 transition-transform p-1 ${myReaction === r.type ? "scale-125" : ""}`}
-                    style={{ animationDelay: `${i * 50}ms` }}
+                    className={`w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all active:scale-90 ${myReaction === r.type ? "scale-125 bg-primary/10" : ""}`}
+                    style={{ animation: `bounce-in 0.3s ease-out ${i * 50}ms both` }}
                     title={isArabic ? r.labelAr : r.labelEn}
                   >
-                    {r.emojiBig}
+                    <span className="text-2xl transition-transform hover:scale-125">{r.emojiBig}</span>
                   </button>
                 ))}
               </div>
@@ -782,7 +784,7 @@ export default function PublicationsFeedClient({
                     </div>
                     <div className="flex items-center justify-between mt-3">
                       <span className="text-xs text-text-light flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{formatDate(pub.createdAt, isArabic)}</span>
-                      {pub.fileUrl && <a href={pub.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded-lg hover:bg-emerald-600 transition-colors"><Download className="w-3.5 h-3.5" />{isArabic ? "تحميل" : "Download"}</a>}
+                      {pub.fileUrl && <a href={pub.fileUrl} target="_blank" rel="noopener noreferrer" download className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded-lg hover:bg-emerald-600 transition-colors"><Download className="w-3.5 h-3.5" />{isArabic ? "تحميل" : "Download"}</a>}
                     </div>
                   </div>
                 </div>
@@ -814,7 +816,7 @@ export default function PublicationsFeedClient({
                     </div>
                     <div className="flex items-center justify-between mt-3">
                       <span className="text-xs text-text-light flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{formatDate(pub.createdAt, isArabic)}</span>
-                      {pub.fileUrl && <a href={pub.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 text-white text-xs font-bold rounded-lg hover:bg-amber-600 transition-colors"><Download className="w-3.5 h-3.5" />{isArabic ? "تحميل" : "Download"}</a>}
+                      {pub.fileUrl && <a href={pub.fileUrl} target="_blank" rel="noopener noreferrer" download className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 text-white text-xs font-bold rounded-lg hover:bg-amber-600 transition-colors"><Download className="w-3.5 h-3.5" />{isArabic ? "تحميل" : "Download"}</a>}
                     </div>
                   </div>
                 </div>

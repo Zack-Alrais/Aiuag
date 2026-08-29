@@ -71,7 +71,7 @@ export default function Error({
             إعادة المحاولة / Try Again
           </button>
           <a
-            href="mailto:support@aiuag.edu"
+            href="mailto:aiuagho@gmail.com"
             style={{
               display: "inline-block",
               padding: "0.875rem 2rem",

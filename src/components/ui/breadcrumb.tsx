@@ -74,6 +74,8 @@ function Breadcrumb({
 }: BreadcrumbProps) {
   const pathname = usePathname()
   const isRtl = dir === "rtl"
+  const lang = pathname.split("/")[1]
+  const resolvedHomeHref = homeHref === "/" && (lang === "ar" || lang === "en") ? `/${lang}` : homeHref
 
   const generatedItems = React.useMemo(() => {
     if (!autoGenerate) return items || []
@@ -113,7 +115,7 @@ function Breadcrumb({
       <ol className={cn("flex items-center gap-1.5 text-sm", isRtl && "flex-row-reverse")}>
         <li>
           <Link
-            href={homeHref}
+            href={resolvedHomeHref}
             className={cn(
               "text-gray-500 hover:text-[#1A3A6B] transition-colors",
               isRtl && "text-right"

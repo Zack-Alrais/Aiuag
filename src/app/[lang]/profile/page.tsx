@@ -289,7 +289,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
               {profile.memberSince && <p className="text-white/50 text-xs mt-1">{isArabic ? "عضو منذ" : "Member since"} {profile.memberSince}</p>}
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 text-xs" onClick={() => router.push("/")}>
+              <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 text-xs" onClick={() => router.push(`/${lang}`)}>
                 <LogOut className="w-3.5 h-3.5 ml-1.5" />
                 {isArabic ? "الرئيسية" : "Home"}
               </Button>
