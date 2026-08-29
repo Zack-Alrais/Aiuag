@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Upload, X, FileText, Film, File } from "lucide-react"
+import { Upload, X, FileText, Film, File, Image } from "lucide-react"
 
 interface FileUploadProps {
   value: string
@@ -32,6 +32,7 @@ export default function FileUpload({
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [imgError, setImgError] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const config = TYPE_CONFIG[type]
@@ -81,7 +82,21 @@ export default function FileUpload({
       {value ? (
         <div className="relative group">
           {isImage(value) ? (
-            <img src={value} alt="Preview" className="w-full h-40 object-cover rounded-lg border border-gray-200 dark:border-[#3b4f6b]" loading="lazy" />
+            imgError ? (
+              <div className="w-full h-40 flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
+                <Image className="w-8 h-8 text-red-400" />
+                <p className="text-sm text-red-500 dark:text-red-300">تعذر عرض الصورة — الرابط غير متاح</p>
+                <button
+                  type="button"
+                  onClick={() => inputRef.current?.click()}
+                  className="px-3 py-1.5 bg-white text-gray-800 text-xs rounded-md hover:bg-gray-100 dark:bg-[#1e2d42] dark:text-[#f1f5f9]"
+                >
+                  إعادة الرفع
+                </button>
+              </div>
+            ) : (
+              <img key={value} src={value} alt="Preview" onError={() => setImgError(true)} className="w-full h-40 object-cover rounded-lg border border-gray-200 dark:border-[#3b4f6b]" loading="lazy" />
+            )
           ) : isVideo(value) ? (
             <video src={value} controls className="w-full h-40 object-cover rounded-lg border border-gray-200 dark:border-[#3b4f6b]" />
           ) : isPdf(value) ? (

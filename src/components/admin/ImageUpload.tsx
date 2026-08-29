@@ -26,6 +26,7 @@ export default function ImageUpload({
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [editorImage, setEditorImage] = useState<string | null>(null)
+  const [imgError, setImgError] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const uploadFile = async (file: File) => {
@@ -74,33 +75,56 @@ export default function ImageUpload({
       )}
       {value ? (
         <div className="relative group">
-          <img src={value} alt="Preview" className="w-full h-40 object-cover rounded-lg border border-gray-200" loading="lazy" />
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-            {showCropButton && (
+          {imgError ? (
+            <div className="w-full h-40 flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
+              <Image className="w-8 h-8 text-red-400" />
+              <p className="text-sm text-red-500 dark:text-red-300">تعذر عرض الصورة — الرابط غير متاح</p>
               <button
                 type="button"
-                onClick={() => setEditorImage(value)}
-                className="p-1.5 bg-white text-blue-600 rounded-md hover:bg-gray-100"
-                title="قص وتعديل"
+                onClick={() => inputRef.current?.click()}
+                className="px-3 py-1.5 bg-white text-gray-800 text-xs rounded-md hover:bg-gray-100 dark:bg-[#1e2d42] dark:text-[#f1f5f9]"
               >
-                <Crop className="w-4 h-4" />
+                إعادة الرفع
               </button>
-            )}
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
-              className="px-3 py-1.5 bg-white text-gray-800 text-xs rounded-md hover:bg-gray-100"
-            >
-              تغيير
-            </button>
-            <button
-              type="button"
-              onClick={() => onChange("")}
-              className="p-1.5 bg-white text-red-600 rounded-md hover:bg-gray-100"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+            </div>
+          ) : (
+            <img
+              key={value}
+              src={value}
+              alt="Preview"
+              onError={() => setImgError(true)}
+              className="w-full h-40 object-cover rounded-lg border border-gray-200 dark:border-[#3b4f6b]"
+              loading="lazy"
+            />
+          )}
+          {!imgError && (
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+              {showCropButton && (
+                <button
+                  type="button"
+                  onClick={() => setEditorImage(value)}
+                  className="p-1.5 bg-white text-blue-600 rounded-md hover:bg-gray-100"
+                  title="قص وتعديل"
+                >
+                  <Crop className="w-4 h-4" />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                className="px-3 py-1.5 bg-white text-gray-800 text-xs rounded-md hover:bg-gray-100"
+              >
+                تغيير
+              </button>
+              <button
+                type="button"
+                onClick={() => onChange("")}
+                className="p-1.5 bg-white text-red-600 rounded-md hover:bg-gray-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <div
