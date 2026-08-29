@@ -200,7 +200,7 @@ export default function GraduatesImportPage() {
             </div>
 
             <div className="p-4">
-              <div className="grid grid-cols-3 gap-3 text-sm mb-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm mb-4">
                 <div className="bg-white dark:bg-[#1a2332] rounded-lg p-3 text-center"><p className="text-2xl font-bold text-green-600">{preview.validCount}</p><p className="text-xs text-gray-500">صف صالح</p></div>
                 <div className="bg-white dark:bg-[#1a2332] rounded-lg p-3 text-center"><p className="text-2xl font-bold text-amber-600">{preview.skipped}</p><p className="text-xs text-gray-500">تم تجاهله</p></div>
                 <div className="bg-white dark:bg-[#1a2332] rounded-lg p-3 text-center"><p className="text-2xl font-bold text-gray-600">{preview.total}</p><p className="text-xs text-gray-500">إجمالي الصفوف</p></div>

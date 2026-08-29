@@ -86,7 +86,7 @@ function Tabs({ tabs, defaultTab, onChange, className, dir }: TabsProps) {
         aria-orientation="horizontal"
         onKeyDown={handleKeyDown}
         className={cn(
-          "flex border-b border-gray-200",
+          "flex border-b border-gray-200 overflow-x-auto no-scrollbar max-w-full",
           isRtl && "flex-row-reverse"
         )}
       >
@@ -107,7 +107,7 @@ function Tabs({ tabs, defaultTab, onChange, className, dir }: TabsProps) {
               disabled={tab.disabled}
               onClick={() => handleChange(tab.id)}
               className={cn(
-                "inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap",
+                "inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap shrink-0",
                 isActive
                   ? "border-[#1A3A6B] text-[#1A3A6B]"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",

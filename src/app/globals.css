@@ -24,6 +24,22 @@
   --color-dark: #0f2547;
 }
 
+/* ==== FLUID TYPOGRAPHY SCALE (creates text-fluid-* utilities) ==== */
+@theme {
+  --text-fluid-xs: clamp(0.72rem, 0.68rem + 0.22vw, 0.85rem);
+  --text-fluid-sm: clamp(0.8125rem, 0.77rem + 0.28vw, 0.9375rem);
+  --text-fluid-base: clamp(0.9375rem, 0.9rem + 0.32vw, 1rem);
+  --text-fluid-lg: clamp(1.0625rem, 1rem + 0.4vw, 1.1875rem);
+  --text-fluid-xl: clamp(1.25rem, 1.15rem + 0.65vw, 1.5rem);
+  --text-fluid-2xl: clamp(1.5rem, 1.35rem + 0.85vw, 1.875rem);
+  --text-fluid-3xl: clamp(1.875rem, 1.6rem + 1.3vw, 2.5rem);
+  --text-fluid-4xl: clamp(2.25rem, 1.95rem + 1.65vw, 3rem);
+  --text-fluid-5xl: clamp(2.5rem, 2.1rem + 2.15vw, 3.75rem);
+
+  --breakpoint-xs: 26rem;
+  --container-site: 80rem;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -32,6 +48,7 @@ body {
   background-color: var(--color-background);
   color: var(--color-text);
   transition: background-color 0.3s, color 0.3s;
+  overflow-wrap: anywhere;
 }
 
 html.dark {
@@ -178,4 +195,67 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 
 .animate-slide-up {
   animation: slide-up 0.2s ease-out;
+}
+
+/* ==== RESPONSIVE ARCHITECTURE UTILITIES ====
+   Centralized, viewport-agnostic building blocks.
+   No fixed desktop dimensions anywhere below. */
+
+iframe,
+embed,
+object {
+  max-width: 100%;
+}
+
+@layer utilities {
+  /* Central fluid container (RTL/LTR safe via logical props) */
+  .container-site {
+    width: 100%;
+    margin-inline: auto;
+    max-width: 80rem;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+  }
+
+  /* Horizontal scroll with clipping protection (keeps content reachable) */
+  .scroll-x {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .scroll-x.no-scrollbar,
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scroll-x.no-scrollbar::-webkit-scrollbar,
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Safe wrapper for tables / long content rows */
+  .table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Auto-fit card grids with fluid min column — never fixed widths */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: clamp(0.75rem, 2.5vw, 1.5rem);
+  }
+  .card-grid-wide {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    gap: clamp(0.75rem, 2.5vw, 1.5rem);
+  }
+
+  /* Viewport-safe modal sizing (never exceeds the screen) */
+  .modal-fit {
+    max-width: calc(100vw - clamp(1rem, 4vw, 2rem));
+    max-height: calc(100dvh - clamp(1.5rem, 5vw, 3rem));
+    overflow-y: auto;
+  }
 }

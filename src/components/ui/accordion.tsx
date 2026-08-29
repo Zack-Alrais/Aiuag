@@ -100,12 +100,14 @@ function AccordionItem({ item, dir }: { item: AccordionItem; dir?: string }) {
         role="region"
         aria-labelledby={headerId}
         className={cn(
-          "overflow-hidden transition-all duration-300 ease-in-out",
-          isOpen ? "max-h-[500px] opacity-100 pb-4" : "max-h-0 opacity-0"
+          "grid transition-all duration-300 ease-in-out",
+          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         )}
       >
-        <div className="text-sm text-gray-600 leading-relaxed">
-          {item.content}
+        <div className="overflow-hidden min-h-0">
+          <div className="text-sm text-gray-600 leading-relaxed pb-4">
+            {item.content}
+          </div>
         </div>
       </div>
     </div>

@@ -440,7 +440,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Hero images table */}
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <div className="border border-gray-200 rounded-lg overflow-x-auto">
               {heroLoading ? (
                 <div className="p-8 text-center text-gray-500">جاري التحميل...</div>
               ) : heroImages.length === 0 ? (
@@ -546,7 +546,7 @@ export default function SettingsPage() {
               {/* Multi-page selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-[#cbd5e1]">اختر الصفحات</label>
-                <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
                   {pageOptions.map((page) => (
                     <button key={page.slug} type="button" onClick={() => togglePageInForm(page.slug)} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all text-right ${heroForm.selectedPages.includes(page.slug) ? "bg-blue-100 text-blue-700 border border-blue-300" : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100"}`}>
                       <div className={`w-4 h-4 rounded border flex items-center justify-center ${heroForm.selectedPages.includes(page.slug) ? "bg-blue-600 border-blue-600" : "border-gray-300"}`}>

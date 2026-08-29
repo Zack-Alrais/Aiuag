@@ -331,7 +331,7 @@ export default function AdminDashboard() {
           <div className="w-1 h-5 bg-[#D4A843] rounded-full" />
           حالة الأعضاء
         </h2>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {(analytics?.membersByStatus || []).map((item, i) => (
             <div key={i} className="text-center p-4 bg-gray-50 dark:bg-[#111927] rounded-xl">
               <div className={`w-3 h-3 rounded-full ${statusColor(item.status)} mx-auto mb-2`} />

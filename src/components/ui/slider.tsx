@@ -75,7 +75,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A3A6B]/20"
             )}
             style={{
-              background: `linear-gradient(to right, #1A3A6B 0%, #1A3A6B ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`,
+              background: `linear-gradient(${isRtl ? "to left" : "to right"}, #1A3A6B 0%, #1A3A6B ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`,
             }}
             aria-valuemin={min}
             aria-valuemax={max}
@@ -90,8 +90,8 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
               return (
                 <div
                   key={mark.value}
-                  className="absolute -translate-x-1/2"
-                  style={{ left: `${markPercentage}%` }}
+                  className="absolute -translate-x-1/2 rtl:translate-x-1/2"
+                  style={{ insetInlineStart: `${markPercentage}%` }}
                 >
                   <div className="h-1.5 w-0.5 bg-gray-300 mx-auto" />
                   <span className="text-xs text-gray-500 block mt-1 whitespace-nowrap">

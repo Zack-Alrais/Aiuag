@@ -156,7 +156,7 @@ export function MembershipCardEngine({
           <div
             onClick={() => { if (!showBoth) setFlipped(true) }}
             style={{
-              width: "450px",
+              width: "min(450px, 100%)",
               height: "280px",
               borderRadius: "12px",
               boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
@@ -341,7 +341,7 @@ export function MembershipCardEngine({
           <div
             onClick={() => { if (!showBoth) setFlipped(false) }}
             style={{
-              width: "450px",
+              width: "min(450px, 100%)",
               height: "280px",
               borderRadius: "12px",
               boxShadow: "0 4px 10px rgba(0,0,0,0.15)",

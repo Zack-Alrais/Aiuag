@@ -237,7 +237,7 @@ function DonationsContent() {
                   {sudaneseGateways.length > 0 && (
                     <div>
                       <p className="text-sm text-text-secondary mb-2">{isArabic ? "الدفع المحلي" : "Local Payment"}</p>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {sudaneseGateways.map((g) => (
                           <button
                             key={g.id}
@@ -263,7 +263,7 @@ function DonationsContent() {
                   {internationalGateways.length > 0 && (
                     <div>
                       <p className="text-sm text-text-secondary mb-2">{isArabic ? "الدفع الدولي" : "International Payment"}</p>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {internationalGateways.map((g) => (
                           <button
                             key={g.id}

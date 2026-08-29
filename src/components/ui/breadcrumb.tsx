@@ -112,7 +112,7 @@ function Breadcrumb({
 
   return (
     <nav aria-label="Breadcrumb" className={cn("flex items-center", isRtl && "flex-row-reverse", className)} dir={dir}>
-      <ol className={cn("flex items-center gap-1.5 text-sm", isRtl && "flex-row-reverse")}>
+      <ol className={cn("flex items-center gap-1.5 text-sm max-w-full overflow-x-auto no-scrollbar", isRtl && "flex-row-reverse")}>
         <li>
           <Link
             href={resolvedHomeHref}

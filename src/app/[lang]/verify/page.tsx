@@ -135,7 +135,7 @@ function VerifyContent() {
             )}
 
             <div className="mt-6 text-center text-xs text-gray-400">
-              <Shield className="w-4 h-4 inline-block ml-1" />
+              <Shield className="w-4 h-4 inline-block ms-1" />
               رابطة خريجي جامعة أفريقيا العالمية
             </div>
           </div>

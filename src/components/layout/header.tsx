@@ -22,6 +22,7 @@ interface NavItem {
   label: string
   href: string
   children?: NavChild[]
+  hideOnLg?: boolean
 }
 
 function getNavItems(lang: string): NavItem[] {
@@ -67,7 +68,7 @@ function getNavItems(lang: string): NavItem[] {
         { label: isArabic ? "التبرعات" : "Donations", href: "/donations" },
       ],
     },
-    { label: isArabic ? "اتصل بنا" : "Contact", href: "/contact" },
+    { label: isArabic ? "اتصل بنا" : "Contact", href: "/contact", hideOnLg: true },
   ]
 }
 
@@ -186,7 +187,7 @@ export default function Header({ lang }: HeaderProps) {
             <motion.div
               animate={{ opacity: scrolled ? 0 : 1, width: scrolled ? 0 : "auto" }}
               transition={{ duration: 0.2 }}
-              className="hidden sm:block overflow-hidden text-white"
+              className="hidden xl:block overflow-hidden text-white"
             >
               <div className="text-lg font-bold leading-tight">AIUAG</div>
               <div className="text-[10px] leading-tight opacity-80">
@@ -197,17 +198,17 @@ export default function Header({ lang }: HeaderProps) {
             </motion.div>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1">
             {navItems.map((item) => (
               <div
                 key={item.label}
-                className="relative"
+                className={`relative ${item.hideOnLg ? "hidden xl:block" : ""}`}
                 onMouseEnter={() => item.children && handleDropdownEnter(item.label)}
                 onMouseLeave={handleDropdownLeave}
               >
                 <Link
                   href={`/${currentLang}${item.href === "/" ? "" : item.href}`}
-                  className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-1 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                     scrolled ? "text-text hover:bg-gray-100 dark:text-white dark:hover:bg-dark-card" : "text-white/80 hover:text-white hover:bg-white/10"
                   } ${
                     pathname === `/${currentLang}${item.href}` || pathname.startsWith(`/${currentLang}${item.href}/`)
@@ -289,7 +290,7 @@ export default function Header({ lang }: HeaderProps) {
 
             <button
               onClick={toggleLanguage}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
+              className={`flex items-center gap-1.5 px-2 xl:px-3 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap ${
                 scrolled ? "text-text hover:bg-gray-100 dark:text-white dark:hover:bg-dark-card" : "text-white/80 hover:text-white hover:bg-white/10"
               }`}
             >

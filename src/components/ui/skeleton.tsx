@@ -152,8 +152,8 @@ export function HeroSkeleton() {
   return (
     <div className="relative bg-gradient-to-br from-primary via-primary-light to-primary-dark py-24">
       <div className="container mx-auto px-4 text-center">
-        <SkeletonLine className="h-8 w-64 mx-auto bg-white/20 mb-3" />
-        <SkeletonLine className="h-4 w-96 mx-auto bg-white/10" />
+        <SkeletonLine className="h-8 w-48 sm:w-64 mx-auto bg-white/20 mb-3" />
+        <SkeletonLine className="h-4 w-56 sm:w-96 mx-auto bg-white/10" />
       </div>
     </div>
   );

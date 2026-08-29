@@ -146,6 +146,25 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
   const isLoginPage = pathname === "/ai.admin/login"
 
+  useEffect(() => {
+    if (!mobileOpen) return
+    document.body.style.overflow = "hidden"
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false)
+    }
+    window.addEventListener("keydown", onKey)
+    return () => {
+      document.body.style.overflow = ""
+      window.removeEventListener("keydown", onKey)
+    }
+  }, [mobileOpen])
+
+  useEffect(() => {
+    setMobileOpen(false)
+    setNotifOpen(false)
+    setUserMenuOpen(false)
+  }, [pathname])
+
   const fetchNotifications = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/notifications?limit=20")
@@ -227,7 +246,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   }
 
   const sidebar = (
-    <aside className={`bg-[#0f2547] dark:bg-[#0d1a2d] text-white transition-all duration-300 flex flex-col h-screen sticky top-0 ${sidebarOpen ? "w-64" : "w-20"}`}>
+    <aside className={`bg-[#0f2547] dark:bg-[#0d1a2d] text-white transition-all duration-300 flex flex-col h-screen sticky top-0 ${sidebarOpen || mobileOpen ? "w-64" : "w-20"}`}>
       <div className="p-4 border-b border-white/10 flex items-center justify-between">
         {sidebarOpen && (
           <div className="flex items-center gap-3">
@@ -362,7 +381,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div className="w-64">{sidebar}</div>
+          <div className="h-full overflow-y-auto overscroll-contain">{sidebar}</div>
           <div className="flex-1 bg-black/50 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
         </div>
       )}
@@ -375,12 +394,12 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             </button>
             <form onSubmit={handleSearch} className="relative hidden sm:block">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-              <input
-                type="text"
-                placeholder="بحث عن أعضاء، أخبار، أحداث..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 bg-gray-100/80 dark:bg-[#111927] dark:border dark:border-[#3b4f6b] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3A6B]/20 dark:focus:ring-blue-500/30 focus:bg-white dark:focus:bg-[#1a2332] w-72 transition-all text-gray-800 dark:text-[#f1f5f9] placeholder-gray-500 dark:placeholder-[#7a8ba3]"
+<input
+                  type="text"
+                  placeholder="بحث عن أعضاء، أخبار، أحداث..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-4 py-2 bg-gray-100/80 dark:bg-[#111927] dark:border dark:border-[#3b4f6b] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3A6B]/20 dark:focus:ring-blue-500/30 focus:bg-white dark:focus:bg-[#1a2332] w-40 md:w-56 xl:w-72 transition-all text-gray-800 dark:text-[#f1f5f9] placeholder-gray-500 dark:placeholder-[#7a8ba3]"
               />
             </form>
 
@@ -422,7 +441,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
               {notifOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
-                  <div className="absolute left-0 mt-2 w-80 bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: "rtl" }}>
+                  <div className="absolute left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: "rtl" }}>
                     <div className="flex items-center justify-between px-4 py-3 border-b dark:border-[#2a3d56] bg-gradient-to-l from-[#1A3A6B] to-[#2B5EA7]">
                       <div className="flex items-center gap-2">
                         <Bell className="w-4 h-4 text-white" />
@@ -502,7 +521,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
               {userMenuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
-                  <div className="absolute left-0 mt-2 w-56 bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: "rtl" }}>
+                  <div className="absolute left-0 mt-2 w-56 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: "rtl" }}>
                     <div className="bg-gradient-to-br from-[#1A3A6B] to-[#122848] p-4 text-white">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-white/30">

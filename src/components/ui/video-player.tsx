@@ -117,7 +117,7 @@ export default function VideoPlayer({ video, queue, currentIndex, onNavigate, is
             />
           </div>
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 min-h-[300px]">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
             <Play className="w-20 h-20 text-white/30" />
           </div>
         )}

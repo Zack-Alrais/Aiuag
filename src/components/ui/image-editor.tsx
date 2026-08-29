@@ -125,7 +125,7 @@ export default function ImageEditor({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden modal-fit">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <div className="flex items-center gap-3">
@@ -138,7 +138,7 @@ export default function ImageEditor({
         </div>
 
         {/* Cropper */}
-        <div className="relative h-96 bg-gray-900">
+        <div className="relative h-72 sm:h-96 bg-gray-900">
           <Cropper
             image={image}
             crop={crop}
@@ -193,7 +193,7 @@ export default function ImageEditor({
           </div>
 
           {/* Aspect Ratio */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Move className="w-5 h-5 text-gray-500 shrink-0" />
             <span className="text-sm text-gray-500 ml-2">النسبة:</span>
             {[
@@ -218,7 +218,7 @@ export default function ImageEditor({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t bg-gray-50">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t bg-gray-50 flex-wrap">
           <button
             onClick={onCancel}
             className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium"

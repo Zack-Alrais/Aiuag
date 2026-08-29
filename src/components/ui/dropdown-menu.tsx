@@ -64,9 +64,9 @@ function DropdownMenu({ trigger, items, align = "left", className, dir = "ltr" }
           ref={menuRef}
           role="menu"
           className={cn(
-            "absolute z-50 mt-2 min-w-[180px] overflow-hidden rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg",
+            "absolute z-50 mt-2 min-w-[180px] max-w-[calc(100vw-1.5rem)] max-h-[calc(100dvh-8rem)] overflow-y-auto rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg",
             "animate-in fade-in-0 zoom-in-95",
-            effectiveAlign === "left" ? "left-0" : "right-0",
+            effectiveAlign === "left" ? "start-0" : "end-0",
             className
           )}
         >

@@ -54,7 +54,7 @@ function Tooltip({ children, content, side = "top", delay = 200, className }: To
         <div
           role="tooltip"
           className={cn(
-            "absolute z-50 px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-md shadow-sm whitespace-nowrap pointer-events-none",
+            "absolute z-50 px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-md shadow-sm whitespace-nowrap max-w-[min(16rem,calc(100vw-2rem))] truncate pointer-events-none",
             "animate-in fade-in-0 zoom-in-95",
             positionStyles[side],
             className

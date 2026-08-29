@@ -219,7 +219,7 @@ export default function AdminCardsPage() {
           <h1 className="text-2xl font-bold text-gray-800">البطاقات</h1>
           <p className="text-sm text-gray-500">{filteredCards.length} بطاقة عضوية</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button onClick={() => setShowUpload(true)} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors">
             <Upload className="w-4 h-4" />رفع Excel
           </button>
@@ -276,7 +276,7 @@ export default function AdminCardsPage() {
       </div>
 
       {/* Sort Bar */}
-      <div className="flex items-center gap-6 px-2">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 px-2">
         <span className="text-sm text-gray-400">ترتيب حسب:</span>
         <SortBtn field="nameAr" label="الاسم" />
         <SortBtn field="country" label="الدولة" />
@@ -391,7 +391,7 @@ export default function AdminCardsPage() {
                       <XCircle className="w-4 h-4" /> {uploadResults.filter(r => r.status === "error").length} خطأ
                     </div>
                   </div>
-                  <div className="max-h-80 overflow-y-auto border border-gray-200 rounded-xl">
+                  <div className="max-h-80 overflow-y-auto overflow-x-auto border border-gray-200 rounded-xl">
                     <table className="w-full text-sm">
                       <thead className="bg-gray-50 sticky top-0">
                         <tr>
@@ -436,7 +436,7 @@ export default function AdminCardsPage() {
       {/* Detail Modal - Using Unified Card Component */}
       {selectedCard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setSelectedCard(null)}>
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="sticky top-0 bg-white z-10 p-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-lg font-bold text-gray-800">تفاصيل البطاقة</h2>
               <button onClick={() => setSelectedCard(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">

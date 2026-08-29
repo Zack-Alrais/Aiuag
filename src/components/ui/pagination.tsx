@@ -72,7 +72,7 @@ function Pagination({
     <nav
       role="navigation"
       aria-label="Pagination"
-      className={cn("flex items-center gap-1", isRtl && "flex-row-reverse", className)}
+      className={cn("flex items-center gap-1 max-w-full overflow-x-auto no-scrollbar", isRtl && "flex-row-reverse", className)}
       dir={dir}
     >
       {showFirstLast && (

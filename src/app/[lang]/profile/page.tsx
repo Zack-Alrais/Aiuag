@@ -290,7 +290,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
             </div>
             <div className="flex gap-2">
               <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 text-xs" onClick={() => router.push(`/${lang}`)}>
-                <LogOut className="w-3.5 h-3.5 ml-1.5" />
+                <LogOut className="w-3.5 h-3.5 ms-1.5" />
                 {isArabic ? "الرئيسية" : "Home"}
               </Button>
             </div>
@@ -327,7 +327,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
                 <CardTitle className="text-lg">{isArabic ? "البيانات الشخصية" : "Personal Information"}</CardTitle>
                 {!editing ? (
                   <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
-                    <Save className="w-3.5 h-3.5 ml-1.5" /> {isArabic ? "تعديل" : "Edit"}
+                    <Save className="w-3.5 h-3.5 ms-1.5" /> {isArabic ? "تعديل" : "Edit"}
                   </Button>
                 ) : (
                   <div className="flex gap-2 items-center">
@@ -336,7 +336,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
                       <X className="w-3.5 h-3.5" />
                     </Button>
                     <Button size="sm" onClick={handleSave} disabled={saving}>
-                      {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5 ml-1" />}
+                      {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5 ms-1" />}
                       {isArabic ? "حفظ" : "Save"}
                     </Button>
                   </div>
@@ -503,7 +503,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
                       {passwordError && <p className="text-xs text-red-600">{passwordError}</p>}
                       {passwordSuccess && <p className="text-xs text-green-600">{passwordSuccess}</p>}
                       <Button onClick={handleChangePassword} disabled={changingPassword || !currentPassword || !newPassword}>
-                        {changingPassword ? <Loader2 className="w-3.5 h-3.5 animate-spin ml-1.5" /> : <Lock className="w-3.5 h-3.5 ml-1.5" />}
+                        {changingPassword ? <Loader2 className="w-3.5 h-3.5 animate-spin ms-1.5" /> : <Lock className="w-3.5 h-3.5 ms-1.5" />}
                         {isArabic ? "تغيير كلمة المرور" : "Change Password"}
                       </Button>
                     </div>
