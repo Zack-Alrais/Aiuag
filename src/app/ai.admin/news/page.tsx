@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, Newspaper, Eye, EyeOff, Search, X } from "lucide-react"
 import ImageUpload from "@/components/admin/ImageUpload"
+import { TranslateInto } from "@/components/admin/AutoTranslate"
 
 interface NewsItem {
   id: string
@@ -331,9 +332,12 @@ export default function NewsManagement() {
 
               {/* English Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                  العنوان بالإنجليزي <span className="text-red-500">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
+                    العنوان بالإنجليزي <span className="text-red-500">*</span>
+                  </label>
+                  <TranslateInto source={form.titleAr} target={form.titleEn} onTranslated={(t) => handleFieldChange("titleEn", t)} />
+                </div>
                 <input
                   type="text"
                   required
@@ -359,9 +363,12 @@ export default function NewsManagement() {
 
               {/* English Excerpt */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                  ملخص بالإنجليزي
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
+                    ملخص بالإنجليزي
+                  </label>
+                  <TranslateInto source={form.excerptAr} target={form.excerptEn} onTranslated={(t) => handleFieldChange("excerptEn", t)} />
+                </div>
                 <textarea
                   rows={2}
                   value={form.excerptEn}
@@ -387,9 +394,12 @@ export default function NewsManagement() {
 
               {/* English Content */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                  المحتوى بالإنجليزي <span className="text-red-500">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
+                    المحتوى بالإنجليزي <span className="text-red-500">*</span>
+                  </label>
+                  <TranslateInto source={form.contentAr} target={form.contentEn} onTranslated={(t) => handleFieldChange("contentEn", t)} />
+                </div>
                 <textarea
                   rows={5}
                   required

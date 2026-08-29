@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, Building2, Mail, Phone, Users, X } from "lucide-react"
 import ImageUpload from "@/components/admin/ImageUpload"
+import { TranslateInto } from "@/components/admin/AutoTranslate"
 
 interface BoardMember {
   id: string
@@ -383,11 +384,14 @@ export default function BoardManagement() {
                      placeholder="الاسم بالعربية"
                    />
                  </div>
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#94a3b8]">
-                     الاسم بالإنجليزية *
-                   </label>
-                   <input
+<div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
+                        الاسم بالإنجليزية *
+                      </label>
+                      <TranslateInto source={form.nameAr} target={form.nameEn} onTranslated={(t) => handleFieldChange("nameEn", t)} />
+                    </div>
+                    <input
                      type="text"
                      required
                      value={form.nameEn}
@@ -447,11 +451,14 @@ export default function BoardManagement() {
                  />
                </div>
 
-               <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#94a3b8]">
-                   نبذة بالإنجليزية
-                 </label>
-                 <textarea
+<div>
+                   <div className="flex items-center justify-between mb-1">
+                     <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
+                       نبذة بالإنجليزية
+                     </label>
+                     <TranslateInto source={form.bioAr} target={form.bioEn} onTranslated={(t) => handleFieldChange("bioEn", t)} />
+                   </div>
+                   <textarea
                    rows={3}
                    value={form.bioEn}
                    onChange={(e) => handleFieldChange("bioEn", e.target.value)}

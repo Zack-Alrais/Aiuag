@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, Building2, Mail, Phone, Users, X, ToggleLeft, ToggleRight } from "lucide-react"
+import { TranslateInto } from "@/components/admin/AutoTranslate"
 
 interface Committee {
   id: string
@@ -394,9 +395,12 @@ export default function CommitteesManagement() {
                   />
                 </div>
                 <div>
-                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    الاسم بالإنجليزية *
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
+                      الاسم بالإنجليزية *
+                    </label>
+                    <TranslateInto source={form.nameAr} target={form.nameEn} onTranslated={(t) => handleFieldChange("nameEn", t)} />
+                  </div>
                   <input
                     type="text"
                     required
@@ -422,9 +426,12 @@ export default function CommitteesManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    الوصف بالإنجليزية
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
+                      الوصف بالإنجليزية
+                    </label>
+                    <TranslateInto source={form.descriptionAr} target={form.descriptionEn} onTranslated={(t) => handleFieldChange("descriptionEn", t)} />
+                  </div>
                   <textarea
                     rows={3}
                     value={form.descriptionEn}
@@ -482,9 +489,12 @@ export default function CommitteesManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    اسم رئيس اللجنة بالإنجليزية
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
+                      اسم رئيس اللجنة بالإنجليزية
+                    </label>
+                    <TranslateInto source={form.chairNameAr} target={form.chairNameEn} onTranslated={(t) => handleFieldChange("chairNameEn", t)} />
+                  </div>
                   <input
                     type="text"
                     value={form.chairNameEn}

@@ -34,7 +34,6 @@ import {
   CreditCard,
   Sun,
   Moon,
-  Globe,
   Play,
   FileText,
   BarChart2,
@@ -131,7 +130,6 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState("")
-  const [lang, setLang] = useState<"ar" | "en">("ar")
   const [userPerms, setUserPerms] = useState<string[]>([])
   const [userRole, setUserRole] = useState<string>("")
   const [userEmail, setUserEmail] = useState<string>("")
@@ -414,14 +412,6 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                 <Sun className="w-5 h-5 text-yellow-500" />
               )}
             </button>
-
-            <button
-              onClick={() => setLang(lang === "ar" ? "en" : "ar")}
-              className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors text-sm font-medium text-gray-600 dark:text-gray-300"
-              title={lang === "ar" ? "English" : "العربية"}
-            >
-              <Globe className="w-5 h-5" />
-            </button>
           </div>
 
           <div className="flex items-center gap-3">
@@ -541,7 +531,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                       </div>
                     </div>
                     <Link
-                      href={`/${lang}/profile`}
+                      href="/ar/profile"
                       onClick={() => setUserMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-[#e2e8f0] hover:bg-gray-50 dark:hover:bg-[#1e2d42] transition-colors"
                     >

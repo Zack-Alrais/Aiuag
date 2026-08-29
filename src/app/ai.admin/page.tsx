@@ -188,10 +188,10 @@ export default function AdminDashboard() {
       {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "إجمالي الأعضاء", value: o?.totalMembers ?? 0, icon: Users, color: "text-[#1A3A6B]", bg: "bg-[#1A3A6B]/10" },
-          { label: "أعضاء نشطون", value: o?.activeMembers ?? 0, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "جديد هذا الأسبوع", value: o?.newThisWeek ?? 0, icon: UserPlus, color: "text-[#D4A843]", bg: "bg-[#D4A843]/10" },
-          { label: "جديد هذا الشهر", value: o?.newThisMonth ?? 0, icon: TrendingUp, color: "text-[#7B1FA2]", bg: "bg-purple-50" },
+          { label: "إجمالي الأعضاء", value: o?.totalMembers ?? 0, icon: Users, color: "text-[#1A3A6B]", bg: "bg-[#1A3A6B]/10 dark:bg-[#1A3A6B]/30" },
+          { label: "أعضاء نشطون", value: o?.activeMembers ?? 0, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-500/15" },
+          { label: "جديد هذا الأسبوع", value: o?.newThisWeek ?? 0, icon: UserPlus, color: "text-[#D4A843]", bg: "bg-[#D4A843]/10 dark:bg-[#D4A843]/25" },
+          { label: "جديد هذا الشهر", value: o?.newThisMonth ?? 0, icon: TrendingUp, color: "text-[#7B1FA2]", bg: "bg-purple-50 dark:bg-purple-500/15" },
         ].map((card, i) => (
           <div key={i} className="bg-white dark:bg-[#1a2332] rounded-2xl border border-gray-100 dark:border-[#2a3d56] p-5">
             <div className="flex items-center justify-between mb-3">

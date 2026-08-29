@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, CalendarDays, MapPin, Clock, Users, X } from "lucide-react"
+import { TranslateInto } from "@/components/admin/AutoTranslate"
 
 interface Event {
   id: string
@@ -381,9 +382,12 @@ export default function EventsManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    العنوان بالإنجليزي *
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
+                      العنوان بالإنجليزي *
+                    </label>
+                    <TranslateInto source={form.titleAr} target={form.titleEn} onTranslated={(t) => setForm({ ...form, titleEn: t })} />
+                  </div>
                   <input
                     type="text"
                     required
@@ -414,9 +418,12 @@ export default function EventsManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    الوصف بالإنجليزي *
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
+                      الوصف بالإنجليزي *
+                    </label>
+                    <TranslateInto source={form.descriptionAr} target={form.descriptionEn} onTranslated={(t) => setForm({ ...form, descriptionEn: t })} />
+                  </div>
                   <textarea
                     required
                     rows={3}

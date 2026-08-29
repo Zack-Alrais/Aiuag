@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, MapPin, Mail, Phone, Building, User, X } from "lucide-react"
+import { TranslateInto } from "@/components/admin/AutoTranslate"
 
 interface Branch {
   id: string
@@ -342,9 +343,12 @@ export default function BranchesManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    اسم الفرع بالإنجليزية *
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
+                      اسم الفرع بالإنجليزية *
+                    </label>
+                    <TranslateInto source={form.name} target={form.nameEn} onTranslated={(t) => handleFieldChange("nameEn", t)} />
+                  </div>
                   <input
                     type="text"
                     required
