@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import Link from "next/link"
 import { Plus, Pencil, Trash2, Users, CheckCircle, XCircle, Search, X, Mail, Phone, GraduationCap, CreditCard, Download, Square, CheckSquare, AlertTriangle, Barcode, QrCode } from "lucide-react"
+import { useAdminLang } from "../admin-lang"
 
 interface MemberRaw {
   id: string
@@ -168,6 +169,7 @@ const emptyForm: MemberFormData = {
 }
 
 export default function MembersManagement() {
+  const { t } = useAdminLang()
   const [rawMembers, setRawMembers] = useState<MemberRaw[]>([])
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
@@ -380,13 +382,13 @@ export default function MembersManagement() {
       const res = await fetch(`/api/admin/members/${id}`, { method: "DELETE" })
       const data = await res.json()
       if (!res.ok) {
-        setDeleteError(data.error || "فشل الحذف")
+        setDeleteError(data.error || t("members.deleteFailed"))
         return
       }
       setDeleteConfirmId(null)
       await fetchMembers()
     } catch (e: any) {
-      setDeleteError("خطأ في الاتصال: " + (e.message || ""))
+      setDeleteError(t("members.connectionError") + ": " + (e.message || ""))
     }
   }
 
@@ -401,13 +403,13 @@ export default function MembersManagement() {
         else failed++
       }
       if (failed > 0) {
-        setDeleteError(`فشل حذف ${failed} عضو، تم حذف ${succeeded}`)
+        setDeleteError(t("members.bulkDeleteFailed").replace("{failed}", String(failed)).replace("{succeeded}", String(succeeded)))
       }
       setSelectedIds(new Set())
       setBulkDeleteConfirm(false)
       await fetchMembers()
     } catch (e: any) {
-      setDeleteError("خطأ في الاتصال: " + (e.message || ""))
+      setDeleteError(t("members.connectionError") + ": " + (e.message || ""))
     }
   }
 
@@ -423,10 +425,10 @@ export default function MembersManagement() {
       if (res.ok) {
         await fetchMembers()
       } else {
-        setCreateError(data.details || data.error || "فشل إنشاء الملف")
+        setCreateError(data.details || data.error || t("members.createFailed"))
       }
     } catch (e: any) {
-      setCreateError("خطأ: " + (e.message || ""))
+      setCreateError(t("members.errorPrefix") + ": " + (e.message || ""))
     }
   }
 
@@ -512,8 +514,8 @@ export default function MembersManagement() {
         <div className="flex items-center gap-3">
           <Users className="w-8 h-8 text-blue-600 dark:text-[#60a5fa]" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">إدارة الأعضاء</h1>
-            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">إدارة أعضاء الرابطة وطلبات العضوية</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("members.title")}</h1>
+            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{t("members.subtitle")}</p>
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -522,14 +524,14 @@ export default function MembersManagement() {
             className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
           >
             <Download className="w-4 h-4" />
-            تصدير Excel
+            {t("members.exportExcel")}
           </button>
           <button
             onClick={openAddModal}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
           >
             <Plus className="w-4 h-4" />
-            إضافة عضو
+            {t("members.add")}
           </button>
         </div>
       </div>
@@ -538,14 +540,14 @@ export default function MembersManagement() {
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-400">
             <CheckSquare className="w-4 h-4" />
-            <span>تم تحديد <strong>{selectedIds.size}</strong> {selectedIds.size === 1 ? "عضو" : "أعضاء"}</span>
+            <span>{t("members.selected").replace("{n}", String(selectedIds.size))}{selectedIds.size === 1 ? t("members.one") : t("members.many")}</span>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => setSelectedIds(new Set())}
               className="px-3 py-1.5 text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
             >
-              إلغاء التحديد
+              {t("members.unselectAll")}
             </button>
             {bulkDeleteConfirm ? (
               <div className="flex items-center gap-1">
@@ -553,13 +555,13 @@ export default function MembersManagement() {
                   onClick={handleBulkDelete}
                   className="px-3 py-1.5 text-xs text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors font-medium"
                 >
-                  تأكيد الحذف ({selectedIds.size})
+                  {t("members.confirmDeleteBulk")} ({selectedIds.size})
                 </button>
                 <button
                   onClick={() => setBulkDeleteConfirm(false)}
                   className="px-3 py-1.5 text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
               </div>
             ) : (
@@ -568,7 +570,7 @@ export default function MembersManagement() {
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-red-600 bg-red-100 hover:bg-red-200 rounded-lg transition-colors font-medium"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                حذف المحدد
+                {t("members.deleteSelected")}
               </button>
             )}
           </div>
@@ -578,10 +580,10 @@ export default function MembersManagement() {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex gap-2 flex-wrap">
           {([
-            { value: "all", label: "الكل" },
-            { value: "pending", label: "قيد المراجعة" },
-            { value: "approved", label: "مقبول" },
-            { value: "rejected", label: "مرفوض" },
+            { value: "all", label: t("common.all") },
+            { value: "pending", label: t("comments.pendingReview") },
+            { value: "approved", label: t("common.approved") },
+            { value: "rejected", label: t("common.rejected") },
           ] as const).map((item) => (
             <button
               key={item.value}
@@ -600,7 +602,7 @@ export default function MembersManagement() {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
           <input
             type="text"
-            placeholder="بحث في الأعضاء..."
+            placeholder={t("members.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
@@ -637,7 +639,7 @@ export default function MembersManagement() {
         ) : filteredMembers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400">
             <Users className="h-12 w-12 mb-3 opacity-40" />
-            <p className="text-sm">لا يوجد أعضاء</p>
+            <p className="text-sm">{t("members.none")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -654,40 +656,40 @@ export default function MembersManagement() {
                     </button>
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    الاسم
+                    {t("common.name")}
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     <span className="flex items-center gap-1.5">
                       <Mail className="h-3.5 w-3.5" />
-                      البريد الإلكتروني
+                      {t("common.email")}
                     </span>
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    الجنس
+                    {t("members.gender")}
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    الدولة
+                    {t("members.country")}
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    الصلاحية
+                    {t("members.role")}
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    الكلية
+                    {t("members.faculty")}
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    التخصص
+                    {t("members.specialization")}
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     <span className="flex items-center gap-1.5">
                       <GraduationCap className="h-3.5 w-3.5" />
-                      سنة التخرج
+                      {t("members.graduationYear")}
                     </span>
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    الحالة
+                    {t("common.status")}
                   </th>
                   <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    الإجراءات
+                    {t("common.actions")}
                   </th>
                 </tr>
               </thead>
@@ -713,7 +715,7 @@ export default function MembersManagement() {
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-gray-900 text-sm dark:text-[#f1f5f9] hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{member.name}</span>
                           {member.hasMember === false && (
-                            <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-medium">جديد</span>
+                            <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-medium">{t("members.new")}</span>
                           )}
                         </div>
                         {member.membershipNumber && (
@@ -725,7 +727,7 @@ export default function MembersManagement() {
                       {member.email}
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600 dark:text-[#cbd5e1] whitespace-nowrap">
-                      {member.gender === "male" ? "ذكر" : member.gender === "female" ? "أنثى" : "-"}
+                      {member.gender === "male" ? t("members.gender.male") : member.gender === "female" ? t("members.gender.female") : "-"}
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600 dark:text-[#cbd5e1] whitespace-nowrap max-w-[120px] truncate" title={member.country ?? ""}>
                       {member.country ?? "-"}
@@ -742,9 +744,9 @@ export default function MembersManagement() {
                             : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
                         }`}
                       >
-                        <option value="member">عضو</option>
-                        <option value="moderator">مشرف</option>
-                        <option value="admin">مدير</option>
+                        <option value="member">{t("members.role.member")}</option>
+                        <option value="moderator">{t("members.role.moderator")}</option>
+                        <option value="admin">{t("members.role.admin")}</option>
                       </select>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600 dark:text-[#cbd5e1] whitespace-nowrap max-w-[160px] truncate" title={member.faculty ?? ""}>
@@ -758,10 +760,10 @@ export default function MembersManagement() {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       {member.hasMember === false ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 border border-gray-200">بدون ملف</span>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 border border-gray-200">{t("members.noProfile")}</span>
                       ) : (
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(member.status)}`}>
-                          {member.status === "pending" ? "قيد المراجعة" : member.status === "approved" ? "مقبول" : "مرفوض"}
+                          {member.status === "pending" ? t("comments.pendingReview") : member.status === "approved" ? t("common.approved") : t("common.rejected")}
                         </span>
                       )}
                     </td>
@@ -772,9 +774,9 @@ export default function MembersManagement() {
                             <button
                               onClick={() => handleCreateMember(member.userId)}
                               className="px-3 py-1.5 bg-[#1A3A6B] text-white text-xs rounded-lg hover:bg-[#0f2547] transition-colors font-medium"
-                              title="إنشاء ملف عضو"
+                              title={t("members.createProfile")}
                             >
-                              + إنشاء ملف
+                              {t("members.createProfileBtn")}
                             </button>
                             {deleteConfirmId === member.id ? (
                               <div className="flex items-center gap-1">
@@ -782,20 +784,20 @@ export default function MembersManagement() {
                                   onClick={() => handleDelete(member.id)}
                                   className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition-colors"
                                 >
-                                  تأكيد
+                                  {t("common.confirm")}
                                 </button>
                                 <button
                                   onClick={() => setDeleteConfirmId(null)}
                                   className="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs rounded-md hover:bg-gray-300 transition-colors"
                                 >
-                                  إلغاء
+                                  {t("common.cancel")}
                                 </button>
                               </div>
                             ) : (
                               <button
                                 onClick={() => setDeleteConfirmId(member.id)}
                                 className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                title="حذف المستخدم"
+                                title={t("members.deleteUser")}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -808,14 +810,14 @@ export default function MembersManagement() {
                                 <button
                                   onClick={() => handleStatusChange(member.id, "approved")}
                                   className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                  title="قبول"
+                                  title={t("members.approve")}
                                 >
                                   <CheckCircle className="h-4 w-4" />
                                 </button>
                                 <button
                                   onClick={() => handleStatusChange(member.id, "rejected")}
                                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                  title="رفض"
+                                  title={t("members.reject")}
                                 >
                                   <XCircle className="h-4 w-4" />
                                 </button>
@@ -824,14 +826,14 @@ export default function MembersManagement() {
                             <button
                               onClick={() => openEditModal(member)}
                               className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="تعديل"
+                              title={t("common.edit")}
                             >
                               <Pencil className="h-4 w-4" />
                             </button>
                             <Link
                               href={`/ai.admin/membership-card?id=${member.id}`}
                               className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                              title="بطاقة العضوية"
+                              title={t("members.membershipCard")}
                             >
                               <CreditCard className="h-4 w-4" />
                             </Link>
@@ -841,20 +843,20 @@ export default function MembersManagement() {
                                   onClick={() => handleDelete(member.id)}
                                   className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition-colors"
                                 >
-                                  تأكيد
+                                  {t("common.confirm")}
                                 </button>
                                 <button
                                   onClick={() => setDeleteConfirmId(null)}
                                   className="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs rounded-md hover:bg-gray-300 transition-colors"
                                 >
-                                  إلغاء
+                                  {t("common.cancel")}
                                 </button>
                               </div>
                             ) : (
                               <button
                                 onClick={() => setDeleteConfirmId(member.id)}
                                 className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                  title="حذف"
+                                  title={t("common.delete")}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -880,7 +882,7 @@ export default function MembersManagement() {
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto dark:bg-[#1a2332] dark:border dark:border-[#2a3d56]">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-[#2a3d56]">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f1f5f9]">
-                {editingMember ? "تعديل عضو" : "إضافة عضو جديد"}
+                {editingMember ? t("members.edit") : t("members.addNew")}
               </h2>
               <button
                 onClick={closeModal}
@@ -894,7 +896,7 @@ export default function MembersManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    الاسم *
+                    {t("common.name")} *
                   </label>
                   <input
                     type="text"
@@ -902,14 +904,14 @@ export default function MembersManagement() {
                     value={form.name}
                     onChange={(e) => handleFieldChange("name", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
-                    placeholder="الاسم الكامل"
+                    placeholder={t("members.form.namePlaceholder")}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
                     <span className="flex items-center gap-1.5">
                       <Mail className="h-3.5 w-3.5" />
-                      البريد الإلكتروني *
+                      {t("common.email")} *
                     </span>
                   </label>
                   <input
@@ -927,7 +929,7 @@ export default function MembersManagement() {
                 <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    كلمة المرور *
+                    {t("common.password")} *
                   </label>
                   <input
                     type="password"
@@ -935,19 +937,19 @@ export default function MembersManagement() {
                     value={form.password}
                     onChange={(e) => handleFieldChange("password", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="كلمة مرور الحساب"
+                    placeholder={t("members.form.passwordPlaceholder")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">صلاحية الحساب</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.accountRole")}</label>
                   <select
                     value={(form as any).role || "member"}
                     onChange={(e) => handleFieldChange("role" as any, e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   >
-                    <option value="member">عضو</option>
-                    <option value="moderator">مشرف</option>
-                    <option value="admin">مدير</option>
+                    <option value="member">{t("members.role.member")}</option>
+                    <option value="moderator">{t("members.role.moderator")}</option>
+                    <option value="admin">{t("members.role.admin")}</option>
                   </select>
                 </div>
                 </>
@@ -956,7 +958,7 @@ export default function MembersManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    رقم العضوية
+                    {t("members.form.membershipNumber")}
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -976,20 +978,20 @@ export default function MembersManagement() {
                         } catch {}
                       }}
                       className="px-3 py-2 bg-[#1A3A6B] text-white text-xs rounded-lg hover:bg-[#0f2547] transition-colors font-medium whitespace-nowrap"
-                      title="توليد رقم عضوية"
+                      title={t("members.form.generateMembership")}
                     >
-                      توليد
+                      {t("members.form.generate")}
                     </button>
                   </div>
                 </div>
                 <div className="flex gap-2 items-end">
                   <button type="button" onClick={generateBarcode} disabled={!form.membershipNumber}
                     className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 text-white text-xs rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-40">
-                    <Barcode className="h-3.5 w-3.5" /> باركود
+                    <Barcode className="h-3.5 w-3.5" /> {t("members.form.barcode")}
                   </button>
                   <button type="button" onClick={generateQrCode} disabled={!form.membershipNumber}
                     className="flex items-center gap-1.5 px-3 py-2 bg-violet-600 text-white text-xs rounded-lg hover:bg-violet-700 transition-colors font-medium disabled:opacity-40">
-                    <QrCode className="h-3.5 w-3.5" /> QR كود
+                    <QrCode className="h-3.5 w-3.5" /> {t("members.form.qrCode")}
                   </button>
                   {(barcodeDataUrl || qrCodeDataUrl) && (
                     <button type="button" onClick={() => { setBarcodeDataUrl(null); setQrCodeDataUrl(null) }}
@@ -1011,7 +1013,7 @@ export default function MembersManagement() {
                       <img src={barcodeDataUrl} alt="Barcode" className="mx-auto h-16" />
                       <button type="button" onClick={downloadBarcode}
                         className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
-                        <Download className="h-3 w-3" /> تحميل الباركود
+                        <Download className="h-3 w-3" /> {t("members.form.downloadBarcode")}
                       </button>
                     </div>
                   )}
@@ -1020,7 +1022,7 @@ export default function MembersManagement() {
                       <img src={qrCodeDataUrl} alt="QR" className="w-28 h-28 mx-auto" />
                       <button type="button" onClick={downloadQrCode}
                         className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
-                        <Download className="h-3 w-3" /> تحميل QR
+                        <Download className="h-3 w-3" /> {t("members.form.downloadQr")}
                       </button>
                     </div>
                   )}
@@ -1032,7 +1034,7 @@ export default function MembersManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     <span className="flex items-center gap-1.5">
                       <GraduationCap className="h-3.5 w-3.5" />
-                      سنة التخرج
+                      {t("members.graduationYear")}
                     </span>
                   </label>
                   <input
@@ -1042,19 +1044,19 @@ export default function MembersManagement() {
                     value={form.graduationYear}
                     onChange={(e) => handleFieldChange("graduationYear", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="مثال: 2025"
+                    placeholder={t("members.form.gradYearPlaceholder")}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    الكلية
+                    {t("members.faculty")}
                   </label>
                   <input
                     type="text"
                     value={form.faculty}
                     onChange={(e) => handleFieldChange("faculty", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="مثال: الهندسة"
+                    placeholder={t("members.form.facultyPlaceholder")}
                   />
                 </div>
               </div>
@@ -1063,7 +1065,7 @@ export default function MembersManagement() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   <span className="flex items-center gap-1.5">
                     <Phone className="h-3.5 w-3.5" />
-                    الهاتف
+                    {t("common.phone")}
                   </span>
                 </label>
                 <input
@@ -1077,96 +1079,96 @@ export default function MembersManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  العنوان
+                  {t("members.form.address")}
                 </label>
                 <input
                   type="text"
                   value={form.address}
                   onChange={(e) => handleFieldChange("address", e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  placeholder="العنوان الكامل"
+                  placeholder={t("members.form.addressPlaceholder")}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">الاسم بالإنجليزية</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.nameEn")}</label>
                   <input type="text" value={form.nameEn} onChange={(e) => handleFieldChange("nameEn", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Mohamed Ahmed" dir="ltr" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">الجنس</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.gender")}</label>
                   <select value={form.gender} onChange={(e) => handleFieldChange("gender", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white">
-                    <option value="">اختر</option>
-                    <option value="male">ذكر</option>
-                    <option value="female">أنثى</option>
+                    <option value="">{t("common.select")}</option>
+                    <option value="male">{t("members.gender.male")}</option>
+                    <option value="female">{t("members.gender.female")}</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الميلاد</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.birthDate")}</label>
                   <input type="date" value={form.birthDate} onChange={(e) => handleFieldChange("birthDate", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">الدولة</label>
-                  <input type="text" value={form.country} onChange={(e) => handleFieldChange("country", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="السودان" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.country")}</label>
+                  <input type="text" value={form.country} onChange={(e) => handleFieldChange("country", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder={t("members.form.countryPlaceholder")} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">الولاية/المدينة</label>
-                  <input type="text" value={form.state} onChange={(e) => handleFieldChange("state", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="الخرطوم" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.state")}</label>
+                  <input type="text" value={form.state} onChange={(e) => handleFieldChange("state", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder={t("members.form.statePlaceholder")} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">المدينة</label>
-                  <input type="text" value={form.city} onChange={(e) => handleFieldChange("city", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="أم درمان" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">الجامعة</label>
-                  <input type="text" value={form.university} onChange={(e) => handleFieldChange("university", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="جامعة أفريقيا العالمية" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">التخصص</label>
-                  <input type="text" value={form.specialization} onChange={(e) => handleFieldChange("specialization", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="علوم الحاسب" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.city")}</label>
+                  <input type="text" value={form.city} onChange={(e) => handleFieldChange("city", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder={t("members.form.cityPlaceholder")} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">الدرجة العلمية</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.university")}</label>
+                  <input type="text" value={form.university} onChange={(e) => handleFieldChange("university", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder={t("members.form.universityPlaceholder")} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.specialization")}</label>
+                  <input type="text" value={form.specialization} onChange={(e) => handleFieldChange("specialization", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder={t("members.form.specializationPlaceholder")} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.degree")}</label>
                   <select value={form.degree} onChange={(e) => handleFieldChange("degree", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white">
-                    <option value="">اختر</option>
-                    <option value="diploma">دبلوم</option>
-                    <option value="bachelor">بكالوريوس</option>
-                    <option value="master">ماجستير</option>
-                    <option value="phd">دكتوراه</option>
+                    <option value="">{t("common.select")}</option>
+                    <option value="diploma">{t("members.form.degree.diploma")}</option>
+                    <option value="bachelor">{t("members.form.degree.bachelor")}</option>
+                    <option value="master">{t("members.form.degree.master")}</option>
+                    <option value="phd">{t("members.form.degree.phd")}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">جهة العمل</label>
-                  <input type="text" value={form.employer} onChange={(e) => handleFieldChange("employer", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="جهة العمل" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.employer")}</label>
+                  <input type="text" value={form.employer} onChange={(e) => handleFieldChange("employer", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="{t("members.form.employer")}" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">المسمى الوظيفي</label>
-                  <input type="text" value={form.jobTitle} onChange={(e) => handleFieldChange("jobTitle", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="مهندس" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.jobTitle")}</label>
+                  <input type="text" value={form.jobTitle} onChange={(e) => handleFieldChange("jobTitle", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder={t("members.form.jobTitlePlaceholder")} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">سنوات الخبرة</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.yearsOfExperience")}</label>
                   <input type="number" min="0" value={form.yearsOfExperience} onChange={(e) => handleFieldChange("yearsOfExperience", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="5" />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  الشهادة (PDF)
+                  {t("members.form.certificate")}
                 </label>
                 <input
                   type="file"
@@ -1186,22 +1188,22 @@ export default function MembersManagement() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                 />
                 {form.graduationCertificate && (
-                  <a href={form.graduationCertificate} target="_blank" rel="noreferrer" className="text-xs text-blue-600 mt-1 block truncate">رابط الشهادة الحالية</a>
+                  <a href={form.graduationCertificate} target="_blank" rel="noreferrer" className="text-xs text-blue-600 mt-1 block truncate">{t("members.form.certificateLink")}</a>
                 )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  الحالة
+                  {t("common.status")}
                 </label>
                 <select
                   value={form.status}
                   onChange={(e) => handleFieldChange("status", e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
                 >
-                  <option value="pending">قيد المراجعة</option>
-                  <option value="approved">مقبول</option>
-                  <option value="rejected">مرفوض</option>
+                  <option value="pending">{t("comments.pendingReview")}</option>
+                  <option value="approved">{t("common.approved")}</option>
+                  <option value="rejected">{t("common.rejected")}</option>
                 </select>
               </div>
 
@@ -1211,7 +1213,7 @@ export default function MembersManagement() {
                   onClick={closeModal}
                   className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors dark:text-[#cbd5e1] dark:bg-[#1e2d42] dark:hover:bg-[#2a3d56]"
                 >
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -1219,10 +1221,10 @@ export default function MembersManagement() {
                   className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting
-                    ? "جاري الحفظ..."
+                    ? t("common.saving")
                     : editingMember
-                      ? "تحديث العضو"
-                      : "إنشاء عضو"}
+                      ? t("members.update")
+                      : t("members.create")}
                 </button>
               </div>
             </form>
@@ -1236,7 +1238,7 @@ export default function MembersManagement() {
           <div className="absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm" onClick={() => setDetailMember(null)} />
           <div className="relative bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto dark:border dark:border-[#2a3d56]">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-[#2a3d56]">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f1f5f9]">تفاصيل العضو</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f1f5f9]">{t("members.details")}</h2>
               <button onClick={() => setDetailMember(null)} className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors dark:text-[#7a8ba3] dark:hover:text-[#cbd5e1] dark:hover:bg-[#2a3d56]">
                 <X className="h-5 w-5" />
               </button>
@@ -1264,12 +1266,12 @@ export default function MembersManagement() {
                 {detailMember.nameEn && <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{detailMember.nameEn}</p>}
                 <div className="mt-2">
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(detailMember.status)}`}>
-                    {detailMember.status === "pending" ? "قيد المراجعة" : detailMember.status === "approved" ? "مقبول" : "مرفوض"}
+                    {detailMember.status === "pending" ? t("comments.pendingReview") : detailMember.status === "approved" ? t("common.approved") : t("common.rejected")}
                   </span>
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mr-2 ${
                     detailMember.role === "admin" ? "bg-purple-100 text-purple-700" : detailMember.role === "moderator" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
                   }`}>
-                    {detailMember.role === "admin" ? "مدير" : detailMember.role === "moderator" ? "مشرف" : "عضو"}
+                    {detailMember.role === "admin" ? t("members.role.admin") : detailMember.role === "moderator" ? t("members.role.moderator") : t("members.role.member")}
                   </span>
                 </div>
               </div>
@@ -1278,61 +1280,61 @@ export default function MembersManagement() {
               <div className="grid grid-cols-2 gap-3">
                 {detailMember.email && (
                   <div className="p-3 bg-gray-50 dark:bg-[#111927] rounded-xl">
-                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">البريد الإلكتروني</p>
+                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">{t("common.email")}</p>
                     <p className="text-sm font-medium text-gray-900 dark:text-[#f1f5f9] truncate mt-0.5" dir="ltr">{detailMember.email}</p>
                   </div>
                 )}
                 {detailMember.phone && (
                   <div className="p-3 bg-gray-50 dark:bg-[#111927] rounded-xl">
-                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">الهاتف</p>
+                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">{t("common.phone")}</p>
                     <p className="text-sm font-medium text-gray-900 dark:text-[#f1f5f9] mt-0.5">{detailMember.phone}</p>
                   </div>
                 )}
                 {detailMember.country && (
                   <div className="p-3 bg-gray-50 dark:bg-[#111927] rounded-xl">
-                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">الدولة</p>
+                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">{t("members.country")}</p>
                     <p className="text-sm font-medium text-gray-900 dark:text-[#f1f5f9] mt-0.5">{detailMember.country}</p>
                   </div>
                 )}
                 {detailMember.city && (
                   <div className="p-3 bg-gray-50 dark:bg-[#111927] rounded-xl">
-                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">المدينة</p>
+                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">{t("members.form.city")}</p>
                     <p className="text-sm font-medium text-gray-900 dark:text-[#f1f5f9] mt-0.5">{detailMember.city}</p>
                   </div>
                 )}
                 {detailMember.faculty && (
                   <div className="p-3 bg-gray-50 dark:bg-[#111927] rounded-xl">
-                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">الكلية</p>
+                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">{t("members.faculty")}</p>
                     <p className="text-sm font-medium text-gray-900 dark:text-[#f1f5f9] mt-0.5">{detailMember.faculty}</p>
                   </div>
                 )}
                 {detailMember.specialization && (
                   <div className="p-3 bg-gray-50 dark:bg-[#111927] rounded-xl">
-                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">التخصص</p>
+                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">{t("members.specialization")}</p>
                     <p className="text-sm font-medium text-gray-900 dark:text-[#f1f5f9] mt-0.5">{detailMember.specialization}</p>
                   </div>
                 )}
                 {detailMember.graduationYear && (
                   <div className="p-3 bg-gray-50 dark:bg-[#111927] rounded-xl">
-                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">سنة التخرج</p>
+                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">{t("members.graduationYear")}</p>
                     <p className="text-sm font-medium text-gray-900 dark:text-[#f1f5f9] mt-0.5">{detailMember.graduationYear}</p>
                   </div>
                 )}
                 {detailMember.membershipNumber && (
                   <div className="p-3 bg-gray-50 dark:bg-[#111927] rounded-xl">
-                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">رقم العضوية</p>
+                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">{t("members.form.membershipNumber")}</p>
                     <p className="text-sm font-medium text-gray-900 dark:text-[#f1f5f9] mt-0.5">{detailMember.membershipNumber}</p>
                   </div>
                 )}
                 {detailMember.university && (
                   <div className="p-3 bg-gray-50 dark:bg-[#111927] rounded-xl">
-                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">الجامعة</p>
+                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">{t("members.form.university")}</p>
                     <p className="text-sm font-medium text-gray-900 dark:text-[#f1f5f9] mt-0.5">{detailMember.university}</p>
                   </div>
                 )}
                 {detailMember.degree && (
                   <div className="p-3 bg-gray-50 dark:bg-[#111927] rounded-xl">
-                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">الدرجة العلمية</p>
+                    <p className="text-xs text-gray-500 dark:text-[#94a3b8]">{t("members.form.degree")}</p>
                     <p className="text-sm font-medium text-gray-900 dark:text-[#f1f5f9] mt-0.5">{detailMember.degree}</p>
                   </div>
                 )}
@@ -1345,13 +1347,13 @@ export default function MembersManagement() {
                   className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors"
                 >
                   <Pencil className="w-4 h-4 inline ml-1.5" />
-                  تعديل
+                  {t("common.edit")}
                 </button>
                 <button
                   onClick={() => setDetailMember(null)}
                   className="px-5 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 dark:text-[#cbd5e1] dark:bg-[#1e2d42] dark:hover:bg-[#2a3d56] rounded-xl transition-colors"
                 >
-                  إغلاق
+                  {t("common.close")}
                 </button>
               </div>
             </div>
