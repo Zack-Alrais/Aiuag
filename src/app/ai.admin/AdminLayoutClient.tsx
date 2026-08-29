@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { ThemeProvider, useTheme } from "@/components/admin/theme-provider"
+import { AdminLangProvider, useAdminLang } from "./admin-lang"
 import {
   LayoutDashboard,
   Newspaper,
@@ -43,6 +44,7 @@ import {
   MessageCircle,
   FileEdit,
   User,
+  Languages,
 } from "lucide-react"
 import { ASSETS } from "@/lib/assets"
 
@@ -61,14 +63,14 @@ interface Notification {
 
 const navGroups = [
   {
-    title: "الرئيسية",
+    title: "main",
     items: [
       { name: "Dashboard", nameAr: "الرئيسية", href: "/ai.admin", icon: LayoutDashboard, perm: "dashboard" },
       { name: "Notifications", nameAr: "الإشعارات", href: "/ai.admin/notifications", icon: Bell, perm: "notifications" },
     ],
   },
   {
-    title: "المحتوى",
+    title: "content",
     items: [
       { name: "News", nameAr: "الأخبار", href: "/ai.admin/news", icon: Newspaper, perm: "news" },
       { name: "Events", nameAr: "الأحداث", href: "/ai.admin/events", icon: CalendarDays, perm: "events" },
@@ -79,7 +81,7 @@ const navGroups = [
     ],
   },
   {
-    title: "المؤسسة",
+    title: "org",
     items: [
       { name: "Members", nameAr: "الأعضاء", href: "/ai.admin/members", icon: Users, perm: "members" },
       { name: "Cards", nameAr: "البطاقات", href: "/ai.admin/cards", icon: CreditCard, perm: "cards" },
@@ -89,7 +91,7 @@ const navGroups = [
     ],
   },
   {
-    title: "المزيد",
+    title: "more",
     items: [
       { name: "Projects", nameAr: "المشاريع", href: "/ai.admin/projects", icon: FolderOpen, perm: "projects" },
       { name: "Publications", nameAr: "المنشورات", href: "/ai.admin/publications", icon: FileText, perm: "publications" },
@@ -100,7 +102,7 @@ const navGroups = [
     ],
   },
   {
-    title: "النظام",
+    title: "system",
     items: [
       { name: "Settings", nameAr: "الإعدادات", href: "/ai.admin/settings", icon: Settings, perm: "settings" },
       { name: "Page Contents", nameAr: "نصوص الصفحات", href: "/ai.admin/page-contents", icon: FileEdit, perm: "settings" },
@@ -115,12 +117,15 @@ const navGroups = [
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      <AdminLayoutInner>{children}</AdminLayoutInner>
+      <AdminLangProvider>
+        <AdminLayoutInner>{children}</AdminLayoutInner>
+      </AdminLangProvider>
     </ThemeProvider>
   )
 }
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
+  const { lang, toggleLang, t } = useAdminLang()
   const { theme, toggleTheme } = useTheme()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -253,7 +258,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
             <div>
               <span className="text-lg font-bold text-white">AIUAG</span>
-              <span className="text-xs text-white/50 block">لوحة التحكم</span>
+              <span className="text-xs text-white/50 block">{t("shell.controlPanel")}</span>
             </div>
           </div>
         )}
@@ -291,7 +296,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                   onClick={() => setCollapsedGroups((prev) => ({ ...prev, [group.title]: !prev[group.title] }))}
                   className="w-full flex items-center justify-between px-6 py-1.5 text-[10px] uppercase tracking-wider text-white/30 hover:text-white/50 transition-colors"
                 >
-                  <span className="font-medium">{group.title}</span>
+                  <span className="font-medium">{t(`shell.${group.title}`)}</span>
                   <ChevronDown className={`w-3 h-3 transition-transform ${isCollapsed ? "-rotate-90" : ""}`} />
                 </button>
               )}
@@ -310,7 +315,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                       title={item.name}
                     >
                       <item.icon className={`w-5 h-5 shrink-0 ${isActive ? "text-[#0f2547]" : ""}`} />
-                      {sidebarOpen && <span className="text-sm">{item.nameAr}</span>}
+                      {sidebarOpen && <span className="text-sm">{lang === "ar" ? item.nameAr : item.name}</span>}
                     </Link>
                   )
                 })}
@@ -333,17 +338,17 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-white truncate">{userName || "مدير النظام"}</p>
+                <p className="text-sm font-bold text-white truncate">{userName || t("shell.systemAdmin")}</p>
                 {userNameEn && <p className="text-[11px] text-white/60 truncate">{userNameEn}</p>}
                 <p className="text-[10px] text-white/50 truncate">{userEmail || ""}</p>
                 {userMemberSince && (
-                  <p className="text-[10px] text-white/40 mt-0.5">مدير منذ {userMemberSince}</p>
+                  <p className="text-[10px] text-white/40 mt-0.5">{t("shell.memberSince")} {userMemberSince}</p>
                 )}
               </div>
             </div>
             {userMembershipNumber && (
               <div className="mt-2 pt-2 border-t border-white/20 flex items-center justify-between text-[10px]">
-                <span className="text-white/50">رقم العضوية</span>
+                <span className="text-white/50">{t("shell.membershipNumber")}</span>
                 <span className="font-bold text-white/80">{userMembershipNumber}</span>
               </div>
             )}
@@ -357,7 +362,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
           className="w-full flex items-center gap-2 px-3 py-2.5 text-white/50 hover:text-white hover:bg-red-500/20 rounded-lg transition-colors text-sm"
         >
           <LogOut className="w-4 h-4" />
-          {sidebarOpen && <span>تسجيل الخروج</span>}
+          {sidebarOpen && <span>{t("shell.logout")}</span>}
         </button>
       </div>
     </aside>
@@ -394,7 +399,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
 <input
                   type="text"
-                  placeholder="بحث عن أعضاء، أخبار، أحداث..."
+                  placeholder={t("shell.searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 pr-4 py-2 bg-gray-100/80 dark:bg-[#111927] dark:border dark:border-[#3b4f6b] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3A6B]/20 dark:focus:ring-blue-500/30 focus:bg-white dark:focus:bg-[#1a2332] w-40 md:w-56 xl:w-72 transition-all text-gray-800 dark:text-[#f1f5f9] placeholder-gray-500 dark:placeholder-[#7a8ba3]"
@@ -402,9 +407,18 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             </form>
 
             <button
+              onClick={toggleLang}
+              className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors flex items-center gap-1.5"
+              title={lang === "ar" ? "English" : "العربية"}
+            >
+              <Languages className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 hidden sm:inline">{lang === "ar" ? "EN" : "عربي"}</span>
+            </button>
+
+            <button
               onClick={toggleTheme}
               className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
-              title={theme === "light" ? "الوضع الليلي" : "الوضع النهاري"}
+              title={theme === "light" ? t("shell.darkMode") : t("shell.lightMode")}
             >
               {theme === "light" ? (
                 <Moon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
@@ -431,11 +445,11 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
               {notifOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
-                  <div className="absolute left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: "rtl" }}>
+                  <div className="absolute left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: lang === "ar" ? "rtl" : "ltr" }}>
                     <div className="flex items-center justify-between px-4 py-3 border-b dark:border-[#2a3d56] bg-gradient-to-l from-[#1A3A6B] to-[#2B5EA7]">
                       <div className="flex items-center gap-2">
                         <Bell className="w-4 h-4 text-white" />
-                        <span className="font-semibold text-sm text-white">الإشعارات</span>
+                        <span className="font-semibold text-sm text-white">{t("shell.notificationsTitle")}</span>
                         {unreadCount > 0 && (
                           <span className="px-1.5 py-0.5 bg-[#D4A843] text-[#0f2547] text-[10px] font-bold rounded-full">{unreadCount}</span>
                         )}
@@ -443,7 +457,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                       {unreadCount > 0 && (
                         <button onClick={markAllAsRead} className="text-xs text-white/80 hover:text-white flex items-center gap-1 transition-colors">
                           <Check className="w-3 h-3" />
-                          قراءة الكل
+                          {t("shell.markAllRead")}
                         </button>
                       )}
                     </div>
@@ -452,7 +466,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                       {notifications.length === 0 ? (
                         <div className="p-6 text-center text-gray-500 dark:text-[#94a3b8] text-sm">
                           <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-[#3b4f6b]" />
-                          لا توجد إشعارات
+                          {t("shell.noNotifications")}
                         </div>
                       ) : (
                         notifications.map((notif) => (
@@ -466,15 +480,15 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                                 {!notif.isRead && <div className="w-2 h-2 bg-[#D4A843] rounded-full shrink-0" />}
                               </div>
                               <p className="text-xs text-gray-500 dark:text-[#94a3b8] truncate mt-0.5">{notif.messageAr}</p>
-                              <p className="text-[10px] text-gray-400 dark:text-[#7a8ba3] mt-1">{new Date(notif.createdAt).toLocaleDateString("ar-EG")}</p>
+                              <p className="text-[10px] text-gray-400 dark:text-[#7a8ba3] mt-1">{new Date(notif.createdAt).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US")}</p>
                             </div>
                             <div className="flex items-center gap-1 shrink-0">
                               {!notif.isRead && (
-                                <button onClick={() => markAsRead(notif.id)} className="p-1 hover:bg-gray-200 dark:hover:bg-[#2a3d56] rounded-lg text-gray-400 dark:text-[#94a3b8] hover:text-[#1A3A6B] dark:hover:text-[#60a5fa] transition-colors" title="تعليم كمقروء">
+                                <button onClick={() => markAsRead(notif.id)} className="p-1 hover:bg-gray-200 dark:hover:bg-[#2a3d56] rounded-lg text-gray-400 dark:text-[#94a3b8] hover:text-[#1A3A6B] dark:hover:text-[#60a5fa] transition-colors" title={t("shell.markRead")}>
                                   <Eye className="w-3.5 h-3.5" />
                                 </button>
                               )}
-                              <button onClick={() => deleteNotification(notif.id)} className="p-1 hover:bg-gray-200 dark:hover:bg-[#2a3d56] rounded-lg text-gray-400 dark:text-[#94a3b8] hover:text-red-600 dark:hover:text-[#f87171] transition-colors" title="حذف">
+                              <button onClick={() => deleteNotification(notif.id)} className="p-1 hover:bg-gray-200 dark:hover:bg-[#2a3d56] rounded-lg text-gray-400 dark:text-[#94a3b8] hover:text-red-600 dark:hover:text-[#f87171] transition-colors" title={t("common.delete")}>
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
@@ -488,7 +502,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                       onClick={() => setNotifOpen(false)}
                       className="block px-4 py-3 text-center text-sm font-medium text-[#1A3A6B] dark:text-[#60a5fa] hover:bg-gray-50 dark:hover:bg-[#1e2d42] border-t dark:border-[#253347] transition-colors"
                     >
-                      عرض جميع الإشعارات
+                      {t("shell.viewAllNotifications")}
                     </Link>
                   </div>
                 </>
@@ -511,7 +525,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
               {userMenuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
-                  <div className="absolute left-0 mt-2 w-56 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: "rtl" }}>
+                  <div className="absolute left-0 mt-2 w-56 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: lang === "ar" ? "rtl" : "ltr" }}>
                     <div className="bg-gradient-to-br from-[#1A3A6B] to-[#122848] p-4 text-white">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-white/30">
@@ -524,19 +538,19 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold truncate">{userName || "مدير النظام"}</p>
+                          <p className="text-sm font-bold truncate">{userName || t("shell.systemAdmin")}</p>
                           {userNameEn && <p className="text-[11px] text-white/60 truncate">{userNameEn}</p>}
                           <p className="text-[10px] text-white/50 truncate">{userEmail || ""}</p>
                         </div>
                       </div>
                     </div>
                     <Link
-                      href="/ar/profile"
+                      href={`/${lang}/profile`}
                       onClick={() => setUserMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-[#e2e8f0] hover:bg-gray-50 dark:hover:bg-[#1e2d42] transition-colors"
                     >
                       <User className="w-4 h-4" />
-                      الملف الشخصي
+                      {t("shell.profile")}
                     </Link>
                     <button
                       onClick={async () => {
@@ -546,7 +560,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                       className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
-                      تسجيل الخروج
+                      {t("shell.logout")}
                     </button>
                   </div>
                 </>

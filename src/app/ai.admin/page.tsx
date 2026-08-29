@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useAdminLang } from "./admin-lang"
 import {
   Users,
   Newspaper,
@@ -56,15 +57,16 @@ interface Analytics {
 }
 
 const quickActions = [
-  { label: "إضافة خبر", href: "/ai.admin/news", icon: Plus, gradient: "from-[#1A3A6B] to-[#2B5EA7]" },
-  { label: "إنشاء حدث", href: "/ai.admin/events", icon: CalendarCheck, gradient: "from-[#2E7D32] to-[#4CAF50]" },
-  { label: "عرض الأعضاء", href: "/ai.admin/members", icon: UserCheck, gradient: "from-[#D4A843] to-[#E0BC6A]" },
-  { label: "إدارة المشاريع", href: "/ai.admin/projects", icon: FolderCog, gradient: "from-[#7B1FA2] to-[#AB47BC]" },
-  { label: "المعرض", href: "/ai.admin/gallery", icon: ImagePlus, gradient: "from-[#C2185B] to-[#E91E63]" },
-  { label: "الرسائل", href: "/ai.admin/contacts", icon: MessageCircle, gradient: "from-[#D84315] to-[#FF7043]" },
+  { labelKey: "dashboard.addNews", href: "/ai.admin/news", icon: Plus, gradient: "from-[#1A3A6B] to-[#2B5EA7]" },
+  { labelKey: "dashboard.createEvent", href: "/ai.admin/events", icon: CalendarCheck, gradient: "from-[#2E7D32] to-[#4CAF50]" },
+  { labelKey: "dashboard.viewMembers", href: "/ai.admin/members", icon: UserCheck, gradient: "from-[#D4A843] to-[#E0BC6A]" },
+  { labelKey: "dashboard.manageProjects", href: "/ai.admin/projects", icon: FolderCog, gradient: "from-[#7B1FA2] to-[#AB47BC]" },
+  { labelKey: "dashboard.gallery", href: "/ai.admin/gallery", icon: ImagePlus, gradient: "from-[#C2185B] to-[#E91E63]" },
+  { labelKey: "dashboard.messages", href: "/ai.admin/contacts", icon: MessageCircle, gradient: "from-[#D84315] to-[#FF7043]" },
 ]
 
 export default function AdminDashboard() {
+  const { lang, t } = useAdminLang()
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -85,7 +87,7 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 text-[#1A3A6B] animate-spin" />
-          <p className="text-sm text-gray-500">جاري تحميل البيانات...</p>
+          <p className="text-sm text-gray-500">{t("common.loadingData")}</p>
         </div>
       </div>
     )
@@ -98,7 +100,7 @@ export default function AdminDashboard() {
           <span className="text-red-600 font-bold">!</span>
         </div>
         <div>
-          <p className="font-medium">خطأ في تحميل لوحة التحكم</p>
+          <p className="font-medium">{t("dashboard.loadError")}</p>
           <p className="text-sm text-red-600">{error}</p>
         </div>
       </div>
@@ -112,9 +114,9 @@ export default function AdminDashboard() {
   const maxContent = Math.max(...(analytics?.contentBreakdown.map((c) => c.count) || [1]), 1)
 
   const monthLabels: Record<string, string> = {
-    "01": "يناير", "02": "فبراير", "03": "مارس", "04": "أبريل",
-    "05": "مايو", "06": "يونيو", "07": "يوليو", "08": "أغسطس",
-    "09": "سبتمبر", "10": "أكتوبر", "11": "نوفمبر", "12": "ديسمبر",
+    "01": t("month.01"), "02": t("month.02"), "03": t("month.03"), "04": t("month.04"),
+    "05": t("month.05"), "06": t("month.06"), "07": t("month.07"), "08": t("month.08"),
+    "09": t("month.09"), "10": t("month.10"), "11": t("month.11"), "12": t("month.12"),
   }
 
   const formatMonth = (m: string) => {
@@ -129,17 +131,17 @@ export default function AdminDashboard() {
     const diffMins = Math.floor(diffMs / 60000)
     const diffHours = Math.floor(diffMins / 60)
     const diffDays = Math.floor(diffHours / 24)
-    if (diffMins < 1) return "الآن"
-    if (diffMins < 60) return `منذ ${diffMins} د`
-    if (diffHours < 24) return `منذ ${diffHours} س`
-    return `منذ ${diffDays} ي`
+    if (diffMins < 1) return t("dashboard.justNow")
+    if (diffMins < 60) return t("dashboard.minAgoAr").replace("{n}", String(diffMins))
+    if (diffHours < 24) return t("dashboard.hourAgoAr").replace("{n}", String(diffHours))
+    return t("dashboard.dayAgoAr").replace("{n}", String(diffDays))
   }
 
   const statusLabel = (s: string) => {
     switch (s) {
-      case "approved": return "معتمد"
-      case "pending": return "معلق"
-      case "rejected": return "مرفوض"
+      case "approved": return t("common.approved")
+      case "pending": return t("common.pending")
+      case "rejected": return t("common.rejected")
       default: return s
     }
   }
@@ -162,24 +164,24 @@ export default function AdminDashboard() {
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
         </div>
         <div className="relative">
-          <h1 className="text-2xl font-bold mb-2">مرحباً بك في لوحة التحكم</h1>
-          <p className="text-white/80 text-sm">رابطة خريجي جامعة أفريقيا العالمية - تحليل وإدارة الموقع</p>
+          <h1 className="text-2xl font-bold mb-2">{t("dashboard.welcome")}</h1>
+          <p className="text-white/80 text-sm">{t("dashboard.subtitle")}</p>
           <div className="flex flex-wrap items-center gap-3 mt-4">
             <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg">
               <Users className="w-4 h-4" />
-              <span className="text-sm">{o?.totalMembers ?? 0} عضو</span>
+              <span className="text-sm">{o?.totalMembers ?? 0} {t("dashboard.member")}</span>
             </div>
             <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg">
               <UserPlus className="w-4 h-4" />
-              <span className="text-sm">{o?.newThisMonth ?? 0} جديد هذا الشهر</span>
+              <span className="text-sm">{o?.newThisMonth ?? 0} {t("dashboard.newThisMonth")}</span>
             </div>
             <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg">
               <Clock className="w-4 h-4" />
-              <span className="text-sm">{o?.pendingMembers ?? 0} معلق</span>
+              <span className="text-sm">{o?.pendingMembers ?? 0} {t("dashboard.pendingMembers")}</span>
             </div>
             <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg">
               <MessageSquare className="w-4 h-4" />
-              <span className="text-sm">{o?.unreadContacts ?? 0} رسالة جديدة</span>
+              <span className="text-sm">{o?.unreadContacts ?? 0} {t("dashboard.newMessages")}</span>
             </div>
           </div>
         </div>
@@ -188,10 +190,10 @@ export default function AdminDashboard() {
       {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "إجمالي الأعضاء", value: o?.totalMembers ?? 0, icon: Users, color: "text-[#1A3A6B]", bg: "bg-[#1A3A6B]/10 dark:bg-[#1A3A6B]/30" },
-          { label: "أعضاء نشطون", value: o?.activeMembers ?? 0, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-500/15" },
-          { label: "جديد هذا الأسبوع", value: o?.newThisWeek ?? 0, icon: UserPlus, color: "text-[#D4A843]", bg: "bg-[#D4A843]/10 dark:bg-[#D4A843]/25" },
-          { label: "جديد هذا الشهر", value: o?.newThisMonth ?? 0, icon: TrendingUp, color: "text-[#7B1FA2]", bg: "bg-purple-50 dark:bg-purple-500/15" },
+          { label: t("dashboard.totalMembers"), value: o?.totalMembers ?? 0, icon: Users, color: "text-[#1A3A6B]", bg: "bg-[#1A3A6B]/10 dark:bg-[#1A3A6B]/30" },
+          { label: t("dashboard.activeMembers"), value: o?.activeMembers ?? 0, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-500/15" },
+          { label: t("dashboard.newThisWeek"), value: o?.newThisWeek ?? 0, icon: UserPlus, color: "text-[#D4A843]", bg: "bg-[#D4A843]/10 dark:bg-[#D4A843]/25" },
+          { label: t("dashboard.newThisMonth"), value: o?.newThisMonth ?? 0, icon: TrendingUp, color: "text-[#7B1FA2]", bg: "bg-purple-50 dark:bg-purple-500/15" },
         ].map((card, i) => (
           <div key={i} className="bg-white dark:bg-[#1a2332] rounded-2xl border border-gray-100 dark:border-[#2a3d56] p-5">
             <div className="flex items-center justify-between mb-3">
@@ -209,7 +211,7 @@ export default function AdminDashboard() {
       <div className="bg-white dark:bg-[#1a2332] rounded-2xl border border-gray-100 dark:border-[#2a3d56] p-6">
         <h2 className="text-lg font-bold text-gray-800 dark:text-[#f1f5f9] mb-4 flex items-center gap-2">
           <div className="w-1 h-5 bg-[#D4A843] rounded-full" />
-          إجراءات سريعة
+          {t("dashboard.quickActions")}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {quickActions.map((action) => (
@@ -219,7 +221,7 @@ export default function AdminDashboard() {
               className={`flex flex-col items-center justify-center gap-3 p-5 text-white rounded-2xl bg-gradient-to-br ${action.gradient} hover:shadow-lg hover:scale-105 transition-all`}
             >
               <action.icon className="w-7 h-7" />
-              <span className="text-sm font-medium text-center">{action.label}</span>
+              <span className="text-sm font-medium text-center">{t(action.labelKey)}</span>
             </Link>
           ))}
         </div>
@@ -231,7 +233,7 @@ export default function AdminDashboard() {
         <div className="bg-white dark:bg-[#1a2332] rounded-2xl border border-gray-100 dark:border-[#2a3d56] p-6">
           <h2 className="text-lg font-bold text-gray-800 dark:text-[#f1f5f9] mb-5 flex items-center gap-2">
             <div className="w-1 h-5 bg-[#1A3A6B] rounded-full" />
-            نمو الأعضاء
+            {t("dashboard.memberGrowth")}
           </h2>
           <div className="flex items-end gap-2 h-40">
             {(analytics?.memberGrowth || []).map((item, i) => (
@@ -245,7 +247,7 @@ export default function AdminDashboard() {
               </div>
             ))}
             {(!analytics?.memberGrowth || analytics.memberGrowth.length === 0) && (
-              <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">لا توجد بيانات</div>
+              <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">{t("dashboard.noData")}</div>
             )}
           </div>
         </div>
@@ -254,7 +256,7 @@ export default function AdminDashboard() {
         <div className="bg-white dark:bg-[#1a2332] rounded-2xl border border-gray-100 dark:border-[#2a3d56] p-6">
           <h2 className="text-lg font-bold text-gray-800 dark:text-[#f1f5f9] mb-5 flex items-center gap-2">
             <div className="w-1 h-5 bg-[#D4A843] rounded-full" />
-            توزيع المحتوى
+            {t("dashboard.contentBreakdown")}
           </h2>
           <div className="space-y-3">
             {(analytics?.contentBreakdown || []).map((item, i) => (
@@ -276,7 +278,7 @@ export default function AdminDashboard() {
         <div className="bg-white dark:bg-[#1a2332] rounded-2xl border border-gray-100 dark:border-[#2a3d56] p-6">
           <h2 className="text-lg font-bold text-gray-800 dark:text-[#f1f5f9] mb-5 flex items-center gap-2">
             <div className="w-1 h-5 bg-[#2E7D32] rounded-full" />
-            الأعضاء حسب الدولة
+            {t("dashboard.membersByCountry")}
           </h2>
           <div className="space-y-3">
             {(analytics?.membersByCountry || []).slice(0, 8).map((item, i) => (
@@ -293,7 +295,7 @@ export default function AdminDashboard() {
               </div>
             ))}
             {(!analytics?.membersByCountry || analytics.membersByCountry.length === 0) && (
-              <div className="text-center text-gray-400 text-sm py-4">لا توجد بيانات</div>
+              <div className="text-center text-gray-400 text-sm py-4">{t("dashboard.noData")}</div>
             )}
           </div>
         </div>
@@ -302,7 +304,7 @@ export default function AdminDashboard() {
         <div className="bg-white dark:bg-[#1a2332] rounded-2xl border border-gray-100 dark:border-[#2a3d56] p-6">
           <h2 className="text-lg font-bold text-gray-800 dark:text-[#f1f5f9] mb-5 flex items-center gap-2">
             <div className="w-1 h-5 bg-[#7B1FA2] rounded-full" />
-            الأعضاء حسب الكلية
+            {t("dashboard.membersByFaculty")}
           </h2>
           <div className="space-y-3">
             {(analytics?.membersByFaculty || []).slice(0, 8).map((item, i) => (
@@ -319,7 +321,7 @@ export default function AdminDashboard() {
               </div>
             ))}
             {(!analytics?.membersByFaculty || analytics.membersByFaculty.length === 0) && (
-              <div className="text-center text-gray-400 text-sm py-4">لا توجد بيانات</div>
+              <div className="text-center text-gray-400 text-sm py-4">{t("dashboard.noData")}</div>
             )}
           </div>
         </div>
@@ -329,7 +331,7 @@ export default function AdminDashboard() {
       <div className="bg-white dark:bg-[#1a2332] rounded-2xl border border-gray-100 dark:border-[#2a3d56] p-6">
         <h2 className="text-lg font-bold text-gray-800 dark:text-[#f1f5f9] mb-5 flex items-center gap-2">
           <div className="w-1 h-5 bg-[#D4A843] rounded-full" />
-          حالة الأعضاء
+          {t("dashboard.membersStatus")}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {(analytics?.membersByStatus || []).map((item, i) => (
@@ -347,13 +349,13 @@ export default function AdminDashboard() {
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-gray-800 dark:text-[#f1f5f9] flex items-center gap-2">
             <div className="w-1 h-5 bg-[#D84315] rounded-full" />
-            آخر النشاطات
+            {t("dashboard.recentActivity")}
           </h2>
           <Link
             href="/ai.admin/activity"
             className="text-sm text-[#1A3A6B] dark:text-[#60a5fa] hover:text-[#2B5EA7] dark:hover:text-[#93c5fd] flex items-center gap-1 font-medium transition-colors"
           >
-            عرض الكل
+            {t("dashboard.viewAll")}
             <ArrowUpRight className="w-4 h-4" />
           </Link>
         </div>
@@ -374,7 +376,7 @@ export default function AdminDashboard() {
             </div>
           ))}
           {(!analytics?.recentActivity || analytics.recentActivity.length === 0) && (
-            <div className="text-center py-8 text-gray-400 text-sm">لا توجد نشاطات حديثة</div>
+            <div className="text-center py-8 text-gray-400 text-sm">{t("dashboard.noRecentActivity")}</div>
           )}
         </div>
       </div>

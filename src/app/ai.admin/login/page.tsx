@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react"
 import { ASSETS } from "@/lib/assets"
+import { useAdminLang } from "../admin-lang"
 
 export default function AdminLoginPage() {
   const router = useRouter()
+  const { t } = useAdminLang()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -29,13 +31,13 @@ export default function AdminLoginPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || "البريد الإلكتروني أو كلمة المرور غير صحيحة")
+        setError(data.error || t("login.invalidCredentials"))
       } else {
         router.push("/ai.admin")
         router.refresh()
       }
     } catch {
-      setError("حدث خطأ أثناء تسجيل الدخول")
+      setError(t("login.error"))
     } finally {
       setLoading(false)
     }
@@ -70,8 +72,8 @@ export default function AdminLoginPage() {
               <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <img src={ASSETS.logo} alt="Logo" className="w-12 h-12 rounded-lg object-cover" />
               </div>
-              <h1 className="text-2xl font-bold text-white">لوحة التحكم</h1>
-              <p className="text-white/70 text-sm mt-2">تسجيل الدخول كمدير</p>
+              <h1 className="text-2xl font-bold text-white">{t("login.title")}</h1>
+              <p className="text-white/70 text-sm mt-2">{t("login.subtitle")}</p>
             </div>
           </div>
 
@@ -86,7 +88,7 @@ export default function AdminLoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("login.email")}</label>
                 <div className="relative">
                   <input
                     type="email"
@@ -102,7 +104,7 @@ export default function AdminLoginPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">كلمة المرور</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("login.password")}</label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -131,17 +133,17 @@ export default function AdminLoginPage() {
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    جاري تسجيل الدخول...
+                    {t("login.signingIn")}
                   </>
                 ) : (
-                  "تسجيل الدخول"
+                  t("login.signIn")
                 )}
               </button>
             </form>
 
             <p className="text-center mt-6 text-sm text-gray-500">
               <Link href="/auth/login" className="text-[#1A3A6B] hover:underline">
-                تسجيل الدخول العام
+                {t("login.publicLogin")}
               </Link>
             </p>
           </div>
