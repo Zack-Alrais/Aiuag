@@ -29,8 +29,6 @@ const staticPages = [
   "/organization/branches",
   "/media",
   "/media/gallery",
-  "/media/publications",
-  "/media/reports",
   "/media/videos",
   "/publications",
   "/resources",

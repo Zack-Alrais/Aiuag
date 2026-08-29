@@ -46,9 +46,7 @@ function getNavItems(lang: string): NavItem[] {
       children: [
         { label: isArabic ? "الأخبار والأحداث" : "News & Events", href: "/news" },
         { label: isArabic ? "المعرض والفيديوهات" : "Gallery & Videos", href: "/media/gallery" },
-        { label: isArabic ? "المنشورات والتفاعل" : "Posts & Publications", href: "/media/publications" },
         { label: isArabic ? "منشورات المجتمع" : "Community Posts", href: "/posts" },
-        { label: isArabic ? "التقارير" : "Reports", href: "/media/reports" },
       ],
     },
     {
@@ -338,7 +336,7 @@ export default function Header({ lang }: HeaderProps) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -4, scale: 0.97 }}
                       transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute top-full start-0 mt-2 w-64 bg-white dark:bg-dark-surface dark:border dark:border-dark-border rounded-xl shadow-xl border border-border z-50 overflow-hidden"
+                      className="absolute top-full end-0 mt-2 w-72 max-w-[calc(100vw-2rem)] max-h-[calc(100dvh-6rem)] overflow-y-auto bg-white dark:bg-dark-surface dark:border dark:border-dark-border rounded-xl shadow-xl border border-border z-50"
                     >
                       <div className="bg-gradient-to-br from-primary to-primary-dark p-5 text-white">
                         <div className="flex items-center gap-4">

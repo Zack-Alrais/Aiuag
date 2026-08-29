@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Camera, Play, FileText, BarChart3, ArrowLeft, ArrowRight, MessageSquare, Newspaper, CalendarClock, Users } from "lucide-react";
+import { Camera, Play, ArrowLeft, ArrowRight, MessageSquare, Newspaper, Users } from "lucide-react";
 import HeroSection from "@/components/ui/hero-section";
 
 export default async function MediaPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -31,14 +31,6 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
       href: `/${lang}/media/videos`,
       color: "from-rose-600 to-rose-700",
       stats: isArabic ? "فيديوهات متنوعة" : "Various Videos",
-    },
-    {
-      icon: FileText,
-      title: isArabic ? "المنشورات والتفاعل" : "Posts & Publications",
-      desc: isArabic ? "شارك وتفاعل مع مجتمع الخريجين - تقارير ومنشورات تفاعلية" : "Interact with the alumni community - reports and interactive posts",
-      href: `/${lang}/media/publications`,
-      color: "from-emerald-600 to-emerald-700",
-      stats: isArabic ? "تقارير + تفاعل" : "Reports + Feed",
     },
     {
       icon: MessageSquare,
