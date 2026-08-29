@@ -14,11 +14,13 @@ interface FileUploadProps {
 }
 
 const TYPE_CONFIG = {
-  image: { accept: "image/*", icon: FileText, label: "اسحب الصورة هنا أو اضغط للاختيار", hint: "JPG, PNG, GIF, WebP" },
-  video: { accept: "video/*", icon: Film, label: "اسحب الفيديو هنا أو اضغط للاختيار", hint: "MP4, WebM (حد أقصى 50MB)" },
-  pdf: { accept: ".pdf,application/pdf", icon: FileText, label: "اسحب الملف هنا أو اضغط للاختيار", hint: "PDF فقط" },
-  any: { accept: "*", icon: File, label: "اسحب الملف هنا أو اضغط للاختيار", hint: "جميع أنواع الملفات" },
+  image: { accept: "image/*", icon: FileText, label: "اسحب الصورة هنا أو اضغط للاختيار", hint: "JPG, PNG, GIF, WebP", max: "10 ميجا" },
+  video: { accept: "video/*", icon: Film, label: "اسحب الفيديو هنا أو اضغط للاختيار", hint: "MP4, WebM", max: "10 ميجا" },
+  pdf: { accept: ".pdf,application/pdf", icon: FileText, label: "اسحب الملف هنا أو اضغط للاختيار", hint: "PDF فقط", max: "10 ميجا" },
+  any: { accept: "*", icon: File, label: "اسحب الملف هنا أو اضغط للاختيار", hint: "جميع أنواع الملفات", max: "10 ميجا" },
 }
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024
 
 export default function FileUpload({
   value,
@@ -40,6 +42,10 @@ export default function FileUpload({
   const Icon = config.icon
 
   const uploadFile = async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      setError("لا يُسمح برفع ملفات أكبر من 10 ميجا بايت")
+      return
+    }
     setUploading(true)
     setError(null)
     try {
@@ -158,7 +164,7 @@ export default function FileUpload({
             <div className="flex flex-col items-center gap-2">
               <Icon className="w-8 h-8 text-gray-400 dark:text-[#3b4f6b]" />
               <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{config.label}</p>
-              <p className="text-xs text-gray-400 dark:text-[#5a7aa3]">{config.hint}</p>
+              <p className="text-xs text-amber-600 dark:text-amber-400">{config.hint} (تنبيه: الحد الأقصى {config.max})</p>
             </div>
           )}
         </div>

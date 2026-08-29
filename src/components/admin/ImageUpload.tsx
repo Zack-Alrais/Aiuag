@@ -4,6 +4,8 @@ import { useState, useRef } from "react"
 import { Upload, X, Image, Crop } from "lucide-react"
 import ImageEditor from "@/components/ui/image-editor"
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024
+
 interface ImageUploadProps {
   value: string
   onChange: (url: string) => void
@@ -27,9 +29,15 @@ export default function ImageUpload({
   const [dragOver, setDragOver] = useState(false)
   const [editorImage, setEditorImage] = useState<string | null>(null)
   const [imgError, setImgError] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const uploadFile = async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      setError("لا يُسمح برفع ملفات أكبر من 10 ميجا بايت")
+      return
+    }
+    setError(null)
     setUploading(true)
     try {
       const formData = new FormData()
@@ -38,9 +46,14 @@ export default function ImageUpload({
       const res = await fetch("/api/upload", { method: "POST", body: formData })
       if (res.ok) {
         const data = await res.json()
+        setImgError(false)
         onChange(data.files?.[0]?.url || data.urls?.[0])
+      } else {
+        const errData = await res.json().catch(() => null)
+        setError(errData?.error || "فشل في رفع الملف")
       }
     } catch {
+      setError("فشل في رفع الملف")
     } finally {
       setUploading(false)
     }
@@ -48,6 +61,11 @@ export default function ImageUpload({
 
   const handleFile = async (file: File) => {
     if (!file.type.startsWith("image/")) return
+    if (file.size > MAX_FILE_SIZE) {
+      setError("لا يُسمح برفع ملفات أكبر من 10 ميجا بايت")
+      return
+    }
+    setError(null)
     const reader = new FileReader()
     reader.onload = () => {
       setEditorImage(reader.result as string)
@@ -145,7 +163,7 @@ export default function ImageUpload({
             <div className="flex flex-col items-center gap-2">
               <Image className="w-8 h-8 text-gray-400" />
               <p className="text-sm text-gray-500">اسحب الصورة هنا أو اضغط للاختيار</p>
-              <p className="text-xs text-gray-400">JPG, PNG, GIF, WebP</p>
+              <p className="text-xs text-amber-600">تنبيه: الحد الأقصى لحجم الصورة 10 ميجا بايت</p>
             </div>
           )}
         </div>
@@ -161,6 +179,8 @@ export default function ImageUpload({
           e.target.value = ""
         }}
       />
+
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
 
       {editorImage && (
         <ImageEditor

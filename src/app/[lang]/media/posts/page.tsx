@@ -144,6 +144,10 @@ function CreatePostBox({ member, onPost, lang }: { member: MemberData | null; on
     setUploading(true);
     setError("");
     for (const file of Array.from(files)) {
+      if (file.size > 10 * 1024 * 1024) {
+        setError(isAr ? "لا يُسمح برفع ملفات أكبر من 10 ميجا بايت" : "Maximum file size is 10MB");
+        continue;
+      }
       if (type === "image" && file.type.startsWith("image/")) {
         // Show cropper for images
         const url = URL.createObjectURL(file);

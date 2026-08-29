@@ -5,7 +5,7 @@ const ALLOWED_TYPES = [
   "application/pdf",
   "video/mp4", "video/webm",
 ];
-const MAX_SIZE = 50 * 1024 * 1024;
+const MAX_SIZE = 10 * 1024 * 1024;
 const MAX_FILES = 10;
 
 export async function POST(request: NextRequest) {
