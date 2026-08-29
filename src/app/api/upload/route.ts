@@ -31,6 +31,12 @@ export async function POST(request: NextRequest) {
     const isVercel = !!process.env.VERCEL;
 
     if (isVercel) {
+      if (!process.env.BLOB_READ_WRITE_TOKEN) {
+        return NextResponse.json(
+          { error: "Blob storage is not configured (BLOB_READ_WRITE_TOKEN)" },
+          { status: 503 }
+        );
+      }
       const { put } = await import("@vercel/blob");
       const results: { url: string; filename: string; name: string }[] = [];
 
@@ -62,7 +68,6 @@ export async function POST(request: NextRequest) {
     await mkdir(uploadDir, { recursive: true });
 
     const results: { url: string; filename: string; name: string }[] = [];
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://aiuag.com";
 
     for (const file of files) {
       if (!ALLOWED_TYPES.includes(file.type)) {
@@ -79,7 +84,7 @@ export async function POST(request: NextRequest) {
       const buffer = Buffer.from(await file.arrayBuffer());
       await writeFile(filepath, buffer);
 
-      const url = `${appUrl}/uploads/${folder}/${filename}`;
+      const url = `/uploads/${folder}/${filename}`;
       results.push({ url, filename: `${folder}/${filename}`, name: file.name });
     }
 
