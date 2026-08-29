@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["lucide-react"],
+    middlewareClientMaxBodySize: "60mb",
   },
   async redirects() {
     return [
