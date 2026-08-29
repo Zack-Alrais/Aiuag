@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, Video, Play, X, Film, Link } from "lucide-react"
 import FileUpload from "@/components/admin/FileUpload"
+import { useAdminLang } from "../admin-lang"
 
 interface VideoItem {
   id: string
@@ -50,6 +51,7 @@ function isVideoFile(url: string): boolean {
 }
 
 export default function VideosManagement() {
+  const { lang, t } = useAdminLang()
   const [items, setItems] = useState<VideoItem[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -168,8 +170,8 @@ export default function VideosManagement() {
         <div className="flex items-center gap-3">
           <Video className="w-8 h-8 text-blue-600 dark:text-[#60a5fa]" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">إدارة الفيديوهات</h1>
-            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{items.length} فيديو مسجل</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("videos.title")}</h1>
+            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{items.length} {t(items.length === 1 ? "videos.single" : "videos.plural")}</p>
           </div>
         </div>
         <button
@@ -177,7 +179,7 @@ export default function VideosManagement() {
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
-          إضافة فيديو
+          {t("videos.add")}
         </button>
       </div>
 
@@ -185,12 +187,12 @@ export default function VideosManagement() {
         {loading ? (
           <div className="flex items-center justify-center py-20 text-gray-400 dark:text-[#3b4f6b]">
             <Video className="h-5 w-5 animate-spin mr-2" />
-            جاري تحميل الفيديوهات...
+            {t("videos.loading")}
           </div>
         ) : items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-[#3b4f6b]">
             <Video className="h-12 w-12 mb-3 opacity-40" />
-            <p className="text-sm">لا توجد فيديوهات</p>
+            <p className="text-sm">{t("videos.none")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -198,22 +200,22 @@ export default function VideosManagement() {
               <thead>
                 <tr className="border-b border-gray-100 dark:border-[#253347] bg-gray-50/60 dark:bg-[#111927]">
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    العنوان
+                    {t("common.title")}
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    المعاينة
+                    {t("videos.preview")}
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    المصدر
+                    {t("videos.source")}
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    التصنيف
+                    {t("common.category")}
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    التاريخ
+                    {t("common.date")}
                   </th>
                   <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    الإجراءات
+                    {t("common.actions")}
                   </th>
                 </tr>
               </thead>
@@ -245,27 +247,27 @@ export default function VideosManagement() {
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${isYT ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400" : "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"}`}>
                           {isYT ? <Link className="w-3 h-3" /> : <Film className="w-3 h-3" />}
-                          {isYT ? "يوتيوب" : "مرفوع"}
+                          {isYT ? t("videos.youtube") : t("videos.uploaded")}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600 dark:text-[#cbd5e1]">
                         {item.category ?? "-"}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-[#94a3b8]">
-                        {new Date(item.createdAt).toLocaleDateString("ar-EG")}
+                        {new Date(item.createdAt).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US")}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-1">
-                          <button onClick={() => openEditModal(item)} className="p-2 text-blue-600 dark:text-[#60a5fa] hover:bg-blue-50 dark:hover:bg-[#1e2d42] rounded-lg transition-colors" title="تعديل">
+                          <button onClick={() => openEditModal(item)} className="p-2 text-blue-600 dark:text-[#60a5fa] hover:bg-blue-50 dark:hover:bg-[#1e2d42] rounded-lg transition-colors" title={t("common.edit")}>
                             <Pencil className="h-4 w-4" />
                           </button>
                           {deleteConfirmId === item.id ? (
                             <div className="flex items-center gap-1">
-                              <button onClick={() => handleDelete(item.id)} className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors">تأكيد</button>
-                              <button onClick={() => setDeleteConfirmId(null)} className="px-2.5 py-1 bg-gray-200 dark:bg-[#2a3d56] text-gray-600 dark:text-[#cbd5e1] text-xs rounded-md hover:bg-gray-300 dark:hover:bg-[#3b4f6b] transition-colors">إلغاء</button>
+                              <button onClick={() => handleDelete(item.id)} className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors">{t("common.confirm")}</button>
+                              <button onClick={() => setDeleteConfirmId(null)} className="px-2.5 py-1 bg-gray-200 dark:bg-[#2a3d56] text-gray-600 dark:text-[#cbd5e1] text-xs rounded-md hover:bg-gray-300 dark:hover:bg-[#3b4f6b] transition-colors">{t("common.cancel")}</button>
                             </div>
                           ) : (
-                            <button onClick={() => setDeleteConfirmId(item.id)} className="p-2 text-red-500 dark:text-[#f87171] hover:bg-red-50 dark:hover:bg-[#1e2d42] rounded-lg transition-colors" title="حذف">
+                            <button onClick={() => setDeleteConfirmId(item.id)} className="p-2 text-red-500 dark:text-[#f87171] hover:bg-red-50 dark:hover:bg-[#1e2d42] rounded-lg transition-colors" title={t("common.delete")}>
                               <Trash2 className="h-4 w-4" />
                             </button>
                           )}
@@ -286,7 +288,7 @@ export default function VideosManagement() {
           <div className="relative bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-[#253347]">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f1f5f9]">
-                {editingItem ? "تعديل فيديو" : "إضافة فيديو جديد"}
+                {editingItem ? t("videos.edit") : t("videos.addNew")}
               </h2>
               <button onClick={closeModal} className="p-1.5 text-gray-400 dark:text-[#94a3b8] hover:text-gray-600 dark:hover:text-[#f1f5f9] hover:bg-gray-100 dark:hover:bg-[#1e2d42] rounded-lg transition-colors">
                 <X className="h-5 w-5" />
@@ -296,23 +298,23 @@ export default function VideosManagement() {
             <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">العنوان بالعربية *</label>
-                  <input type="text" required dir="rtl" value={form.title} onChange={(e) => handleFieldChange("title", e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="عنوان الفيديو بالعربية" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">{t("news.form.titleAr")} *</label>
+                  <input type="text" required dir="rtl" value={form.title} onChange={(e) => handleFieldChange("title", e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder={t("videos.form.titleArPlace")} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">العنوان بالإنجليزية *</label>
-                  <input type="text" required value={form.titleEn} onChange={(e) => handleFieldChange("titleEn", e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Video title in English" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">{t("news.form.titleEn")} *</label>
+                  <input type="text" required value={form.titleEn} onChange={(e) => handleFieldChange("titleEn", e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder={t("videos.form.titleEnPlace")} />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-2">مصدر الفيديو</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-2">{t("videos.form.source")}</label>
                 <div className="flex gap-2 mb-3">
                   <button type="button" onClick={() => { setVideoSource("youtube"); handleFieldChange("url", "") }} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${videoSource === "youtube" ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-700" : "bg-gray-100 dark:bg-[#111927] text-gray-600 dark:text-[#94a3b8] border border-gray-200 dark:border-[#3b4f6b]"}`}>
-                    <Link className="w-4 h-4" /> رابط يوتيوب
+                    <Link className="w-4 h-4" /> {t("videos.form.youtubeLink")}
                   </button>
                   <button type="button" onClick={() => { setVideoSource("upload"); handleFieldChange("url", "") }} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${videoSource === "upload" ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-700" : "bg-gray-100 dark:bg-[#111927] text-gray-600 dark:text-[#94a3b8] border border-gray-200 dark:border-[#3b4f6b]"}`}>
-                    <Film className="w-4 h-4" /> رفع من الجهاز
+                    <Film className="w-4 h-4" /> {t("videos.form.uploadDevice")}
                   </button>
                 </div>
 
@@ -333,25 +335,25 @@ export default function VideosManagement() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">الوصف</label>
-                <textarea rows={3} dir="rtl" value={form.description} onChange={(e) => handleFieldChange("description", e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none" placeholder="وصف الفيديو" />
+                <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">{t("videos.form.description")}</label>
+                <textarea rows={3} dir="rtl" value={form.description} onChange={(e) => handleFieldChange("description", e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none" placeholder={t("videos.form.descriptionPlace")} />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">التصنيف</label>
-                  <input type="text" value={form.category} onChange={(e) => handleFieldChange("category", e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="مثال: تعليمي" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">{t("common.category")}</label>
+                  <input type="text" value={form.category} onChange={(e) => handleFieldChange("category", e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder={t("videos.form.categoryPlace")} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">صورة مصغرة (اختياري)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">{t("videos.form.thumbnail")}</label>
                   <FileUpload value={form.thumbnail} onChange={(url) => handleFieldChange("thumbnail", url)} folder="videos/thumbnails" type="image" />
                 </div>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100 dark:border-[#253347]">
-                <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-[#cbd5e1] bg-gray-100 dark:bg-[#2a3d56] hover:bg-gray-200 dark:hover:bg-[#3b4f6b] rounded-lg transition-colors">إلغاء</button>
+                <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-[#cbd5e1] bg-gray-100 dark:bg-[#2a3d56] hover:bg-gray-200 dark:hover:bg-[#3b4f6b] rounded-lg transition-colors">{t("common.cancel")}</button>
                 <button type="submit" disabled={submitting} className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                  {submitting ? "جاري الحفظ..." : editingItem ? "تحديث الفيديو" : "إنشاء فيديو"}
+                  {submitting ? t("common.saving") : editingItem ? t("videos.update") : t("videos.create")}
                 </button>
               </div>
             </form>

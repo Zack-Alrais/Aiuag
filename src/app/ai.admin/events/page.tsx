@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, CalendarDays, MapPin, Clock, Users, X } from "lucide-react"
 import { TranslateInto } from "@/components/admin/AutoTranslate"
+import { useAdminLang } from "../admin-lang"
 
 interface Event {
   id: string
@@ -49,6 +50,7 @@ const emptyForm: EventFormData = {
 }
 
 export default function EventsManagement() {
+  const { lang, t } = useAdminLang()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState("all")
@@ -174,7 +176,7 @@ export default function EventsManagement() {
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "-"
     const d = new Date(dateStr)
-    return d.toLocaleDateString("en-GB", {
+    return d.toLocaleDateString(lang === "ar" ? "ar-EG" : "en-GB", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -186,14 +188,14 @@ export default function EventsManagement() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <CalendarDays className="h-7 w-7 text-blue-600 dark:text-[#60a5fa]" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-[#f1f5f9]">إدارة الأحداث</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-[#f1f5f9]">{t("events.title")}</h1>
         </div>
         <button
           onClick={openAddModal}
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
         >
           <Plus className="h-4 w-4" />
-          إضافة حدث
+          {t("events.add")}
         </button>
       </div>
 
@@ -208,7 +210,7 @@ export default function EventsManagement() {
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-[#1e2d42] dark:text-[#cbd5e1] dark:hover:bg-[#2a3d56]"
             }`}
           >
-            {status === "all" ? "الكل" : status === "upcoming" ? "قادم" : status === "ongoing" ? "جاري" : status === "completed" ? "مكتمل" : status === "cancelled" ? "ملغي" : status}
+            {status === "all" ? t("common.all") : t(`common.${status}`) || status}
           </button>
         ))}
       </div>
@@ -228,7 +230,7 @@ export default function EventsManagement() {
         ) : filteredEvents.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400">
             <CalendarDays className="h-12 w-12 mb-3 opacity-40" />
-            <p className="text-sm">لا توجد أحداث</p>
+            <p className="text-sm">{t("events.none")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -236,31 +238,31 @@ export default function EventsManagement() {
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60 dark:bg-[#111927] dark:border-[#2a3d56]">
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    العنوان
+                    {t("common.title")}
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <CalendarDays className="h-3.5 w-3.5" />
-                      التاريخ
+                      {t("common.date")}
                     </span>
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5" />
-                      الموقع
+                      {t("common.location")}
                     </span>
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    الحالة
+                    {t("common.status")}
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <Users className="h-3.5 w-3.5" />
-                      السعة
+                      {t("common.capacity")}
                     </span>
                   </th>
                   <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    الإجراءات
+                    {t("common.actions")}
                   </th>
                 </tr>
               </thead>
@@ -296,7 +298,7 @@ export default function EventsManagement() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(event.status)}`}
                       >
-                        {event.status}
+                        {t(`common.${event.status}`) || event.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-[#cbd5e1]">
@@ -307,7 +309,7 @@ export default function EventsManagement() {
                         <button
                           onClick={() => openEditModal(event)}
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="تعديل"
+                          title={t("common.edit")}
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
@@ -317,20 +319,20 @@ export default function EventsManagement() {
                               onClick={() => handleDelete(event.id)}
                               className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition-colors"
                             >
-                              تأكيد
+                              {t("common.confirm")}
                             </button>
                             <button
                               onClick={() => setDeleteConfirm(null)}
                               className="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs rounded-md hover:bg-gray-300 transition-colors"
                             >
-                              إلغاء
+                              {t("common.cancel")}
                             </button>
                           </div>
                         ) : (
                           <button
                             onClick={() => setDeleteConfirm(event.id)}
                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                            title="حذف"
+                            title={t("common.delete")}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -354,7 +356,7 @@ export default function EventsManagement() {
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto dark:bg-[#1a2332] dark:border dark:border-[#2a3d56]">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-[#2a3d56]">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f1f5f9]">
-                {editingEvent ? "تعديل حدث" : "إضافة حدث جديد"}
+                {editingEvent ? t("events.edit") : t("events.addNew")}
               </h2>
               <button
                 onClick={closeModal}
@@ -368,7 +370,7 @@ export default function EventsManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    العنوان بالعربي *
+                    {t("news.form.titleAr")} *
                   </label>
                   <input
                     type="text"
@@ -378,13 +380,13 @@ export default function EventsManagement() {
                       setForm({ ...form, titleAr: e.target.value })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                    placeholder="العنوان بالعربية"
+                    placeholder={t("events.form.titleArPlace")}
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
-                      العنوان بالإنجليزي *
+                      {t("news.form.titleEn")} *
                     </label>
                     <TranslateInto source={form.titleAr} target={form.titleEn} onTranslated={(t) => setForm({ ...form, titleEn: t })} />
                   </div>
@@ -396,7 +398,7 @@ export default function EventsManagement() {
                       setForm({ ...form, titleEn: e.target.value })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                    placeholder="Title in English"
+                    placeholder={t("events.form.titleEnPlace")}
                   />
                 </div>
               </div>
@@ -404,7 +406,7 @@ export default function EventsManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    الوصف بالعربي *
+                    {t("events.form.descriptionAr")} *
                   </label>
                   <textarea
                     required
@@ -414,13 +416,13 @@ export default function EventsManagement() {
                       setForm({ ...form, descriptionAr: e.target.value })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                    placeholder="الوصف بالعربية"
+                    placeholder={t("events.form.descriptionArPlace")}
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
-                      الوصف بالإنجليزي *
+                      {t("events.form.descriptionEn")} *
                     </label>
                     <TranslateInto source={form.descriptionAr} target={form.descriptionEn} onTranslated={(t) => setForm({ ...form, descriptionEn: t })} />
                   </div>
@@ -432,7 +434,7 @@ export default function EventsManagement() {
                       setForm({ ...form, descriptionEn: e.target.value })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                    placeholder="Description in English"
+                    placeholder={t("events.form.descriptionEnPlace")}
                   />
                 </div>
               </div>
@@ -442,7 +444,7 @@ export default function EventsManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
                     <span className="flex items-center gap-1.5">
                       <CalendarDays className="h-3.5 w-3.5" />
-                      التاريخ *
+                      {t("common.date")} *
                     </span>
                   </label>
                   <input
@@ -459,7 +461,7 @@ export default function EventsManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
                     <span className="flex items-center gap-1.5">
                       <Clock className="h-3.5 w-3.5" />
-                      وقت البداية
+                      {t("events.form.startTime")}
                     </span>
                   </label>
                   <input
@@ -475,7 +477,7 @@ export default function EventsManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
                     <span className="flex items-center gap-1.5">
                       <Clock className="h-3.5 w-3.5" />
-                      وقت النهاية
+                      {t("events.form.endTime")}
                     </span>
                   </label>
                   <input
@@ -494,7 +496,7 @@ export default function EventsManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
                     <span className="flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5" />
-                      الموقع *
+                      {t("common.location")} *
                     </span>
                   </label>
                   <input
@@ -505,14 +507,14 @@ export default function EventsManagement() {
                       setForm({ ...form, location: e.target.value })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                    placeholder="موقع الحدث"
+                    placeholder={t("events.form.locationPlace")}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
                     <span className="flex items-center gap-1.5">
                       <Users className="h-3.5 w-3.5" />
-                      السعة
+                      {t("common.capacity")}
                     </span>
                   </label>
                   <input
@@ -523,12 +525,12 @@ export default function EventsManagement() {
                       setForm({ ...form, capacity: e.target.value })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                    placeholder="الحد الأقصى للحضور"
+                    placeholder={t("events.form.capacityPlace")}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    التصنيف
+                    {t("common.category")}
                   </label>
                   <input
                     type="text"
@@ -537,14 +539,14 @@ export default function EventsManagement() {
                       setForm({ ...form, category: e.target.value })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                    placeholder="مثال: ورشة عمل"
+                    placeholder={t("events.form.categoryPlace")}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                  الحالة
+                  {t("common.status")}
                 </label>
                 <select
                   value={form.status}
@@ -553,10 +555,10 @@ export default function EventsManagement() {
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
                 >
-                  <option value="upcoming">قادم</option>
-                  <option value="ongoing">جاري</option>
-                  <option value="completed">مكتمل</option>
-                  <option value="cancelled">ملغي</option>
+                  <option value="upcoming">{t("common.upcoming")}</option>
+                  <option value="ongoing">{t("common.ongoing")}</option>
+                  <option value="completed">{t("common.completed")}</option>
+                  <option value="cancelled">{t("common.cancelled")}</option>
                 </select>
               </div>
 
@@ -566,7 +568,7 @@ export default function EventsManagement() {
                   onClick={closeModal}
                   className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -574,10 +576,10 @@ export default function EventsManagement() {
                   className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting
-                    ? "جاري الحفظ..."
+                    ? t("common.saving")
                     : editingEvent
-                      ? "تحديث الحدث"
-                      : "إنشاء الحدث"}
+                      ? t("events.update")
+                      : t("events.create")}
                 </button>
               </div>
             </form>

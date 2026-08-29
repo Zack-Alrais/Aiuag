@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, Newspaper, Eye, EyeOff, Search, X } from "lucide-react"
 import ImageUpload from "@/components/admin/ImageUpload"
 import { TranslateInto } from "@/components/admin/AutoTranslate"
+import { useAdminLang } from "../admin-lang"
 
 interface NewsItem {
   id: string
@@ -33,6 +34,7 @@ const emptyForm: Omit<NewsItem, "id" | "createdAt" | "updatedAt"> = {
 }
 
 export default function NewsManagement() {
+  const { lang, t } = useAdminLang()
   const [news, setNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<"all" | "published" | "draft" | "archived">("all")
@@ -151,9 +153,9 @@ export default function NewsManagement() {
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
-      published: "منشور",
-      draft: "مسودة",
-      archived: "مؤرشف",
+      published: t("common.published"),
+      draft: t("common.draft"),
+      archived: t("common.archived"),
     }
     return labels[status] || status
   }
@@ -165,8 +167,8 @@ export default function NewsManagement() {
         <div className="flex items-center gap-3">
           <Newspaper className="w-8 h-8 text-blue-600 dark:text-[#60a5fa]" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">إدارة الأخبار</h1>
-            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">إدارة الأخبار</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("news.title")}</h1>
+            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{t("news.title")}</p>
           </div>
         </div>
         <button
@@ -174,7 +176,7 @@ export default function NewsManagement() {
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          إضافة خبر
+          {t("news.add")}
         </button>
       </div>
 
@@ -191,7 +193,7 @@ export default function NewsManagement() {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-[#1e2d42] dark:text-[#cbd5e1] dark:hover:bg-[#2a3d56]"
               }`}
             >
-              {status === "all" ? "الكل" : getStatusLabel(status)}
+              {status === "all" ? t("common.all") : getStatusLabel(status)}
             </button>
           ))}
         </div>
@@ -199,7 +201,7 @@ export default function NewsManagement() {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
           <input
             type="text"
-            placeholder="بحث..."
+            placeholder={t("news.search")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
@@ -214,19 +216,19 @@ export default function NewsManagement() {
             <thead className="bg-gray-50 dark:bg-[#111927]">
               <tr>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
-                  العنوان
+                  {t("common.title")}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
-                  الحالة
+                  {t("common.status")}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
-                  التصنيف
+                  {t("news.category")}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
-                  التاريخ
+                  {t("news.date")}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
-                  الإجراءات
+                  {t("common.actions")}
                 </th>
               </tr>
             </thead>
@@ -249,7 +251,7 @@ export default function NewsManagement() {
               ) : filteredNews.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                    لا توجد نتائج
+                    {t("news.noResults")}
                   </td>
                 </tr>
               ) : (
@@ -273,21 +275,21 @@ export default function NewsManagement() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-[#cbd5e1]">{item.category}</td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-[#cbd5e1]">
-                      {new Date(item.createdAt).toLocaleDateString("ar-EG")}
+                      {new Date(item.createdAt).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US")}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => openEditModal(item)}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="تعديل"
+                          title={t("common.edit")}
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeleteConfirmId(item.id)}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="حذف"
+                          title={t("common.delete")}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -307,7 +309,7 @@ export default function NewsManagement() {
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4 dark:bg-[#1a2332] dark:border dark:border-[#2a3d56]">
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-[#2a3d56]">
               <h2 className="text-xl font-bold text-gray-800 dark:text-[#f1f5f9]">
-                {editingId ? "تعديل خبر" : "إضافة خبر"}
+                {editingId ? t("news.edit") : t("news.add")}
               </h2>
               <button onClick={closeModal} className="p-2 hover:bg-gray-100 rounded-lg transition-colors dark:hover:bg-[#2a3d56]">
                 <X className="w-5 h-5 text-gray-500 dark:text-[#7a8ba3]" />
@@ -318,7 +320,7 @@ export default function NewsManagement() {
               {/* Arabic Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                  العنوان بالعربي <span className="text-red-500">*</span>
+                  {t("news.form.titleAr")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -334,7 +336,7 @@ export default function NewsManagement() {
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
-                    العنوان بالإنجليزي <span className="text-red-500">*</span>
+                    {t("news.form.titleEn")} <span className="text-red-500">*</span>
                   </label>
                   <TranslateInto source={form.titleAr} target={form.titleEn} onTranslated={(t) => handleFieldChange("titleEn", t)} />
                 </div>
@@ -350,7 +352,7 @@ export default function NewsManagement() {
               {/* Arabic Excerpt */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                  ملخص بالعربي
+                  {t("news.form.excerptAr")}
                 </label>
                 <textarea
                   rows={2}
@@ -365,7 +367,7 @@ export default function NewsManagement() {
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
-                    ملخص بالإنجليزي
+                    {t("news.form.excerptEn")}
                   </label>
                   <TranslateInto source={form.excerptAr} target={form.excerptEn} onTranslated={(t) => handleFieldChange("excerptEn", t)} />
                 </div>
@@ -380,7 +382,7 @@ export default function NewsManagement() {
               {/* Arabic Content */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                  المحتوى بالعربي <span className="text-red-500">*</span>
+                  {t("news.form.contentAr")} <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   rows={5}
@@ -396,7 +398,7 @@ export default function NewsManagement() {
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
-                    المحتوى بالإنجليزي <span className="text-red-500">*</span>
+                    {t("news.form.contentEn")} <span className="text-red-500">*</span>
                   </label>
                   <TranslateInto source={form.contentAr} target={form.contentEn} onTranslated={(t) => handleFieldChange("contentEn", t)} />
                 </div>
@@ -413,7 +415,7 @@ export default function NewsManagement() {
                 {/* Category */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    التصنيف <span className="text-red-500">*</span>
+                    {t("news.category")} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -427,7 +429,7 @@ export default function NewsManagement() {
                 {/* Status */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    الحالة <span className="text-red-500">*</span>
+                    {t("common.status")} <span className="text-red-500">*</span>
                   </label>
                   <select
                     required
@@ -435,9 +437,9 @@ export default function NewsManagement() {
                     onChange={(e) => handleFieldChange("status", e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
                   >
-                    <option value="draft">مسودة</option>
-                    <option value="published">منشور</option>
-                    <option value="archived">مؤرشف</option>
+                    <option value="draft">{t("common.draft")}</option>
+                    <option value="published">{t("common.published")}</option>
+                    <option value="archived">{t("common.archived")}</option>
                   </select>
                 </div>
               </div>
@@ -447,7 +449,7 @@ export default function NewsManagement() {
                 value={form.featuredImage}
                 onChange={(url) => handleFieldChange("featuredImage", url)}
                 folder="news"
-                label="الصورة الرئيسية"
+                label={t("news.form.featuredImage")}
               />
 
               {/* Actions */}
@@ -457,7 +459,7 @@ export default function NewsManagement() {
                   onClick={closeModal}
                   className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors dark:text-[#cbd5e1] dark:bg-[#1e2d42] dark:hover:bg-[#2a3d56]"
                 >
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -465,10 +467,10 @@ export default function NewsManagement() {
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
                   {saving
-                    ? "جاري الحفظ..."
+                    ? t("common.saving")
                     : editingId
-                      ? "تحديث"
-                      : "إنشاء"}
+                      ? t("common.update")
+                      : t("common.create")}
                 </button>
               </div>
             </form>
@@ -484,23 +486,21 @@ export default function NewsManagement() {
               <div className="p-2 bg-red-100 rounded-full">
                 <Trash2 className="w-5 h-5 text-red-600" />
               </div>
-              <h3 className="text-lg font-bold text-gray-800">تأكيد الحذف</h3>
-            </div>
-            <p className="text-gray-600 mb-6">
-              هل أنت متأكد من حذف هذا الخبر؟ هذا الإجراء لا يمكن التراجع عنه.
-            </p>
+<h3 className="text-lg font-bold text-gray-800">{t("common.confirmDelete")}</h3>
+              </div>
+              <p className="text-gray-600 mb-6">{t("news.deleteMessage")}</p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setDeleteConfirmId(null)}
                 className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                إلغاء
+                {t("common.cancel")}
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirmId)}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
-                حذف
+                {t("common.delete")}
               </button>
             </div>
           </div>
