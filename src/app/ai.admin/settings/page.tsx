@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Settings, Globe, Mail, Phone, MapPin, Share2, Search, Save, X, Image, Plus, ChevronUp, ChevronDown, Check } from "lucide-react"
 import ImageUpload from "@/components/admin/ImageUpload"
+import { useAdminLang } from "../admin-lang"
 
 interface SettingsForm {
   siteNameAr: string
@@ -69,6 +70,7 @@ const initialForm: SettingsForm = {
 }
 
 export default function SettingsPage() {
+  const { lang, t } = useAdminLang()
   const [form, setForm] = useState<SettingsForm>(initialForm)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null)
@@ -177,12 +179,12 @@ export default function SettingsPage() {
       )
       const allOk = results.every((r) => r.success)
       if (allOk) {
-        showToast("تم حفظ الإعدادات بنجاح", "success")
+        showToast(t("settings.saved"), "success")
       } else {
-        showToast("فشل في حفظ بعض الإعدادات", "error")
+        showToast(t("settings.savePartialFail"), "error")
       }
     } catch {
-      showToast("فشل في حفظ الإعدادات", "error")
+      showToast(t("settings.saveFail"), "error")
     } finally {
       setSaving(false)
     }
@@ -222,11 +224,11 @@ export default function SettingsPage() {
 
   const saveHero = async () => {
     if (!heroForm.imageUrl) {
-      showToast("يرجى اختيار صورة", "error")
+      showToast(t("settings.pickImage"), "error")
       return
     }
     if (heroForm.selectedPages.length === 0) {
-      showToast("يرجى اختيار صفحة واحدة على الأقل", "error")
+      showToast(t("settings.pickPage"), "error")
       return
     }
 
@@ -239,30 +241,30 @@ export default function SettingsPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...heroForm, pageSlugs }),
         })
-        showToast("تم تحديث الصورة بنجاح", "success")
+        showToast(t("settings.imageUpdated"), "success")
       } else {
         await fetch("/api/admin/hero-images", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...heroForm, pageSlugs }),
         })
-        showToast("تم إضافة الصورة بنجاح", "success")
+        showToast(t("settings.imageAdded"), "success")
       }
       setShowHeroModal(false)
       fetchHeroImages()
     } catch {
-      showToast("حدث خطأ أثناء الحفظ", "error")
+      showToast(t("settings.saveError"), "error")
     }
   }
 
   const deleteHero = async (id: string) => {
-    if (!confirm("هل أنت متأكد من حذف هذه الصورة؟")) return
+    if (!confirm(t("settings.confirmDeleteImage"))) return
     try {
       await fetch(`/api/admin/hero-images/${id}`, { method: "DELETE" })
-      showToast("تم الحذف بنجاح", "success")
+      showToast(t("settings.deleted"), "success")
       fetchHeroImages()
     } catch {
-      showToast("فشل في الحذف", "error")
+      showToast(t("settings.deleteFailed"), "error")
     }
   }
 
@@ -304,8 +306,9 @@ export default function SettingsPage() {
   const getPageLabels = (pageSlugs: string) => {
     return pageSlugs.split(",").map(slug => {
       const page = pageOptions.find(p => p.slug === slug.trim())
-      return page?.labelAr || slug.trim()
-    }).join("، ")
+      if (!page) return slug.trim()
+      return lang === "ar" ? page.labelAr : page.labelEn
+    }).join(lang === "ar" ? "، " : ", ")
   }
 
   const toggleFilterPage = (slug: string) => {
@@ -326,8 +329,8 @@ export default function SettingsPage() {
       <div className="flex items-center gap-3">
         <Settings className="w-8 h-8 text-blue-600 dark:text-[#60a5fa]" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">إعدادات الموقع</h1>
-          <p className="text-sm text-gray-500 dark:text-[#94a3b8]">تكوين إعدادات وتفضيلات موقعك</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("settings.title")}</h1>
+          <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{t("settings.subtitle")}</p>
         </div>
       </div>
 
@@ -336,21 +339,21 @@ export default function SettingsPage() {
         <div className="bg-white rounded-lg shadow overflow-hidden dark:bg-[#1a2332] dark:border dark:border-[#2a3d56]">
           <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-200 bg-gray-50 dark:bg-[#111927] dark:border-[#2a3d56]">
             <Globe className="w-5 h-5 text-blue-600 dark:text-[#60a5fa]" />
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-[#f1f5f9]">الإعدادات العامة</h2>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-[#f1f5f9]">{t("settings.general")}</h2>
           </div>
           <div className="p-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">اسم الموقع بالعربية</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.siteNameAr")}</label>
                 <input type="text" value={form.siteNameAr} onChange={(e) => handleFieldChange("siteNameAr", e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" dir="rtl" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">اسم الموقع بالإنجليزية</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.siteNameEn")}</label>
                 <input type="text" value={form.siteNameEn} onChange={(e) => handleFieldChange("siteNameEn", e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">وصف الموقع</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.siteDescription")}</label>
               <textarea rows={3} value={form.siteDescription} onChange={(e) => handleFieldChange("siteDescription", e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
             </div>
           </div>
@@ -360,26 +363,26 @@ export default function SettingsPage() {
         <div className="bg-white rounded-lg shadow overflow-hidden dark:bg-[#1a2332] dark:border dark:border-[#2a3d56]">
           <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-200 bg-gray-50 dark:bg-[#111927] dark:border-[#2a3d56]">
             <Mail className="w-5 h-5 text-blue-600 dark:text-[#60a5fa]" />
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-[#f1f5f9]">معلومات الاتصال</h2>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-[#f1f5f9]">{t("settings.contactInfo")}</h2>
           </div>
           <div className="p-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                  <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> البريد الإلكتروني</span>
+                  <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> {t("common.email")}</span>
                 </label>
                 <input type="email" value={form.email} onChange={(e) => handleFieldChange("email", e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                  <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> رقم الهاتف</span>
+                  <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> {t("common.phone")}</span>
                 </label>
                 <input type="tel" value={form.phone} onChange={(e) => handleFieldChange("phone", e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> العنوان</span>
+                <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {t("settings.address")}</span>
               </label>
               <textarea rows={2} value={form.address} onChange={(e) => handleFieldChange("address", e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
             </div>
@@ -390,24 +393,24 @@ export default function SettingsPage() {
         <div className="bg-white rounded-lg shadow overflow-hidden dark:bg-[#1a2332] dark:border dark:border-[#2a3d56]">
           <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-200 bg-gray-50 dark:bg-[#111927] dark:border-[#2a3d56]">
             <Share2 className="w-5 h-5 text-blue-600 dark:text-[#60a5fa]" />
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-[#f1f5f9]">روابط التواصل الاجتماعي</h2>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-[#f1f5f9]">{t("settings.social")}</h2>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">فيسبوك</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.facebook")}</label>
                 <input type="url" value={form.facebook} onChange={(e) => handleFieldChange("facebook", e.target.value)} placeholder="https://facebook.com/..." className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">تويتر / إكس</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.twitterX")}</label>
                 <input type="url" value={form.twitter} onChange={(e) => handleFieldChange("twitter", e.target.value)} placeholder="https://twitter.com/..." className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">إنستغرام</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.instagram")}</label>
                 <input type="url" value={form.instagram} onChange={(e) => handleFieldChange("instagram", e.target.value)} placeholder="https://instagram.com/..." className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">يوتيوب</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.youtube")}</label>
                 <input type="url" value={form.youtube} onChange={(e) => handleFieldChange("youtube", e.target.value)} placeholder="https://youtube.com/..." className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
               </div>
             </div>
@@ -419,21 +422,21 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50 dark:bg-[#111927] dark:border-[#2a3d56]">
             <div className="flex items-center gap-3">
               <Image className="w-5 h-5 text-blue-600 dark:text-[#60a5fa]" />
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-[#f1f5f9]">صور الهيرو</h2>
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-[#f1f5f9]">{t("settings.hero")}</h2>
             </div>
             <button type="button" onClick={openAddHero} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
-              <Plus className="w-4 h-4" /> إضافة صورة
+              <Plus className="w-4 h-4" /> {t("settings.addImageNow")}
             </button>
           </div>
           <div className="p-6 space-y-4">
             {/* Page filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-[#cbd5e1]">تصفية حسب الصفحة</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-[#cbd5e1]">{t("settings.filterByPage")}</label>
               <div className="flex flex-wrap gap-2">
                 {pageOptions.map((page) => (
                   <button key={page.slug} type="button" onClick={() => toggleFilterPage(page.slug)} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${filterPages.includes(page.slug) ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
                     {filterPages.includes(page.slug) && <Check className="w-3.5 h-3.5" />}
-                    {page.labelAr}
+                    {lang === "ar" ? page.labelAr : page.labelEn}
                   </button>
                 ))}
               </div>
@@ -442,23 +445,23 @@ export default function SettingsPage() {
             {/* Hero images table */}
             <div className="border border-gray-200 rounded-lg overflow-x-auto">
               {heroLoading ? (
-                <div className="p-8 text-center text-gray-500">جاري التحميل...</div>
+                <div className="p-8 text-center text-gray-500">{t("common.loading")}</div>
               ) : heroImages.length === 0 ? (
                 <div className="p-8 text-center text-gray-500">
                   <Image className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                  <p>لا توجد صور هيرو</p>
-                  <button type="button" onClick={openAddHero} className="mt-2 text-blue-600 hover:underline text-sm">إضافة صورة الآن</button>
+                  <p>{t("settings.noHeroImages")}</p>
+                  <button type="button" onClick={openAddHero} className="mt-2 text-blue-600 hover:underline text-sm">{t("settings.addImageNow")}</button>
                 </div>
               ) : (
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-4 py-3 text-right font-medium text-gray-600 w-12"></th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-600">الصورة</th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-600">العنوان</th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-600">الصفحات</th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-600">الحالة</th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-600">الإجراءات</th>
+                      <th className="px-4 py-3 text-right font-medium text-gray-600">{t("settings.imageCol")}</th>
+                      <th className="px-4 py-3 text-right font-medium text-gray-600">{t("settings.titleCol")}</th>
+                      <th className="px-4 py-3 text-right font-medium text-gray-600">{t("settings.pagesCol")}</th>
+                      <th className="px-4 py-3 text-right font-medium text-gray-600">{t("common.status")}</th>
+                      <th className="px-4 py-3 text-right font-medium text-gray-600">{t("common.actions")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -476,20 +479,20 @@ export default function SettingsPage() {
                         <td className="px-4 py-3 text-gray-700">{hero.titleAr || "—"}</td>
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap gap-1">
-                            {getPageLabels(hero.pageSlugs).split("، ").map((label, i) => (
+                            {getPageLabels(hero.pageSlugs).split(lang === "ar" ? "، " : ", ").map((label, i) => (
                               <span key={i} className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">{label}</span>
                             ))}
                           </div>
                         </td>
                         <td className="px-4 py-3">
                           <button type="button" onClick={() => toggleHeroActive(hero)} className={`px-2 py-1 rounded-full text-xs font-medium ${hero.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                            {hero.isActive ? "نشط" : "معطل"}
+                            {hero.isActive ? t("settings.statusActive") : t("settings.statusDisabled")}
                           </button>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <button type="button" onClick={() => openEditHero(hero)} className="text-blue-600 hover:text-blue-800 text-xs">تعديل</button>
-                            <button type="button" onClick={() => deleteHero(hero.id)} className="text-red-600 hover:text-red-800 text-xs">حذف</button>
+                            <button type="button" onClick={() => openEditHero(hero)} className="text-blue-600 hover:text-blue-800 text-xs">{t("common.edit")}</button>
+                            <button type="button" onClick={() => deleteHero(hero.id)} className="text-red-600 hover:text-red-800 text-xs">{t("common.delete")}</button>
                           </div>
                         </td>
                       </tr>
@@ -505,18 +508,18 @@ export default function SettingsPage() {
         <div className="bg-white rounded-lg shadow overflow-hidden dark:bg-[#1a2332] dark:border dark:border-[#2a3d56]">
           <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-200 bg-gray-50 dark:bg-[#111927] dark:border-[#2a3d56]">
             <Search className="w-5 h-5 text-blue-600 dark:text-[#60a5fa]" />
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-[#f1f5f9]">إعدادات تحسين محركات البحث</h2>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-[#f1f5f9]">{t("settings.seo")}</h2>
           </div>
           <div className="p-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">العنوان الوصفي</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.metaTitle")}</label>
               <input type="text" value={form.metaTitle} onChange={(e) => handleFieldChange("metaTitle", e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
-              <p className="mt-1 text-xs text-gray-400 dark:text-[#7a8ba3]">{form.metaTitle.length}/60 حرف موصى به</p>
+              <p className="mt-1 text-xs text-gray-400 dark:text-[#7a8ba3]">{t("settings.metaTitleHint").replace("{n}", String(form.metaTitle.length))}</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">الوصف الوصفي</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.metaDescription")}</label>
               <textarea rows={3} value={form.metaDescription} onChange={(e) => handleFieldChange("metaDescription", e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
-              <p className="mt-1 text-xs text-gray-400 dark:text-[#7a8ba3]">{form.metaDescription.length}/160 حرف موصى به</p>
+              <p className="mt-1 text-xs text-gray-400 dark:text-[#7a8ba3]">{t("settings.metaDescHint").replace("{n}", String(form.metaDescription.length))}</p>
             </div>
           </div>
         </div>
@@ -524,7 +527,7 @@ export default function SettingsPage() {
         <div className="flex justify-end">
           <button type="submit" disabled={saving} className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm font-medium">
             <Save className="w-4 h-4" />
-            {saving ? "جاري الحفظ..." : "حفظ الإعدادات"}
+            {saving ? t("common.saving") : t("settings.saveSettings")}
           </button>
         </div>
       </form>
@@ -534,65 +537,65 @@ export default function SettingsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto dark:bg-[#1a2332] dark:border dark:border-[#2a3d56]">
             <div className="flex items-center justify-between px-6 py-4 border-b dark:border-[#2a3d56]">
-              <h3 className="text-lg font-semibold dark:text-[#f1f5f9]">{editingHero ? "تعديل صورة الهيرو" : "إضافة صورة هيرو جديدة"}</h3>
+              <h3 className="text-lg font-semibold dark:text-[#f1f5f9]">{editingHero ? t("settings.editHero") : t("settings.addHeroNew")}</h3>
               <button onClick={() => setShowHeroModal(false)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-[#cbd5e1]">الصورة</label>
-                <ImageUpload value={heroForm.imageUrl} onChange={(url) => setHeroForm((p) => ({ ...p, imageUrl: url }))} folder="hero" label="صورة الهيرو" />
+                <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-[#cbd5e1]">{t("settings.imageLabel")}</label>
+                <ImageUpload value={heroForm.imageUrl} onChange={(url) => setHeroForm((p) => ({ ...p, imageUrl: url }))} folder="hero" label={t("settings.heroImageUpload")} />
               </div>
 
               {/* Multi-page selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-[#cbd5e1]">اختر الصفحات</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-[#cbd5e1]">{t("settings.choosePages")}</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
                   {pageOptions.map((page) => (
                     <button key={page.slug} type="button" onClick={() => togglePageInForm(page.slug)} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all text-right ${heroForm.selectedPages.includes(page.slug) ? "bg-blue-100 text-blue-700 border border-blue-300" : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100"}`}>
                       <div className={`w-4 h-4 rounded border flex items-center justify-center ${heroForm.selectedPages.includes(page.slug) ? "bg-blue-600 border-blue-600" : "border-gray-300"}`}>
                         {heroForm.selectedPages.includes(page.slug) && <Check className="w-3 h-3 text-white" />}
                       </div>
-                      {page.labelAr}
+                      {lang === "ar" ? page.labelAr : page.labelEn}
                     </button>
                   ))}
                 </div>
                 {heroForm.selectedPages.length > 0 && (
-                  <p className="mt-1 text-xs text-gray-500">محدد: {heroForm.selectedPages.length} صفحة</p>
+                  <p className="mt-1 text-xs text-gray-500">{t("settings.selectedPages").replace("{n}", String(heroForm.selectedPages.length))}</p>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">العنوان بالعربية</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.titleAr")}</label>
                 <input type="text" value={heroForm.titleAr} onChange={(e) => setHeroForm((p) => ({ ...p, titleAr: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" dir="rtl" />
                 </div>
                 <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">العنوان بالإنجليزية</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.titleEn")}</label>
                 <input type="text" value={heroForm.titleEn} onChange={(e) => setHeroForm((p) => ({ ...p, titleEn: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">الوصف بالعربية</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.descAr")}</label>
                 <input type="text" value={heroForm.subtitleAr} onChange={(e) => setHeroForm((p) => ({ ...p, subtitleAr: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" dir="rtl" />
                 </div>
                 <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">الوصف بالإنجليزية</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.descEn")}</label>
                 <input type="text" value={heroForm.subtitleEn} onChange={(e) => setHeroForm((p) => ({ ...p, subtitleEn: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">رابط الضغط (اختياري)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("settings.linkUrl")}</label>
                 <input type="url" value={heroForm.linkUrl} onChange={(e) => setHeroForm((p) => ({ ...p, linkUrl: e.target.value }))} placeholder="https://..." className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]" />
               </div>
               <div className="flex items-center gap-2">
                 <input type="checkbox" id="heroActive" checked={heroForm.isActive} onChange={(e) => setHeroForm((p) => ({ ...p, isActive: e.target.checked }))} className="rounded border-gray-300 dark:border-[#3b4f6b]" />
-                <label htmlFor="heroActive" className="text-sm text-gray-700 dark:text-[#cbd5e1]">نشط</label>
+                <label htmlFor="heroActive" className="text-sm text-gray-700 dark:text-[#cbd5e1]">{t("settings.activeCheckbox")}</label>
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t bg-gray-50 rounded-b-xl">
-              <button type="button" onClick={() => setShowHeroModal(false)} className="px-4 py-2 text-gray-600 hover:text-gray-800 text-sm">إلغاء</button>
-              <button type="button" onClick={saveHero} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">{editingHero ? "تحديث" : "إضافة"}</button>
+              <button type="button" onClick={() => setShowHeroModal(false)} className="px-4 py-2 text-gray-600 hover:text-gray-800 text-sm">{t("common.cancel")}</button>
+              <button type="button" onClick={saveHero} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">{editingHero ? t("common.update") : t("common.add")}</button>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, Building2, Mail, Phone, Users, X } from "lucide-react"
 import ImageUpload from "@/components/admin/ImageUpload"
 import { TranslateInto } from "@/components/admin/AutoTranslate"
+import { useAdminLang } from "../admin-lang"
 
 interface BoardMember {
   id: string
@@ -81,6 +82,7 @@ const emptyForm: BoardFormData = {
 }
 
 export default function BoardManagement() {
+  const { lang, t } = useAdminLang()
   const [members, setMembers] = useState<BoardMember[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -200,8 +202,8 @@ export default function BoardManagement() {
         <div className="flex items-center gap-3">
            <Building2 className="w-8 h-8 text-blue-600 dark:text-[#60a5fa]" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">إدارة مجلس الإدارة</h1>
-            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">أعضاء مجلس الإدارة ومناصبهم</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("board.title")}</h1>
+            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{t("board.subtitle")}</p>
           </div>
         </div>
         <button
@@ -209,7 +211,7 @@ export default function BoardManagement() {
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
-          إضافة عضو مجلس
+          {t("board.add")}
         </button>
       </div>
 
@@ -228,7 +230,7 @@ export default function BoardManagement() {
         ) : members.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-[#94a3b8]">
             <Building2 className="h-12 w-12 mb-3 opacity-40 dark:text-[#60a5fa]" />
-            <p className="text-sm">لا يوجد أعضاء مجلس</p>
+            <p className="text-sm">{t("board.none")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -236,25 +238,25 @@ export default function BoardManagement() {
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60 dark:bg-[#111927] dark:border-[#2a3d56]">
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
-                      الاسم بالعربية
+                      {t("board.nameArCol")}
                     </th>
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
-                      المنصب بالعربية
+                      {t("board.positionArCol")}
                     </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
                     <span className="flex items-center gap-1.5">
                       <Mail className="h-3.5 w-3.5" />
-                      البريد
+                      {t("common.email")}
                     </span>
                   </th>
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
-                      الترتيب
+                      {t("board.orderCol")}
                     </th>
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
-                      الحالة
+                      {t("common.status")}
                     </th>
                     <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
-                      الإجراءات
+                      {t("common.actions")}
                     </th>
                 </tr>
               </thead>
@@ -284,7 +286,7 @@ export default function BoardManagement() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-[#cbd5e1]">
-                      {member.positionAr}
+                      {lang === "ar" ? member.positionAr : member.positionEn || member.positionAr}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-[#cbd5e1]">
                       <span className="flex items-center gap-1.5">
@@ -303,7 +305,7 @@ export default function BoardManagement() {
                             : "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-[#111927] dark:text-[#94a3b8] dark:border-[#2a3d56]"
                         }`}
                       >
-                        {member.isActive ? "نشط" : "غير نشط"}
+                        {member.isActive ? t("board.active") : t("board.inactive")}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -311,7 +313,7 @@ export default function BoardManagement() {
                         <button
                           onClick={() => openEditModal(member)}
                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors dark:text-[#60a5fa] dark:hover:bg-[#2a3d56]"
-                           title="تعديل"
+                           title={t("common.edit")}
                          >
                            <Pencil className="h-4 w-4 dark:text-[#60a5fa]" />
                         </button>
@@ -321,20 +323,20 @@ export default function BoardManagement() {
                               onClick={() => handleDelete(member.id)}
                                className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition-colors dark:hover:bg-red-800"
                             >
-                              تأكيد
+                              {t("common.confirm")}
                             </button>
                             <button
                               onClick={() => setDeleteConfirmId(null)}
                                className="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs rounded-md hover:bg-gray-300 transition-colors dark:bg-[#2a3d56] dark:text-[#cbd5e1] dark:hover:bg-[#3b4f6b]"
                             >
-                              إلغاء
+{t("common.cancel")}
                             </button>
                           </div>
                         ) : (
                           <button
                             onClick={() => setDeleteConfirmId(member.id)}
                              className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors dark:text-[#f87171] dark:hover:bg-[#2a3d56]"
-                             title="حذف"
+                             title={t("common.delete")}
                            >
                              <Trash2 className="h-4 w-4 dark:text-[#f87171]" />
                           </button>
@@ -358,7 +360,7 @@ export default function BoardManagement() {
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto dark:bg-[#1a2332]">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-[#2a3d56]">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f1f5f9]">
-                 {editingMember ? "تعديل عضو مجلس" : "إضافة عضو مجلس جديد"}
+                 {editingMember ? t("board.editTitle") : t("board.addNewTitle")}
               </h2>
               <button
                 onClick={closeModal}
@@ -372,8 +374,8 @@ export default function BoardManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#94a3b8]">
-                     الاسم بالعربية *
-                   </label>
+                      {t("board.nameArField")} *
+                    </label>
                    <input
                      type="text"
                      required
@@ -381,13 +383,13 @@ export default function BoardManagement() {
                      value={form.nameAr}
                      onChange={(e) => handleFieldChange("nameAr", e.target.value)}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                     placeholder="الاسم بالعربية"
+                     placeholder={t("board.nameArField")}
                    />
                  </div>
 <div>
                     <div className="flex items-center justify-between mb-1">
                       <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
-                        الاسم بالإنجليزية *
+                        {t("board.nameEnField")} *
                       </label>
                       <TranslateInto source={form.nameAr} target={form.nameEn} onTranslated={(t) => handleFieldChange("nameEn", t)} />
                     </div>
@@ -397,7 +399,7 @@ export default function BoardManagement() {
                      value={form.nameEn}
                      onChange={(e) => handleFieldChange("nameEn", e.target.value)}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                     placeholder="الاسم بالإنجليزية"
+                     placeholder={t("board.nameEnField")}
                   />
                 </div>
               </div>
@@ -405,7 +407,7 @@ export default function BoardManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#94a3b8]">
-                     المنصب *
+                     {t("board.positionField")} *
                    </label>
                    <select
                      required
@@ -417,29 +419,29 @@ export default function BoardManagement() {
                      }}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
                    >
-                     <option value="">اختر المنصب</option>
+                     <option value="">{t("board.choosePosition")}</option>
                      {POSITIONS.map((p) => (
-                       <option key={p.ar} value={p.ar}>{p.ar}</option>
+                       <option key={p.ar} value={p.ar}>{lang === "ar" ? p.ar : p.en}</option>
                      ))}
                    </select>
                  </div>
                  <div>
                    <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#94a3b8]">
-                     المنصب بالإنجليزية
+                     {t("board.positionEnField")}
                    </label>
                    <input
                      type="text"
                      readOnly
                      value={form.positionEn}
                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 dark:bg-[#0b1120] dark:border-[#2a3d56] dark:text-[#94a3b8] outline-none"
-                     placeholder="يملأ تلقائياً"
+                     placeholder={t("board.autoFill")}
                   />
                 </div>
               </div>
 
               <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#94a3b8]">
-                   نبذة بالعربية
+                   {t("board.bioAr")}
                  </label>
                  <textarea
                    rows={3}
@@ -447,14 +449,14 @@ export default function BoardManagement() {
                    value={form.bioAr}
                    onChange={(e) => handleFieldChange("bioAr", e.target.value)}
                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                   placeholder="نبذة بالعربية"
+                   placeholder={t("board.bioAr")}
                  />
                </div>
 
 <div>
                    <div className="flex items-center justify-between mb-1">
                      <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
-                       نبذة بالإنجليزية
+                       {t("board.bioEn")}
                      </label>
                      <TranslateInto source={form.bioAr} target={form.bioEn} onTranslated={(t) => handleFieldChange("bioEn", t)} />
                    </div>
@@ -463,7 +465,7 @@ export default function BoardManagement() {
                    value={form.bioEn}
                    onChange={(e) => handleFieldChange("bioEn", e.target.value)}
                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                   placeholder="نبذة بالإنجليزية"
+                   placeholder={t("board.bioEn")}
                 />
               </div>
 
@@ -472,7 +474,7 @@ export default function BoardManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
                     <span className="flex items-center gap-1.5">
                       <Mail className="h-3.5 w-3.5" />
-                      البريد *
+                      {t("common.email")} *
                     </span>
                   </label>
                   <input
@@ -488,7 +490,7 @@ export default function BoardManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
                     <span className="flex items-center gap-1.5">
                       <Phone className="h-3.5 w-3.5" />
-                      الهاتف
+                      {t("common.phone")}
                     </span>
                   </label>
                   <input
@@ -506,14 +508,14 @@ export default function BoardManagement() {
                   value={form.photo}
                   onChange={(url) => handleFieldChange("photo", url)}
                   folder="board"
-                  label="صورة العضو"
+                  label={t("board.photoLabel")}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                      الترتيب
+                      {t("board.orderCol")}
                     </label>
                   <input
                     type="number"
@@ -526,7 +528,7 @@ export default function BoardManagement() {
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                      الفترة
+                      {t("board.termField")}
                     </label>
                   <input
                     type="text"
@@ -538,15 +540,15 @@ export default function BoardManagement() {
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                      الحالة
+                      {t("common.status")}
                     </label>
                   <select
                     value={form.isActive}
                     onChange={(e) => handleFieldChange("isActive", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
                   >
-                    <option value="true">نشط</option>
-                    <option value="false">غير نشط</option>
+                    <option value="true">{t("board.active")}</option>
+                    <option value="false">{t("board.inactive")}</option>
                   </select>
                 </div>
               </div>
@@ -557,7 +559,7 @@ export default function BoardManagement() {
                   onClick={closeModal}
                   className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -565,10 +567,10 @@ export default function BoardManagement() {
                   className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting
-                    ? "جاري الحفظ..."
+                    ? t("common.saving")
                     : editingMember
-                      ? "تحديث العضو"
-                      : "إنشاء عضو"}
+                      ? t("board.updateMember")
+                      : t("board.createMember")}
                 </button>
               </div>
             </form>
