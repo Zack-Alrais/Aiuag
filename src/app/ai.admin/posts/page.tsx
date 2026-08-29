@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, FileText, Image, Film, Heart, MessageSquare, Calendar, X, Loader2 } from "lucide-react"
 import FileUpload from "@/components/admin/FileUpload"
+import { useAdminLang } from "../admin-lang"
 
 interface Post {
   id: string
@@ -25,6 +26,7 @@ interface PostFormData {
 const emptyForm: PostFormData = { content: "", images: [], videos: [] }
 
 export default function PostsManagement() {
+  const { lang, t } = useAdminLang()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -162,8 +164,8 @@ export default function PostsManagement() {
         <div className="flex items-center gap-3">
           <FileText className="w-8 h-8 text-blue-600 dark:text-[#60a5fa]" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">إدارة المنشورات</h1>
-            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">إدارة منشورات النظام الأساسي</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("posts.title")}</h1>
+            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{t("posts.subtitle")}</p>
           </div>
         </div>
         <button
@@ -171,7 +173,7 @@ export default function PostsManagement() {
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
-          إضافة منشور
+          {t("posts.add")}
         </button>
       </div>
 
@@ -190,7 +192,7 @@ export default function PostsManagement() {
             onClick={() => setFilterDate("")}
             className="text-sm text-blue-600 dark:text-[#60a5fa] hover:underline"
           >
-            إعادة تعيين
+            {t("posts.reset")}
           </button>
         )}
       </div>
@@ -210,30 +212,30 @@ export default function PostsManagement() {
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400">
             <FileText className="h-12 w-12 mb-3 opacity-40" />
-            <p className="text-sm">لا يوجد منشورات</p>
+            <p className="text-sm">{t("posts.none")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60 dark:bg-[#111927] dark:border-[#2a3d56]">
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">المحتوى</th>
+                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("posts.content")}</th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    <span className="flex items-center gap-1.5"><Image className="h-3.5 w-3.5" /> الصور</span>
+                    <span className="flex items-center gap-1.5"><Image className="h-3.5 w-3.5" /> {t("posts.images")}</span>
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    <span className="flex items-center gap-1.5"><Film className="h-3.5 w-3.5" /> الفيديو</span>
+                    <span className="flex items-center gap-1.5"><Film className="h-3.5 w-3.5" /> {t("posts.videos")}</span>
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    <span className="flex items-center gap-1.5"><Heart className="h-3.5 w-3.5" /> الإعجابات</span>
+                    <span className="flex items-center gap-1.5"><Heart className="h-3.5 w-3.5" /> {t("posts.likes")}</span>
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    <span className="flex items-center gap-1.5"><MessageSquare className="h-3.5 w-3.5" /> التعليقات</span>
+                    <span className="flex items-center gap-1.5"><MessageSquare className="h-3.5 w-3.5" /> {t("posts.comments")}</span>
                   </th>
                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
-                    <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> التاريخ</span>
+                    <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {t("common.date")}</span>
                   </th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">الإجراءات</th>
+                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-[#253347]">
@@ -243,7 +245,7 @@ export default function PostsManagement() {
                   return (
                     <tr key={post.id} className="transition-colors hover:bg-gray-50/50 dark:hover:bg-[#1e2d42]">
                       <td className="px-4 py-4 max-w-[300px]">
-                        <p className="text-sm text-gray-900 dark:text-[#f1f5f9] line-clamp-2 leading-relaxed" dir="rtl">
+                        <p className="text-sm text-gray-900 dark:text-[#f1f5f9] line-clamp-2 leading-relaxed" dir={lang === "ar" ? "rtl" : "ltr"}>
                           {truncate(post.content, 120)}
                         </p>
                       </td>
@@ -260,7 +262,7 @@ export default function PostsManagement() {
                         <span className="text-sm text-gray-600 dark:text-[#cbd5e1]">{post._count?.comments ?? 0}</span>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-[#94a3b8]">
-                        {new Date(post.createdAt).toLocaleDateString("ar-EG", {
+                        {new Date(post.createdAt).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", {
                           year: "numeric", month: "short", day: "numeric",
                         })}
                       </td>
@@ -269,7 +271,7 @@ export default function PostsManagement() {
                           <button
                             onClick={() => openEditModal(post)}
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="تعديل"
+                            title={t("common.edit")}
                           >
                             <Pencil className="h-4 w-4" />
                           </button>
@@ -279,20 +281,20 @@ export default function PostsManagement() {
                                 onClick={() => handleDelete(post.id)}
                                 className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition-colors"
                               >
-                                تأكيد
+                                {t("common.confirm")}
                               </button>
                               <button
                                 onClick={() => setDeleteConfirmId(null)}
                                 className="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs rounded-md hover:bg-gray-300 transition-colors"
                               >
-                                إلغاء
+                                {t("common.cancel")}
                               </button>
                             </div>
                           ) : (
                             <button
                               onClick={() => setDeleteConfirmId(post.id)}
                               className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                              title="حذف"
+                              title={t("common.delete")}
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -314,7 +316,7 @@ export default function PostsManagement() {
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto dark:bg-[#1a2332] dark:border dark:border-[#2a3d56]">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-[#2a3d56]">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f1f5f9]">
-                {editingPost ? "تعديل منشور" : "إضافة منشور جديد"}
+                {editingPost ? t("posts.edit") : t("posts.addNew")}
               </h2>
               <button
                 onClick={closeModal}
@@ -326,25 +328,25 @@ export default function PostsManagement() {
 
             <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">المحتوى</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">{t("posts.content")}</label>
                 <textarea
-                  dir="rtl"
+                  dir={lang === "ar" ? "rtl" : "ltr"}
                   required
                   value={form.content}
                   onChange={(e) => setForm(prev => ({ ...prev, content: e.target.value }))}
                   rows={5}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3] resize-y"
-                  placeholder="اكتب محتوى المنشور..."
+                  placeholder={t("posts.contentPlaceholder")}
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
-                    <span className="flex items-center gap-1.5"><Image className="h-3.5 w-3.5" /> الصور</span>
+                    <span className="flex items-center gap-1.5"><Image className="h-3.5 w-3.5" /> {t("posts.images")}</span>
                   </label>
                   <button type="button" onClick={addImageSlot} className="text-xs text-blue-600 dark:text-[#60a5fa] hover:underline">
-                    + إضافة صورة
+                    {t("posts.addImage")}
                   </button>
                 </div>
                 {form.images.map((url, i) => (
@@ -357,24 +359,24 @@ export default function PostsManagement() {
                         dir="ltr"
                         value={url}
                         onChange={(e) => updateImage(i, e.target.value)}
-                        placeholder="أو الصق رابط الصورة هنا..."
+                        placeholder={t("posts.pasteImage")}
                         className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
                       />
                     </div>
                   </div>
                 ))}
                 {form.images.length === 0 && (
-                  <p className="text-xs text-gray-400 dark:text-[#7a8ba3]">لا توجد صور مرفوعة. اضف "إضافة صورة" للرفع.</p>
+                  <p className="text-xs text-gray-400 dark:text-[#7a8ba3]">{t("posts.noImages")}</p>
                 )}
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#cbd5e1]">
-                    <span className="flex items-center gap-1.5"><Film className="h-3.5 w-3.5" /> الفيديو</span>
+                    <span className="flex items-center gap-1.5"><Film className="h-3.5 w-3.5" /> {t("posts.videos")}</span>
                   </label>
                   <button type="button" onClick={addVideoSlot} className="text-xs text-blue-600 dark:text-[#60a5fa] hover:underline">
-                    + إضافة فيديو
+                    {t("posts.addVideo")}
                   </button>
                 </div>
                 {form.videos.map((url, i) => (
@@ -387,14 +389,14 @@ export default function PostsManagement() {
                         dir="ltr"
                         value={url}
                         onChange={(e) => updateVideo(i, e.target.value)}
-                        placeholder="أو الصق رابط الفيديو هنا..."
+                        placeholder={t("posts.pasteVideo")}
                         className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
                       />
                     </div>
                   </div>
                 ))}
                 {form.videos.length === 0 && (
-                  <p className="text-xs text-gray-400 dark:text-[#7a8ba3]">لا توجد فيديوهات مرفوعة. اضف "إضافة فيديو" للرفع.</p>
+                  <p className="text-xs text-gray-400 dark:text-[#7a8ba3]">{t("posts.noVideos")}</p>
                 )}
               </div>
 
@@ -404,14 +406,14 @@ export default function PostsManagement() {
                   onClick={closeModal}
                   className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors dark:text-[#cbd5e1] dark:bg-[#1e2d42] dark:hover:bg-[#2a3d56]"
                 >
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
                 >
-                  {submitting ? "جاري الحفظ..." : editingPost ? "حفظ التغييرات" : "إضافة"}
+                  {submitting ? t("common.saving") : editingPost ? t("posts.save") : t("common.add")}
                 </button>
               </div>
             </form>

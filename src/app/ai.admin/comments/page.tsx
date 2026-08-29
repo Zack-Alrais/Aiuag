@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { MessageSquare, CheckCircle, XCircle, Trash2, ThumbsUp, Loader2, Search } from "lucide-react"
+import { useAdminLang } from "../admin-lang"
 
 interface PostComment {
   id: string
@@ -15,6 +16,7 @@ interface PostComment {
 }
 
 export default function CommentsManagement() {
+  const { lang, t } = useAdminLang()
   const [comments, setComments] = useState<PostComment[]>([])
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState<"all" | "approved" | "pending">("all")
@@ -75,17 +77,17 @@ export default function CommentsManagement() {
       <div className="flex items-center gap-3">
         <MessageSquare className="w-8 h-8 text-blue-600 dark:text-[#60a5fa]" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">إدارة التعليقات</h1>
-          <p className="text-sm text-gray-500 dark:text-[#94a3b8]">مراجعة وإدارة تعليقات المنشورات</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("comments.title")}</h1>
+          <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{t("comments.subtitle")}</p>
         </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex gap-2 flex-wrap">
           {([
-            { value: "all", label: "الكل" },
-            { value: "pending", label: "قيد المراجعة" },
-            { value: "approved", label: "مقبول" },
+            { value: "all", label: t("common.all") },
+            { value: "pending", label: t("comments.pendingReview") },
+            { value: "approved", label: t("common.approved") },
           ] as const).map((item) => (
             <button
               key={item.value}
@@ -104,7 +106,7 @@ export default function CommentsManagement() {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
           <input
             type="text"
-            placeholder="بحث في التعليقات..."
+            placeholder={t("comments.search")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
@@ -116,24 +118,24 @@ export default function CommentsManagement() {
         {loading ? (
           <div className="flex items-center justify-center py-20 text-gray-400">
             <Loader2 className="w-5 h-5 animate-spin mr-2" />
-            جاري تحميل التعليقات...
+            {t("comments.loading")}
           </div>
         ) : filteredComments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400">
             <MessageSquare className="h-12 w-12 mb-3 opacity-40" />
-            <p className="text-sm">لا يوجد تعليقات</p>
+            <p className="text-sm">{t("comments.none")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60 dark:bg-[#111927] dark:border-[#2a3d56]">
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">العضو</th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">المنشور</th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">التعليق</th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">التاريخ</th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">الحالة</th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">الإجراءات</th>
+                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("comments.member")}</th>
+                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("comments.post")}</th>
+                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("comments.comment")}</th>
+                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.date")}</th>
+                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.status")}</th>
+                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-[#253347]">
@@ -153,12 +155,12 @@ export default function CommentsManagement() {
                       </p>
                     </td>
                     <td className="px-4 py-4 max-w-[250px]">
-                      <p className="text-sm text-gray-700 dark:text-[#e2e8f0] leading-relaxed" dir="rtl">
+                      <p className="text-sm text-gray-700 dark:text-[#e2e8f0] leading-relaxed" dir={lang === "ar" ? "rtl" : "ltr"}>
                         {truncate(comment.content, 100)}
                       </p>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-[#94a3b8]">
-                      {new Date(comment.createdAt).toLocaleDateString("ar-EG", {
+                      {new Date(comment.createdAt).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", {
                         year: "numeric", month: "short", day: "numeric",
                       })}
                     </td>
@@ -168,7 +170,7 @@ export default function CommentsManagement() {
                           ? "bg-green-100 text-green-700 border border-green-200"
                           : "bg-yellow-100 text-yellow-700 border border-yellow-200"
                       }`}>
-                        {comment.isApproved ? "مقبول" : "قيد المراجعة"}
+                        {comment.isApproved ? t("common.approved") : t("comments.pendingReview")}
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
@@ -180,7 +182,7 @@ export default function CommentsManagement() {
                               ? "text-yellow-600 hover:bg-yellow-50"
                               : "text-green-600 hover:bg-green-50"
                           }`}
-                          title={comment.isApproved ? "إلغاء الموافقة" : "موافقة"}
+                          title={comment.isApproved ? t("comments.unapprove") : t("comments.approve")}
                         >
                           {comment.isApproved ? <XCircle className="h-4 w-4" /> : <ThumbsUp className="h-4 w-4" />}
                         </button>
@@ -190,20 +192,20 @@ export default function CommentsManagement() {
                               onClick={() => handleDelete(comment.id)}
                               className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition-colors"
                             >
-                              تأكيد
+                              {t("common.confirm")}
                             </button>
                             <button
                               onClick={() => setDeleteConfirmId(null)}
                               className="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs rounded-md hover:bg-gray-300 transition-colors"
                             >
-                              إلغاء
+                              {t("common.cancel")}
                             </button>
                           </div>
                         ) : (
                           <button
                             onClick={() => setDeleteConfirmId(comment.id)}
                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                            title="حذف"
+                            title={t("common.delete")}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
