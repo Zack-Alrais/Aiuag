@@ -13,6 +13,7 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import FileUpload from "@/components/admin/FileUpload"
+import { useAdminLang } from "../admin-lang"
 
 interface SecretariatMember {
   id: string
@@ -80,6 +81,7 @@ function SortableCard({
   onToggle: () => void
   isOpen: boolean
 }) {
+  const { t } = useAdminLang()
   const stableId = item?.id ?? `vacant-${levelIndex}-${slotIndex}`
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: stableId,
@@ -96,8 +98,8 @@ function SortableCard({
     return (
       <div className="border-2 border-dashed border-gray-400 dark:border-gray-500 rounded-2xl p-4 text-center min-h-[160px] flex flex-col items-center justify-center opacity-50">
         <User className="w-10 h-10 text-gray-400 mb-2" />
-        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">شاغر</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500">Vacant</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{t("secretariat.vacant")}</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500">{t("secretariat.vacant")}</p>
       </div>
     )
   }
@@ -115,7 +117,7 @@ function SortableCard({
             {...listeners}
             className="flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-grab active:cursor-grabbing text-gray-500 touch-target"
             role="button"
-            aria-label="سحب لإعادة الترتيب"
+            aria-label={t("secretariat.dragAria")}
           >
             <GripVertical className="w-5 h-5" />
           </div>
@@ -123,7 +125,7 @@ function SortableCard({
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(item) }}
               className="p-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors touch-target"
-              aria-label="تعديل العضو"
+              aria-label={t("secretariat.editAria")}
             >
               <Pencil className="w-4 h-4" />
             </button>
@@ -133,20 +135,20 @@ function SortableCard({
                   onClick={(e) => { e.stopPropagation(); onDelete(item.id) }}
                   className="px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors touch-target"
                 >
-                  تأكيد
+                  {t("common.confirm")}
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); onDelete(null as any) }}
                   className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors touch-target"
                 >
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
               </div>
             ) : (
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete(item.id) }}
                 className="p-2.5 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors touch-target"
-                aria-label="حذف العضو"
+                aria-label={t("secretariat.deleteAria")}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -203,6 +205,7 @@ function LevelSection({
   deleteConfirmId: string | null
   onReorder: (orders: { id: string; order: number }[]) => void
 }) {
+  const { lang, t } = useAdminLang()
   const level = LEVELS[levelIndex]
   const [expanded, setExpanded] = useState(true)
 
@@ -245,7 +248,7 @@ function LevelSection({
           className={`inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2 rounded-full text-sm sm:text-base font-bold text-white bg-gradient-to-r ${level.color} shadow-md hover:shadow-lg transition-all touch-target`}
         >
           <LevelIcon icon={level.icon} />
-          {level.label}
+          {lang === "ar" ? level.label : level.labelEn}
           <span className="opacity-90 font-medium">({items.filter(Boolean).length}/{items.length})</span>
           {expanded ? <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5" /> : <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />}
         </button>
@@ -307,6 +310,7 @@ function LevelSection({
 }
 
 export default function SecretariatManagement() {
+  const { lang, t } = useAdminLang()
   const [items, setItems] = useState<SecretariatMember[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -428,8 +432,8 @@ export default function SecretariatManagement() {
         <div className="flex items-center gap-3">
           <Users className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400" />
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">الأمانة العامة</h1>
-            <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">{items.length} عضو مسجل</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("secretariat.title")}</h1>
+            <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">{t("secretariat.count").replace("{n}", String(items.length))}</p>
           </div>
         </div>
         <button
@@ -437,7 +441,7 @@ export default function SecretariatManagement() {
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors text-sm font-medium touch-target w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">إضافة عضو</span>
+          <span className="hidden sm:inline">{t("secretariat.addBtn")}</span>
         </button>
       </div>
 
@@ -446,14 +450,14 @@ export default function SecretariatManagement() {
         {loading ? (
           <div className="flex items-center justify-center py-16 text-gray-500 dark:text-gray-400">
             <Users className="h-5 w-5 animate-spin mr-2 sm:mr-3" />
-            <span className="text-sm sm:text-base">جاري تحميل الأعضاء...</span>
+            <span className="text-sm sm:text-base">{t("secretariat.loading")}</span>
           </div>
         ) : items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-gray-500 dark:text-gray-400">
             <Users className="h-10 w-10 sm:h-12 sm:w-12 mb-3 opacity-40" />
-            <p className="text-sm sm:text-base mb-3">لا يوجد أعضاء</p>
+            <p className="text-sm sm:text-base mb-3">{t("secretariat.empty")}</p>
             <button onClick={openAddModal} className="text-blue-600 dark:text-blue-400 text-sm font-medium underline touch-target py-2">
-              إضافة أول عضو
+              {t("secretariat.addFirst")}
             </button>
           </div>
         ) : (
@@ -486,12 +490,12 @@ export default function SecretariatManagement() {
           <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-y-auto">
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10 rounded-t-2xl">
               <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-                {editingItem ? "تعديل عضو" : "إضافة عضو جديد"}
+                {editingItem ? t("secretariat.editTitle") : t("secretariat.addTitle")}
               </h2>
               <button
                 onClick={closeModal}
                 className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors touch-target"
-                aria-label="إغلاق"
+                aria-label={t("secretariat.closeAria")}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -500,51 +504,51 @@ export default function SecretariatManagement() {
             <form onSubmit={handleSubmit} className="px-4 sm:px-6 py-4 sm:py-5 space-y-4 sm:space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">الاسم بالعربية *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t("secretariat.nameArLabel")} *</label>
                   <input type="text" required dir="rtl" value={form.name}
                     onChange={(e) => handleFieldChange("name", e.target.value)}
                     className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all touch-target"
-                    placeholder="الاسم بالعربية" />
+                    placeholder={t("secretariat.nameArPh")} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">الاسم بالإنجليزية *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t("secretariat.nameEnLabel")} *</label>
                   <input type="text" required value={form.nameEn}
                     onChange={(e) => handleFieldChange("nameEn", e.target.value)}
                     className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all touch-target"
-                    placeholder="Name in English" />
+                    placeholder={t("secretariat.nameEnPh")} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">المنصب بالعربية *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t("secretariat.roleArLabel")} *</label>
                   <input type="text" required dir="rtl" value={form.role}
                     onChange={(e) => handleFieldChange("role", e.target.value)}
                     className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all touch-target"
-                    placeholder="المنصب بالعربية" />
+                    placeholder={t("secretariat.roleArPh")} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">المنصب بالإنجليزية</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t("secretariat.roleEnLabel")}</label>
                   <input type="text" value={form.roleEn}
                     onChange={(e) => handleFieldChange("roleEn", e.target.value)}
                     className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all touch-target"
-                    placeholder="Role in English" />
+                    placeholder={t("secretariat.roleEnPh")} />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">نبذة</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t("secretariat.bioLabel")}</label>
                 <textarea rows={3} dir="rtl" value={form.bio}
                   onChange={(e) => handleFieldChange("bio", e.target.value)}
                   className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-y touch-target"
-                  placeholder="نبذة عن العضو" />
+                  placeholder={t("secretariat.bioPh")} />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-1.5">
                     <Phone className="h-4 w-4" />
-                    الهاتف
+                    {t("common.phone")}
                   </label>
                   <input type="tel" value={form.phone}
                     onChange={(e) => handleFieldChange("phone", e.target.value)}
@@ -554,7 +558,7 @@ export default function SecretariatManagement() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-1.5">
                     <Mail className="h-4 w-4" />
-                    البريد الإلكتروني
+                    {t("common.email")}
                   </label>
                   <input type="email" value={form.email}
                     onChange={(e) => handleFieldChange("email", e.target.value)}
@@ -564,7 +568,7 @@ export default function SecretariatManagement() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">الترتيب</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t("secretariat.orderLabel")}</label>
                 <input type="number" min="1" max="29" value={form.order}
                   onChange={(e) => handleFieldChange("order", e.target.value)}
                   className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all touch-target"
@@ -572,18 +576,18 @@ export default function SecretariatManagement() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">الصورة الشخصية</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t("secretariat.imageLabel")}</label>
                 <FileUpload value={form.image} onChange={(url) => handleFieldChange("image", url)} folder="secretariat" type="image" />
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button type="button" onClick={closeModal}
                   className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors touch-target w-full sm:w-auto">
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
                 <button type="submit" disabled={submitting}
                   className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-target w-full sm:w-auto">
-                  {submitting ? "جاري الحفظ..." : editingItem ? "تحديث العضو" : "إنشاء عضو"}
+                  {submitting ? t("common.saving") : editingItem ? t("secretariat.updateBtn") : t("secretariat.createBtn")}
                 </button>
               </div>
             </form>
