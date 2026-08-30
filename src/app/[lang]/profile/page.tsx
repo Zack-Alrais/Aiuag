@@ -19,6 +19,7 @@ import { GENDERS, DEGREES, SECTORS, MEMBERSHIP_TYPES, COUNTRY_NAMES } from "@/li
 
 interface ProfileData {
   id: string
+  memberId: string
   name: string
   email: string
   image: string | null
@@ -561,7 +562,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
 
         {/* === POSTS TAB === */}
         {activeTab === "posts" && (
-          <PostsTab memberId={profile.id} isArabic={isArabic} />
+          <PostsTab memberId={profile.memberId || profile.id} isArabic={isArabic} />
         )}
       </div>
 

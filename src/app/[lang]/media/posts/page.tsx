@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import { toast } from "sonner";
 import ScrollReveal from "@/components/ui/scroll-reveal";
+import { useMember } from "@/hooks/use-member";
 import {
   Heart,
   MessageCircle,
@@ -16,6 +18,8 @@ import {
   MoreHorizontal,
   User,
   Globe,
+  Link2,
+  ExternalLink,
 } from "lucide-react";
 
 interface Author {
@@ -89,7 +93,7 @@ function timeAgo(dateStr: string, isAr: boolean): string {
   return date.toLocaleDateString(isAr ? "ar" : "en", { month: "short", day: "numeric" });
 }
 
-function parseMedia(jsonStr: string | null): string[] {
+function parseMedia(jsonStr: string | null | undefined): string[] {
   if (!jsonStr) return [];
   try { const p = JSON.parse(jsonStr); return Array.isArray(p) ? p : []; } catch { return []; }
 }
@@ -98,29 +102,28 @@ function highlightMentions(text: string) {
   return text.replace(/@(\w+)/g, '<span class="text-blue-500 font-semibold">@$1</span>');
 }
 
-function Avatar({ src, name, size = 40 }: { src?: string | null; name?: string; size?: number }) {
+function Avatar({ src, name, size = 40 }: { src?: string | null | undefined; name?: string; size?: number }) {
+  const [error, setError] = useState(false);
+  const showFallback = !src || error;
   const initials = name ? name.charAt(0) : "?";
-  if (src) {
+  if (showFallback) {
     return (
-      <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
-        <Image
-          src={src}
-          alt={name || ""}
-          width={size}
-          height={size}
-          className="rounded-full object-cover"
-          unoptimized
-          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-        />
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold" style={{ fontSize: size * 0.4 }}>
-          {initials}
-        </div>
+      <div className="rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold flex-shrink-0" style={{ width: size, height: size, fontSize: size * 0.4 }}>
+        {initials}
       </div>
     );
   }
   return (
-    <div className="rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold flex-shrink-0" style={{ width: size, height: size, fontSize: size * 0.4 }}>
-      {initials}
+    <div className="relative flex-shrink-0 rounded-full overflow-hidden" style={{ width: size, height: size }}>
+      <Image
+        src={src}
+        alt={name || ""}
+        width={size}
+        height={size}
+        className="rounded-full object-cover w-full h-full"
+        unoptimized
+        onError={() => setError(true)}
+      />
     </div>
   );
 }
@@ -346,26 +349,38 @@ function ImageCropper({ src, onSave, onCancel, lang }: { src: string; onSave: (u
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={onCancel}>
-      <div className="bg-white dark:bg-[#111927] rounded-2xl w-full max-w-lg shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="bg-white dark:bg-[#111927] rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90dvh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="p-4 border-b border-gray-200 dark:border-[#3b4f6b] flex items-center justify-between">
           <h3 className="font-bold text-gray-900 dark:text-white">{isAr ? "قص الصورة" : "Crop Image"}</h3>
           <button onClick={onCancel} className="p-1 hover:bg-gray-100 dark:hover:bg-[#1e2d42] rounded-full"><X className="w-5 h-5" /></button>
         </div>
-        <div className="p-4">
-          <div className="flex gap-2 mb-3 justify-center">
+        <div className="p-4 pb-0">
+          <div className="flex gap-2 mb-3 justify-center flex-wrap">
             {(["free", "1:1", "4:3", "16:9"] as const).map((a) => (
               <button key={a} onClick={() => setAspect(a)} className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${aspect === a ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-[#1e2d42] text-gray-700 dark:text-gray-300"}`}>
                 {a === "free" ? (isAr ? "حر" : "Free") : a}
               </button>
             ))}
           </div>
-          <div className="flex justify-center bg-gray-50 dark:bg-[#0d1525] rounded-xl p-2">
-            <canvas ref={canvasRef} className="max-h-[400px] object-contain" />
-          </div>
         </div>
-        <div className="p-4 border-t border-gray-200 dark:border-[#3b4f6b] flex justify-end gap-2">
+        {/* Cropper viewport: fixed height, overflow hidden, never sized by the image */}
+        <div className="relative flex-1 min-h-0 h-60 sm:h-72 md:h-80 mx-4 my-3 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-[#0d1525] rounded-xl">
+          {!loaded ? (
+            <div className="w-8 h-8 border-2 border-gray-300 dark:border-[#3b4f6b] border-t-blue-600 rounded-full animate-spin" />
+          ) : (
+            <canvas
+              ref={canvasRef}
+              className="block"
+              style={{ maxWidth: "100%", maxHeight: "100%", width: "auto", height: "auto" }}
+            />
+          )}
+        </div>
+        <div className="p-4 border-t border-gray-200 dark:border-[#3b4f6b] flex justify-end gap-2 mt-auto">
           <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] rounded-xl">{isAr ? "إلغاء" : "Cancel"}</button>
-          <button onClick={handleSave} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-xl font-semibold">{isAr ? "حفظ" : "Save"}</button>
+          <button onClick={handleSave} disabled={!loaded} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed text-white text-sm rounded-xl font-semibold">{isAr ? "حفظ" : "Save"}</button>
         </div>
       </div>
     </div>
@@ -398,8 +413,8 @@ function PostCard({
 }: {
   post: Post; member: MemberData | null; lang: string;
   onReact: (postId: string, type: string) => void;
-  onComment: (postId: string, content: string) => void;
-  onShare: (postId: string) => void;
+  onComment: (postId: string, content: string) => Promise<Comment | null>;
+  onShare: (post: Post) => void;
   onRepost: (post: Post) => void;
 }) {
   const isAr = lang === "ar";
@@ -429,14 +444,17 @@ function PostCard({
     } catch {} finally { setLoadingComments(false); }
   };
 
-  const handleComment = () => {
+  const handleComment = async () => {
     if (!commentText.trim() || !member) return;
-    onComment(post.id, commentText.trim());
-    setComments((prev) => [...prev, {
-      id: Date.now().toString(), content: commentText.trim(), createdAt: new Date().toISOString(),
-      memberId: member.id, memberName: member.name, memberImage: member.image,
-    }]);
+    const text = commentText.trim();
     setCommentText("");
+    const created = await onComment(post.id, text);
+    if (created) {
+      setComments((prev) => [...prev, created]);
+    } else {
+      toast.error(isAr ? "فشل إرسال التعليق" : "Failed to send comment");
+      setCommentText(text);
+    }
   };
 
   const author = post.author || { id: "", name: isAr ? "عضو" : "Member", image: null };
@@ -549,7 +567,7 @@ function PostCard({
             <MessageCircle className="w-5 h-5" />
             {isAr ? "تعليق" : "Comment"}
           </button>
-          <button onClick={() => onRepost(post)} className="flex-1 py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors">
+          <button onClick={() => onShare(post)} className="flex-1 py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors">
             <Share2 className="w-5 h-5" />
             {isAr ? "مشاركة" : "Share"}
           </button>
@@ -652,21 +670,121 @@ function RepostModal({ post, member, lang, onClose, onPost }: { post: Post; memb
   );
 }
 
+// ========== SHARE MODAL ==========
+function ShareModal({ post, member, lang, onClose, onRepost, onShared }: {
+  post: Post; member: MemberData; lang: string; onClose: () => void;
+  onRepost: (post: Post) => void; onShared: (postId: string) => void;
+}) {
+  const isAr = lang === "ar";
+  const [sharing, setSharing] = useState(false);
+
+  const postUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/${lang}/media/posts`
+    : "";
+
+  const recordShare = async (): Promise<boolean> => {
+    try {
+      const res = await fetch(`/api/posts/${post.id}/share`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberId: member.id }),
+      });
+      const data = await res.json().catch(() => null);
+      if (res.ok && (data?.shared !== undefined ? data.shared : true)) {
+        onShared(post.id);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleShare = async () => {
+    setSharing(true);
+    const recorded = await recordShare();
+    try {
+      // Prefer the native Web Share API when available
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share({ title: post.content, text: post.content, url: postUrl });
+      } else if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(postUrl);
+        toast.success(isAr ? "تم نسخ رابط المشاركة" : "Share link copied");
+      }
+      if (recorded) {
+        toast.success(isAr ? "تمت مشاركة المنشور" : "Post shared");
+      }
+    } catch {
+      // User dismissed the native share sheet or clipboard failed
+      if (recorded) {
+        toast.success(isAr ? "تمت مشاركة المنشور" : "Post shared");
+      }
+    } finally {
+      setSharing(false);
+      onClose();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white dark:bg-[#111927] rounded-2xl w-full max-w-lg shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="p-4 border-b border-gray-200 dark:border-[#3b4f6b] flex items-center justify-between">
+          <h3 className="font-bold text-gray-900 dark:text-white">{isAr ? "مشاركة المنشور" : "Share Post"}</h3>
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-[#1e2d42] rounded-full"><X className="w-5 h-5" /></button>
+        </div>
+        <div className="p-4 space-y-3">
+          <button
+            onClick={handleShare}
+            disabled={sharing}
+            className="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl transition-colors disabled:opacity-50"
+          >
+            <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0">
+              <ExternalLink className="w-5 h-5" />
+            </div>
+            <div className="text-start flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{isAr ? "مشاركة عبر رابط" : "Share via link"}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{isAr ? "نسخ الرابط أو مشاركته عبر التطبيقات" : "Copy the link or share it with other apps"}</p>
+            </div>
+          </button>
+          <button
+            onClick={() => { onClose(); onRepost(post); }}
+            className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-[#1e2d42] hover:bg-gray-100 dark:hover:bg-[#2a3f5f] rounded-xl transition-colors"
+          >
+            <div className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center shrink-0">
+              <Repeat2 className="w-5 h-5" />
+            </div>
+            <div className="text-start flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{isAr ? "إعادة نشر" : "Repost"}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{isAr ? "نشر المنشور على ملفك الشخصي" : "Publish this post on your profile"}</p>
+            </div>
+          </button>
+          <div className="bg-gray-50 dark:bg-[#0d1525] rounded-xl p-3 border border-gray-200 dark:border-[#1e2d42]">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{isAr ? "المشاركة الأصلية" : "Original post"}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3" dir="rtl">{post.content}</p>
+          </div>
+        </div>
+        <div className="p-4 border-t border-gray-200 dark:border-[#3b4f6b] flex justify-end">
+          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] rounded-xl">{isAr ? "إلغاء" : "Cancel"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ========== MAIN PAGE ==========
 export default function MediaPostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [member, setMember] = useState<MemberData | null>(null);
+  const { member } = useMember();
   const [lang, setLang] = useState("ar");
   const [repostPost, setRepostPost] = useState<Post | null>(null);
+  const [sharePost, setSharePost] = useState<Post | null>(null);
 
   useEffect(() => {
     const savedLang = localStorage.getItem("lang") || "ar";
     setLang(savedLang);
-    const savedMember = localStorage.getItem("memberData");
-    if (savedMember) { try { setMember(JSON.parse(savedMember)); } catch {} }
   }, []);
 
   const fetchPosts = useCallback(async (pageNum: number, append = false) => {
@@ -696,24 +814,30 @@ export default function MediaPostsPage() {
     } catch {}
   };
 
-  const handleComment = async (postId: string, content: string) => {
-    if (!member) return;
+  const handleComment = async (postId: string, content: string): Promise<Comment | null> => {
+    if (!member) return null;
     try {
-      await fetch(`/api/posts/${postId}/comments`, {
+      const res = await fetch(`/api/posts/${postId}/comments`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ memberId: member.id, content }),
       });
-    } catch {}
+      if (!res.ok) return null;
+      const created = await res.json();
+      return {
+        id: created.id,
+        content: created.content,
+        createdAt: created.createdAt,
+        memberId: created.memberId ?? member.id,
+        memberName: created.memberName ?? member.name,
+        memberImage: created.memberImage ?? member.image,
+      } as Comment;
+    } catch { return null; }
   };
 
-  const handleShare = async (postId: string) => {
-    if (!member) return;
-    try {
-      await fetch(`/api/posts/${postId}/share`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberId: member.id }),
-      });
-    } catch {}
+  const handleShared = (postId: string) => {
+    setPosts((prev) =>
+      prev.map((p) => (p.id === postId ? { ...p, sharesCount: (p._count?.shares ?? p.sharesCount ?? 0) + 1 } : p))
+    );
   };
 
   const handleNewPost = (post: Post) => {
@@ -743,7 +867,7 @@ export default function MediaPostsPage() {
         ) : (
           <div className="space-y-4">
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} member={member} lang={lang} onReact={handleReact} onComment={handleComment} onShare={handleShare} onRepost={setRepostPost} />
+              <PostCard key={post.id} post={post} member={member} lang={lang} onReact={handleReact} onComment={handleComment} onShare={setSharePost} onRepost={setRepostPost} />
             ))}
           </div>
         )}
@@ -769,6 +893,9 @@ export default function MediaPostsPage() {
       </ScrollReveal>
       {repostPost && member && (
         <RepostModal post={repostPost} member={member} lang={lang} onClose={() => setRepostPost(null)} onPost={handleNewPost} />
+      )}
+      {sharePost && member && (
+        <ShareModal post={sharePost} member={member} lang={lang} onClose={() => setSharePost(null)} onRepost={setRepostPost} onShared={handleShared} />
       )}
 
       <style jsx global>{`

@@ -24,18 +24,38 @@ export async function GET(
     });
 
     const memberIds = [...new Set(comments.flatMap((c) => [c.memberId, ...c.replies.map((r) => r.memberId)]))];
+
     const members = memberIds.length > 0
       ? await prisma.member.findMany({
           where: { id: { in: memberIds } },
-          include: { user: { select: { name: true, email: true } } },
+          include: { user: { select: { name: true, email: true, image: true } } },
         })
       : [];
-
-    const memberMap = Object.fromEntries(
-      members.map((m) => [m.id, { id: m.id, name: m.user.name, email: m.user.email }])
+    const memberMap = new Map(
+      members.map((m) => [
+        m.id,
+        { id: m.id, name: m.user.name, email: m.user.email, image: m.user.image },
+      ])
     );
 
-    const enrich = (c: any) => ({ ...c, memberName: memberMap[c.memberId]?.name ?? null, member: memberMap[c.memberId] ?? null });
+    // Fallback: legacy data may be keyed by the User id instead of the Member id.
+    const unresolvedIds = memberIds.filter((id) => !memberMap.has(id));
+    if (unresolvedIds.length > 0) {
+      const users = await prisma.user.findMany({
+        where: { id: { in: unresolvedIds } },
+        select: { id: true, name: true, email: true, image: true },
+      });
+      for (const u of users) {
+        memberMap.set(u.id, { id: u.id, name: u.name, email: u.email, image: u.image });
+      }
+    }
+
+    const enrich = (c: any) => ({
+      ...c,
+      memberName: memberMap.get(c.memberId)?.name ?? null,
+      memberImage: memberMap.get(c.memberId)?.image ?? null,
+      member: memberMap.get(c.memberId) ?? null,
+    });
 
     const enriched = comments.map((c) => ({
       ...enrich(c),
@@ -73,19 +93,41 @@ export async function POST(
       }
     }
 
-    const comment = await prisma.postComment.create({
-      data: { postId: id, memberId, content, parentId: parentId || null, isApproved: true },
-    });
-
     const member = await prisma.member.findUnique({
       where: { id: memberId },
-      include: { user: { select: { name: true } } },
+      include: { user: { select: { name: true, image: true } } },
+    });
+
+    // Resolve legacy comments keyed by the User id instead of the Member id.
+    let resolvedMemberId = memberId;
+    let memberName: string | null = member?.user?.name ?? null;
+    let memberImage: string | null = member?.user?.image ?? null;
+    if (!member) {
+      const user = await prisma.user.findUnique({
+        where: { id: memberId },
+        select: { id: true, name: true, image: true },
+      });
+      if (user) {
+        memberName = user.name;
+        memberImage = user.image;
+      } else {
+        return NextResponse.json({ error: "Member not found" }, { status: 404 });
+      }
+    }
+
+    const comment = await prisma.postComment.create({
+      data: { postId: id, memberId: resolvedMemberId, content, parentId: parentId || null, isApproved: true },
     });
 
     return NextResponse.json({
       ...comment,
-      memberName: member?.user?.name ?? null,
-      member: member ? { id: member.id, name: member.user.name } : null,
+      memberName,
+      memberImage,
+      member: {
+        id: resolvedMemberId,
+        name: memberName,
+        image: memberImage,
+      },
     }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: "Failed to create comment" }, { status: 500 });

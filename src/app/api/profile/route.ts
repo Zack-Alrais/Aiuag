@@ -46,6 +46,7 @@ export async function GET() {
 
     const profile = {
       id: user.id,
+      memberId: m?.id || "",
       name: user.name,
       email: user.email,
       image: user.image,
@@ -161,6 +162,7 @@ export async function PATCH(request: Request) {
     const m = updatedUser.member;
     return NextResponse.json({
       id: updatedUser.id,
+      memberId: m?.id || "",
       name: updatedUser.name,
       email: updatedUser.email,
       image: updatedUser.image,

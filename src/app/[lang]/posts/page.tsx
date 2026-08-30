@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import {
-  Heart, MessageCircle, Share2, ChevronLeft, ChevronRight, X, Play,
-  Image as ImageIcon, Send, Loader2, User, Calendar,
+  Heart, MessageCircle, Share2, ChevronLeft, ChevronRight, X,
+  Image as ImageIcon, Send, Loader2, Calendar,
 } from "lucide-react";
 import Link from "next/link";
 import CustomVideoPlayer from "@/components/ui/custom-video-player";
 import { PostSkeleton } from "@/components/ui/skeleton";
 import ReactionIcon from "@/components/shared/reaction-icon";
+import { useMember } from "@/hooks/use-member";
+import { toast } from "sonner";
 
 const REACTIONS = ["like", "love", "haha", "wow", "sad", "angry"] as const;
 
@@ -19,10 +21,11 @@ interface Post {
   videos: string | null;
   authorId: string | null;
   likes: number;
+  sharesCount?: number;
   createdAt: string;
-  _count?: { comments: number; reactions: number };
+  _count?: { comments: number; reactions: number; shares: number };
   reactionSummary?: Record<string, number>;
-  author?: { name: string; nameEn?: string; image?: string };
+  author?: { id?: string; name: string; nameEn?: string; image?: string };
 }
 
 interface Comment {
@@ -30,20 +33,7 @@ interface Comment {
   content: string;
   createdAt: string;
   memberName?: string;
-}
-
-interface MemberData {
-  id: string;
-  name: string;
-  email?: string;
-}
-
-function getMember(): MemberData | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem("memberData");
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
+  memberImage?: string;
 }
 
 function parseImages(raw: string | null): string[] {
@@ -56,6 +46,25 @@ function parseVideos(raw: string | null): string[] {
   if (!raw) return [];
   try { const p = JSON.parse(raw); return Array.isArray(p) ? p : []; }
   catch { return []; }
+}
+
+function Avatar({ src, name, size = 40 }: { src?: string | null; name?: string; size?: number }) {
+  const [error, setError] = useState(false);
+  const initials = name ? name.charAt(0) : "?";
+  if (src && !error) {
+    return (
+      <div className="relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-primary/20" style={{ width: size, height: size }}>
+        <img src={src} alt={name || ""} loading="lazy"
+          className="rounded-full object-cover w-full h-full"
+          onError={() => setError(true)} />
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-full bg-primary/10 flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
+      <span className="font-semibold text-primary" style={{ fontSize: size * 0.4 }}>{initials}</span>
+    </div>
+  );
 }
 
 function formatTime(iso: string, locale: string) {
@@ -83,14 +92,13 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
   const [commentsLoading, setCommentsLoading] = useState<Record<string, boolean>>({});
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState<Record<string, boolean>>({});
-  const [member, setMember] = useState<MemberData | null>(null);
+  const { member } = useMember();
   const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null);
   const [reactionPopover, setReactionPopover] = useState<string | null>(null);
 
   const isArabic = lang === "ar";
 
   useEffect(() => { params.then((p) => setLang(p.lang)); }, [params]);
-  useEffect(() => { setMember(getMember()); }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -136,9 +144,34 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
         const newComment = await res.json();
         setComments((s) => ({ ...s, [postId]: [...(s[postId] || []), newComment] }));
         setCommentTexts((s) => ({ ...s, [postId]: "" }));
+      } else {
+        toast.error(isArabic ? "فشل إرسال التعليق" : "Failed to send comment");
+      }
+    } catch {
+      toast.error(isArabic ? "خطأ في الاتصال" : "Connection error");
+    }
+    setSubmitting((s) => ({ ...s, [postId]: false }));
+  };
+
+  const handleShare = async (post: Post) => {
+    if (!member) return;
+    const url = `${window.location.origin}/${lang}/posts/${post.id}`;
+    try {
+      await fetch(`/api/posts/${post.id}/share`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberId: member.id }),
+      });
+    } catch {}
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: post.content, text: post.content, url });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        toast.success(isArabic ? "تم نسخ الرابط" : "Link copied");
       }
     } catch {}
-    setSubmitting((s) => ({ ...s, [postId]: false }));
+    setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, sharesCount: (p.sharesCount ?? 0) + 1 } : p)));
   };
 
   const handleReaction = async (postId: string, type: string) => {
@@ -180,9 +213,7 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
               <article key={post.id} className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center gap-3 p-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <User className="w-5 h-5 text-primary" />
-                  </div>
+                  <Avatar src={post.author?.image} name={post.author?.name} size={40} />
                   <div className="flex-1 min-w-0">
                     <Link href={`/${lang}/posts/${post.id}`} className="font-semibold text-sm text-text hover:text-primary transition-colors">
                       {post.author?.name || (isArabic ? "عضو" : "Member")}
@@ -272,7 +303,7 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                     <MessageCircle className="w-4 h-4" />
                     {isArabic ? "تعليق" : "Comment"}
                   </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                  <button onClick={() => handleShare(post)} className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                     <Share2 className="w-4 h-4" />
                     {isArabic ? "مشاركة" : "Share"}
                   </button>
@@ -294,8 +325,8 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                         ) : (
                           (comments[post.id] || []).map((c) => (
                             <div key={c.id} className="flex gap-2">
-                              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                                <User className="w-3.5 h-3.5 text-primary" />
+                              <div className="mt-0.5">
+                                <Avatar src={c.memberImage} name={c.memberName} size={28} />
                               </div>
                               <div className="bg-surface rounded-xl px-3 py-2 flex-1">
                                 <p className="text-xs font-semibold text-text">{c.memberName || (isArabic ? "عضو" : "Member")}</p>
@@ -310,8 +341,8 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                     {/* Comment Form */}
                     {member ? (
                       <div className="flex items-center gap-2 px-4 pb-4">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <User className="w-4 h-4 text-primary" />
+                        <div className="shrink-0">
+                          <Avatar src={member.image} name={member.name} size={32} />
                         </div>
                         <div className="flex-1 flex items-center gap-2 bg-background rounded-xl px-3 py-1.5 border border-border">
                           <input

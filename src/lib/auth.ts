@@ -57,12 +57,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           await prisma.user.update({ where: { id: user.id }, data: { password: hashedPassword } });
         }
 
+        // Resolve the Member record id (used as authorId/memberId for posts,
+        // comments, reactions and shares).
+        const member = await prisma.member.findUnique({
+          where: { userId: user.id },
+          select: { id: true },
+        });
+
         return {
           id: user.id,
           email: user.email,
           name: user.name,
           image: user.image,
           role: user.role,
+          memberId: member?.id ?? null,
         };
       },
     }),
@@ -76,10 +84,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.role = (user as any).role;
         token.id = user.id;
         token.picture = user.image;
+        if ((user as any).memberId !== undefined) token.memberId = (user as any).memberId;
       }
       if (trigger === "update" && session) {
         if ((session as any).image !== undefined) token.picture = (session as any).image;
         if (session.name !== undefined) token.name = session.name;
+      }
+      // Lazy-resolve memberId once for tokens created before this field existed.
+      if (!(token as any).memberId && (token as any).id) {
+        try {
+          const member = await prisma.member.findUnique({
+            where: { userId: String((token as any).id) },
+            select: { id: true },
+          });
+          (token as any).memberId = member?.id ?? null;
+        } catch (e) {
+          console.error("Failed to resolve memberId:", e);
+        }
       }
       return token;
     },
@@ -87,6 +108,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.role = token.role as string;
         (session.user as any).id = token.id;
+        (session.user as any).memberId = token.memberId ?? null;
         if (token.picture) session.user.image = token.picture as string;
       }
       return session;

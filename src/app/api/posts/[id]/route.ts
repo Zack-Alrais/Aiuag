@@ -33,23 +33,39 @@ export async function GET(
     const members = memberIds.length > 0
       ? await prisma.member.findMany({
           where: { id: { in: memberIds } },
-          include: { user: { select: { name: true, email: true } } },
+          include: { user: { select: { name: true, email: true, image: true } } },
         })
       : [];
-
-    const memberMap = Object.fromEntries(
-      members.map((m) => [m.id, { id: m.id, name: m.user.name, email: m.user.email }])
+    const memberMap = new Map(
+      members.map((m) => [
+        m.id,
+        { id: m.id, name: m.user.name, email: m.user.email, image: m.user.image },
+      ])
     );
+
+    // Fallback: legacy data may be keyed by the User id instead of the Member id.
+    const unresolvedIds = memberIds.filter((id) => !memberMap.has(id));
+    if (unresolvedIds.length > 0) {
+      const users = await prisma.user.findMany({
+        where: { id: { in: unresolvedIds } },
+        select: { id: true, name: true, email: true, image: true },
+      });
+      for (const u of users) {
+        memberMap.set(u.id, { id: u.id, name: u.name, email: u.email, image: u.image });
+      }
+    }
 
     const enriched = {
       ...post,
       comments: post.comments.map((c) => ({
         ...c,
-        member: memberMap[c.memberId] ?? null,
+        memberName: memberMap.get(c.memberId)?.name ?? null,
+        memberImage: memberMap.get(c.memberId)?.image ?? null,
+        member: memberMap.get(c.memberId) ?? null,
       })),
       reactions: post.reactions.map((r) => ({
         ...r,
-        member: memberMap[r.memberId] ?? null,
+        member: memberMap.get(r.memberId) ?? null,
       })),
     };
 

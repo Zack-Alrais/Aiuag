@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import {
-  Heart, MessageCircle, Share2, ChevronLeft, ChevronRight, X, Play,
-  Send, Loader2, User, Calendar, ArrowRight, ArrowLeft, Pencil, Trash2, Check,
+  Heart, MessageCircle, Share2, ChevronLeft, ChevronRight, X,
+  Send, Loader2, Calendar, ArrowRight, ArrowLeft, Pencil, Trash2, Check,
 } from "lucide-react";
 import Link from "next/link";
 import CustomVideoPlayer from "@/components/ui/custom-video-player";
 import { SkeletonLine, SkeletonCircle } from "@/components/ui/skeleton";
 import ReactionIcon from "@/components/shared/reaction-icon";
+import { useMember } from "@/hooks/use-member";
+import { toast } from "sonner";
 
 const REACTIONS = [
   { type: "like", labelAr: "إعجاب", labelEn: "Like", emoji: "👍" },
@@ -26,11 +28,12 @@ interface Post {
   videos: string | null;
   authorId: string | null;
   likes: number;
+  sharesCount?: number;
   createdAt: string;
   updatedAt: string;
-  _count?: { comments: number; reactions: number };
+  _count?: { comments: number; reactions: number; shares: number };
   reactions?: { type: string; count: number }[];
-  author?: { name: string; nameEn?: string; image?: string };
+  author?: { id?: string; name: string; nameEn?: string; image?: string };
   comments?: Comment[];
 }
 
@@ -40,20 +43,7 @@ interface Comment {
   createdAt: string;
   memberId: string;
   memberName?: string;
-}
-
-interface MemberData {
-  id: string;
-  name: string;
-  email?: string;
-}
-
-function getMember(): MemberData | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem("memberData");
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
+  memberImage?: string;
 }
 
 function parseImages(raw: string | null): string[] {
@@ -74,13 +64,32 @@ function formatDate(iso: string, locale: string) {
   });
 }
 
+function Avatar({ src, name, size = 40 }: { src?: string | null; name?: string; size?: number }) {
+  const [error, setError] = useState(false);
+  const initials = name ? name.charAt(0) : "?";
+  if (src && !error) {
+    return (
+      <div className="relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-primary/20" style={{ width: size, height: size }}>
+        <img src={src} alt={name || ""} loading="lazy"
+          className="rounded-full object-cover w-full h-full"
+          onError={() => setError(true)} />
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-full bg-primary/10 flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
+      <span className="font-semibold text-primary" style={{ fontSize: size * 0.4 }}>{initials}</span>
+    </div>
+  );
+}
+
 export default function PostDetailPage({ params }: { params: Promise<{ lang: string; id: string }> }) {
   const [lang, setLang] = useState("ar");
   const [id, setId] = useState("");
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [member, setMember] = useState<MemberData | null>(null);
+  const { member } = useMember();
   const [commentText, setCommentText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null);
@@ -95,8 +104,6 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
     params.then((p) => { setLang(p.lang); setId(p.id); });
   }, [params]);
 
-  useEffect(() => { setMember(getMember()); }, []);
-
   useEffect(() => {
     if (!id) return;
     setLoading(true);
@@ -107,6 +114,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
       .then(([postData, commentsData]) => {
         setPost(postData);
         setComments(commentsData.data || []);
+        if (postData.myReaction) setCurrentReaction(postData.myReaction);
         // Aggregate reactions from raw reaction records
         if (postData.reactions && Array.isArray(postData.reactions)) {
           const counts: Record<string, number> = {};
@@ -160,9 +168,33 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
         const newComment = await res.json();
         setComments((prev) => [...prev, newComment]);
         setCommentText("");
+      } else {
+        toast.error(isArabic ? "فشل إرسال التعليق" : "Failed to send comment");
+      }
+    } catch {
+      toast.error(isArabic ? "خطأ في الاتصال" : "Connection error");
+    }
+    setSubmitting(false);
+  };
+
+  const handleShare = async () => {
+    if (!post || !member) return;
+    const url = `${window.location.origin}/${lang}/posts/${post.id}`;
+    try {
+      await fetch(`/api/posts/${post.id}/share`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberId: member.id }),
+      });
+    } catch {}
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: post.content, text: post.content, url });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        toast.success(isArabic ? "تم نسخ الرابط" : "Link copied");
       }
     } catch {}
-    setSubmitting(false);
   };
 
   const handleEditComment = async (commentId: string) => {
@@ -266,9 +298,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
           <article className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
             {/* Header */}
             <div className="flex items-center gap-3 p-5">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <User className="w-6 h-6 text-primary" />
-              </div>
+              <Avatar src={post.author?.image} name={post.author?.name} size={48} />
               <div className="flex-1 min-w-0">
                 <h2 className="font-semibold text-text">
                   {post.author?.name || (isArabic ? "عضو" : "Member")}
@@ -363,7 +393,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
 
             {/* Share */}
             <div className="flex items-center justify-center border-t border-border py-2.5">
-              <button className="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
+              <button onClick={handleShare} className="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
                 <Share2 className="w-4 h-4" />
                 {isArabic ? "مشاركة" : "Share"}
               </button>
@@ -377,8 +407,8 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
             </h3>
             {member ? (
               <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <User className="w-5 h-5 text-primary" />
+                <div className="shrink-0">
+                  <Avatar src={member.image} name={member.name} size={36} />
                 </div>
                 <div className="flex-1">
                   <textarea
@@ -432,8 +462,8 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
               <div className="space-y-4">
                 {comments.map((c) => (
                   <div key={c.id} className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center shrink-0 mt-0.5">
-                      <User className="w-4 h-4 text-primary/60" />
+                    <div className="shrink-0 mt-0.5">
+                      <Avatar src={c.memberImage} name={c.memberName} size={32} />
                     </div>
                     <div className="flex-1 min-w-0">
                       {editingCommentId === c.id ? (

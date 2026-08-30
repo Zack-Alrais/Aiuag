@@ -28,22 +28,38 @@ export async function GET(request: NextRequest) {
             },
           },
           reactions: {
-            select: { type: true },
+            select: { type: true, memberId: true },
           },
         },
       }),
       prisma.post.count({ where }),
     ]);
 
-    // Enrich with author data (name/image are on User model)
+    // Enrich with author data (name/image live on the User model, keyed by Member.id)
     const authorIds = [...new Set(posts.map((p) => p.authorId).filter(Boolean))] as string[];
-    const authors = authorIds.length
-      ? await prisma.member.findMany({
-          where: { id: { in: authorIds } },
-          select: { id: true, user: { select: { name: true, image: true, email: true } } },
-        })
-      : [];
-    const authorMap = new Map(authors.map((a) => [a.id, a.user]));
+    const authorMap = new Map<string, { id: string; name: string; image: string | null }>();
+
+    if (authorIds.length) {
+      const members = await prisma.member.findMany({
+        where: { id: { in: authorIds } },
+        select: { id: true, user: { select: { name: true, image: true, email: true } } },
+      });
+      for (const m of members) {
+        authorMap.set(m.id, { id: m.id, name: m.user.name, image: m.user.image });
+      }
+
+      // Fallback: some posts may reference the User id instead of the Member id
+      const unresolvedIds = authorIds.filter((id) => !authorMap.has(id));
+      if (unresolvedIds.length) {
+        const users = await prisma.user.findMany({
+          where: { id: { in: unresolvedIds } },
+          select: { id: true, name: true, image: true },
+        });
+        for (const u of users) {
+          authorMap.set(u.id, { id: u.id, name: u.name, image: u.image });
+        }
+      }
+    }
 
     // Enrich with original post data for reposts
     const originalPostIds = posts.filter((p) => p.originalPostId).map((p) => p.originalPostId!);
@@ -68,7 +84,7 @@ export async function GET(request: NextRequest) {
       return {
         ...post,
         author: author
-          ? { id: null, name: author.name, image: author.image }
+          ? { id: author.id, name: author.name, image: author.image }
           : null,
         reactionSummary,
         myReaction,
@@ -81,7 +97,7 @@ export async function GET(request: NextRequest) {
               return {
                 ...orig,
                 author: origAuthor
-                  ? { id: null, name: origAuthor.name, image: origAuthor.image }
+                  ? { id: origAuthor.id, name: origAuthor.name, image: origAuthor.image }
                   : null,
               };
             })()
@@ -162,7 +178,7 @@ export async function POST(request: NextRequest) {
     // Return post with author data
     return NextResponse.json({
       ...post,
-      author: { id: null, name: member.user.name, image: member.user.image },
+      author: { id: member.id, name: member.user.name, image: member.user.image },
       _count: { comments: 0, reactions: 0, shares: 0 },
       reactionSummary: {},
       myReaction: null,
