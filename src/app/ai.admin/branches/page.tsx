@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, MapPin, Mail, Phone, Building, User, X } from "lucide-react"
 import { TranslateInto } from "@/components/admin/AutoTranslate"
+import { useAdminLang } from "../admin-lang"
 
 interface Branch {
   id: string
@@ -47,6 +48,7 @@ const emptyForm: BranchFormData = {
 }
 
 export default function BranchesManagement() {
+  const { lang, t } = useAdminLang()
   const [items, setItems] = useState<Branch[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -162,8 +164,8 @@ export default function BranchesManagement() {
         <div className="flex items-center gap-3">
           <MapPin className="w-8 h-8 text-blue-600 dark:text-[#60a5fa]" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">إدارة الفروع</h1>
-            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{items.length} فرع مسجل</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("branches.title")}</h1>
+            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{t("branches.count").replace("{n}", String(items.length))}</p>
           </div>
         </div>
         <button
@@ -171,7 +173,7 @@ export default function BranchesManagement() {
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
-          إضافة فرع
+          {t("branches.addBtn")}
         </button>
       </div>
 
@@ -179,12 +181,12 @@ export default function BranchesManagement() {
         {loading ? (
           <div className="flex items-center justify-center py-20 text-gray-400 dark:text-[#3b4f6b]">
             <Building className="h-5 w-5 animate-spin mr-2" />
-            جاري تحميل الفروع...
+            {t("branches.loading")}
           </div>
         ) : items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-[#3b4f6b]">
             <Building className="h-12 w-12 mb-3 opacity-40" />
-            <p className="text-sm">لا توجد فروع</p>
+            <p className="text-sm">{t("branches.empty")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -192,31 +194,31 @@ export default function BranchesManagement() {
               <thead>
                 <tr className="border-b border-gray-100 dark:border-[#253347] bg-gray-50/60 dark:bg-[#111927]">
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    الاسم
+                    {t("common.name")}
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5" />
-                      الموقع
+                      {t("branches.locationCol")}
                     </span>
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <Phone className="h-3.5 w-3.5" />
-                      التواصل
+                      {t("branches.contactCol")}
                     </span>
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <User className="h-3.5 w-3.5" />
-                      مدير الفرع
+                      {t("branches.headCol")}
                     </span>
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    الحالة
+                    {t("common.status")}
                   </th>
                   <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    الإجراءات
+                    {t("common.actions")}
                   </th>
                 </tr>
               </thead>
@@ -262,7 +264,7 @@ export default function BranchesManagement() {
                         item.status === "establishing" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" :
                         "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400"
                       }`}>
-                        {item.status === "active" ? "نشط" : item.status === "establishing" ? "قيد التأسيس" : "مخطط له"}
+                        {item.status === "active" ? t("branches.status.active") : item.status === "establishing" ? t("branches.status.establishing") : t("branches.status.planned")}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -270,7 +272,7 @@ export default function BranchesManagement() {
                         <button
                           onClick={() => openEditModal(item)}
                           className="p-2 text-blue-600 dark:text-[#60a5fa] hover:bg-blue-50 dark:hover:bg-[#1e2d42] rounded-lg transition-colors"
-                          title="تعديل"
+                          title={t("common.edit")}
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
@@ -280,20 +282,20 @@ export default function BranchesManagement() {
                               onClick={() => handleDelete(item.id)}
                               className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
                             >
-                              تأكيد
+                              {t("common.yes")}
                             </button>
                             <button
                               onClick={() => setDeleteConfirmId(null)}
                               className="px-2.5 py-1 bg-gray-200 dark:bg-[#2a3d56] text-gray-600 dark:text-[#cbd5e1] text-xs rounded-md hover:bg-gray-300 dark:hover:bg-[#3b4f6b] transition-colors"
                             >
-                              إلغاء
+                              {t("common.cancel")}
                             </button>
                           </div>
                         ) : (
                           <button
                             onClick={() => setDeleteConfirmId(item.id)}
                             className="p-2 text-red-500 dark:text-[#f87171] hover:bg-red-50 dark:hover:bg-[#1e2d42] rounded-lg transition-colors"
-                            title="حذف"
+                            title={t("common.delete")}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -316,7 +318,7 @@ export default function BranchesManagement() {
           <div className="relative bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-[#253347]">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f1f5f9]">
-                {editingItem ? "تعديل فرع" : "إضافة فرع جديد"}
+                {editingItem ? t("branches.editTitle") : t("branches.addTitle")}
               </h2>
               <button
                 onClick={closeModal}
@@ -330,7 +332,7 @@ export default function BranchesManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    اسم الفرع بالعربية *
+                    {t("branches.nameArLabel")} *
                   </label>
                   <input
                     type="text"
@@ -339,13 +341,13 @@ export default function BranchesManagement() {
                     value={form.name}
                     onChange={(e) => handleFieldChange("name", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="اسم الفرع بالعربية"
+                    placeholder={t("branches.nameArPh")}
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
-                      اسم الفرع بالإنجليزية *
+                      {t("branches.nameEnLabel")} *
                     </label>
                     <TranslateInto source={form.name} target={form.nameEn} onTranslated={(t) => handleFieldChange("nameEn", t)} />
                   </div>
@@ -355,7 +357,7 @@ export default function BranchesManagement() {
                     value={form.nameEn}
                     onChange={(e) => handleFieldChange("nameEn", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="Branch name in English"
+                    placeholder={t("branches.nameEnPh")}
                   />
                 </div>
               </div>
@@ -365,7 +367,7 @@ export default function BranchesManagement() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
                     <span className="flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5" />
-                      المدينة
+                      {t("branches.cityLabel")}
                     </span>
                   </label>
                   <input
@@ -373,19 +375,19 @@ export default function BranchesManagement() {
                     value={form.city}
                     onChange={(e) => handleFieldChange("city", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="المدينة"
+                    placeholder={t("branches.cityPh")}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    الدولة
+                    {t("branches.countryLabel")}
                   </label>
                   <input
                     type="text"
                     value={form.country}
                     onChange={(e) => handleFieldChange("country", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="الدولة"
+                    placeholder={t("branches.countryPh")}
                   />
                 </div>
               </div>
@@ -393,43 +395,43 @@ export default function BranchesManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    الحالة
+                    {t("common.status")}
                   </label>
                   <select
                     value={form.status}
                     onChange={(e) => handleFieldChange("status", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   >
-                    <option value="active">نشط</option>
-                    <option value="establishing">قيد التأسيس</option>
-                    <option value="planned">مخطط له</option>
+                    <option value="active">{t("branches.status.active")}</option>
+                    <option value="establishing">{t("branches.status.establishing")}</option>
+                    <option value="planned">{t("branches.status.planned")}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    النوع
+                    {t("branches.typeLabel")}
                   </label>
                   <select
                     value={form.type}
                     onChange={(e) => handleFieldChange("type", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   >
-                    <option value="sudan">السودان</option>
-                    <option value="africa">أفريقيا والعالم</option>
+                    <option value="sudan">{t("branches.type.sudan")}</option>
+                    <option value="africa">{t("branches.type.africa")}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                  العنوان
+                  {t("branches.addressLabel")}
                 </label>
                 <input
                   type="text"
                   value={form.address}
                   onChange={(e) => handleFieldChange("address", e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  placeholder="العنوان التفصيلي"
+                  placeholder={t("branches.addressPh")}
                 />
               </div>
 
@@ -438,7 +440,7 @@ export default function BranchesManagement() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
                     <span className="flex items-center gap-1.5">
                       <Phone className="h-3.5 w-3.5" />
-                      الهاتف
+                      {t("common.phone")}
                     </span>
                   </label>
                   <input
@@ -453,7 +455,7 @@ export default function BranchesManagement() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
                     <span className="flex items-center gap-1.5">
                       <Mail className="h-3.5 w-3.5" />
-                      البريد الإلكتروني
+                      {t("common.email")}
                     </span>
                   </label>
                   <input
@@ -470,7 +472,7 @@ export default function BranchesManagement() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
                   <span className="flex items-center gap-1.5">
                     <User className="h-3.5 w-3.5" />
-                    اسم مدير الفرع
+                    {t("branches.headLabel")}
                   </span>
                 </label>
                 <input
@@ -478,7 +480,7 @@ export default function BranchesManagement() {
                   value={form.headName}
                   onChange={(e) => handleFieldChange("headName", e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  placeholder="اسم مدير الفرع"
+                  placeholder={t("branches.headPh")}
                 />
               </div>
 
@@ -488,7 +490,7 @@ export default function BranchesManagement() {
                   onClick={closeModal}
                   className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-[#cbd5e1] bg-gray-100 dark:bg-[#2a3d56] hover:bg-gray-200 dark:hover:bg-[#3b4f6b] rounded-lg transition-colors"
                 >
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -496,10 +498,10 @@ export default function BranchesManagement() {
                   className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting
-                    ? "جاري الحفظ..."
+                    ? t("common.saving")
                     : editingItem
-                      ? "تحديث الفرع"
-                      : "إنشاء فرع"}
+                      ? t("branches.updateBtn")
+                      : t("branches.createBtn")}
                 </button>
               </div>
             </form>

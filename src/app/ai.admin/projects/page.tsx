@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, FolderOpen, Calendar, DollarSign, Search, X } from "lucide-react"
 import ImageUpload from "@/components/admin/ImageUpload"
+import { useAdminLang } from "../admin-lang"
 
 interface Project {
   id: string
@@ -47,6 +48,7 @@ const emptyForm: ProjectFormData = {
 }
 
 export default function ProjectsManagement() {
+  const { lang, t } = useAdminLang()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<"all" | "active" | "completed" | "paused">("all")
@@ -174,7 +176,7 @@ export default function ProjectsManagement() {
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "-"
-    return new Date(dateStr).toLocaleDateString("en-GB", {
+    return new Date(dateStr).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-GB", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -183,7 +185,7 @@ export default function ProjectsManagement() {
 
   const formatBudget = (budget: number | null) => {
     if (budget == null) return "-"
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat(lang === "ar" ? "ar-EG" : "en-US", {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 0,
@@ -200,8 +202,8 @@ export default function ProjectsManagement() {
         <div className="flex items-center gap-3">
           <FolderOpen className="h-8 w-8 text-blue-600 dark:text-[#60a5fa]" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-[#f1f5f9]">إدارة المشاريع</h1>
-            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">إدارة وتنظيم مشاريع الرابطة</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-[#f1f5f9]">{t("projects.title")}</h1>
+            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{t("projects.subtitle")}</p>
           </div>
         </div>
         <button
@@ -209,17 +211,17 @@ export default function ProjectsManagement() {
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
         >
           <Plus className="h-4 w-4" />
-          إضافة مشروع
+          {t("projects.addBtn")}
         </button>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex gap-2 flex-wrap">
           {([
-            { value: "all", label: "الكل" },
-            { value: "active", label: "نشط" },
-            { value: "completed", label: "مكتمل" },
-            { value: "paused", label: "متوقف" },
+            { value: "all", label: t("common.all") },
+            { value: "active", label: t("projects.status.active") },
+            { value: "completed", label: t("projects.status.completed") },
+            { value: "paused", label: t("projects.status.paused") },
           ] as const).map((item) => (
             <button
               key={item.value}
@@ -238,7 +240,7 @@ export default function ProjectsManagement() {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
           <input
             type="text"
-            placeholder="بحث في المشاريع..."
+            placeholder={t("projects.searchPh")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
@@ -261,7 +263,7 @@ export default function ProjectsManagement() {
         ) : filteredProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400">
             <FolderOpen className="h-12 w-12 mb-3 opacity-40" />
-            <p className="text-sm">لا توجد مشاريع</p>
+            <p className="text-sm">{t("projects.empty")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -269,28 +271,28 @@ export default function ProjectsManagement() {
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60 dark:bg-[#111927] dark:border-[#2a3d56]">
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    العنوان (بالعربية)
+                    {t("projects.titleCol")}
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    الحالة
+                    {t("common.status")}
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    الفئة
+                    {t("projects.categoryLabel")}
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <DollarSign className="h-3.5 w-3.5" />
-                      الميزانية
+                      {t("projects.budgetCol")}
                     </span>
                   </th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5" />
-                      النطاق الزمني
+                      {t("projects.rangeCol")}
                     </span>
                   </th>
                   <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                    الإجراءات
+                    {t("common.actions")}
                   </th>
                 </tr>
               </thead>
@@ -314,7 +316,7 @@ export default function ProjectsManagement() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(project.status)}`}
                       >
-                        {project.status === "active" ? "نشط" : project.status === "completed" ? "مكتمل" : "متوقف"}
+                        {project.status === "active" ? t("projects.status.active") : project.status === "completed" ? t("projects.status.completed") : t("projects.status.paused")}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-[#cbd5e1]">
@@ -326,7 +328,7 @@ export default function ProjectsManagement() {
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-[#cbd5e1]">
                       <div>{formatDate(project.startDate)}</div>
                       <div className="text-xs text-gray-400 mt-0.5 dark:text-[#7a8ba3]">
-                        إلى {formatDate(project.endDate)}
+                        {t("projects.to")} {formatDate(project.endDate)}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -334,7 +336,7 @@ export default function ProjectsManagement() {
                         <button
                           onClick={() => openEditModal(project)}
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="تعديل"
+                          title={t("common.edit")}
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
@@ -344,20 +346,20 @@ export default function ProjectsManagement() {
                               onClick={() => handleDelete(project.id)}
                               className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition-colors"
                             >
-                              تأكيد
+                              {t("common.yes")}
                             </button>
                             <button
                               onClick={() => setDeleteConfirmId(null)}
                               className="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs rounded-md hover:bg-gray-300 transition-colors"
                             >
-                              إلغاء
+                              {t("common.cancel")}
                             </button>
                           </div>
                         ) : (
                           <button
                             onClick={() => setDeleteConfirmId(project.id)}
                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                            title="حذف"
+                            title={t("common.delete")}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -381,7 +383,7 @@ export default function ProjectsManagement() {
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto dark:bg-[#1a2332] dark:border dark:border-[#2a3d56]">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-[#2a3d56]">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f1f5f9]">
-                {editingProject ? "تعديل مشروع" : "إضافة مشروع جديد"}
+                {editingProject ? t("projects.editTitle") : t("projects.addTitle")}
               </h2>
               <button
                 onClick={closeModal}
@@ -395,7 +397,7 @@ export default function ProjectsManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    العنوان (بالعربية) *
+                    {t("projects.titleArLabel")} *
                   </label>
                   <input
                     type="text"
@@ -404,12 +406,12 @@ export default function ProjectsManagement() {
                     onChange={(e) => handleFieldChange("titleAr", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
                     dir="rtl"
-                    placeholder="العنوان بالعربية"
+                    placeholder={t("projects.titleArPh")}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    العنوان (بالإنجليزية) *
+                    {t("projects.titleEnLabel")} *
                   </label>
                   <input
                     type="text"
@@ -417,7 +419,7 @@ export default function ProjectsManagement() {
                     value={form.titleEn}
                     onChange={(e) => handleFieldChange("titleEn", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                    placeholder="عنوان المشروع بالإنجليزية"
+                    placeholder={t("projects.titleEnPh")}
                   />
                 </div>
               </div>
@@ -425,7 +427,7 @@ export default function ProjectsManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    الوصف (بالعربية) *
+                    {t("projects.descArLabel")} *
                   </label>
                   <textarea
                     required
@@ -436,12 +438,12 @@ export default function ProjectsManagement() {
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
                     dir="rtl"
-                    placeholder="الوصف بالعربية"
+                    placeholder={t("projects.descArPh")}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    الوصف (بالإنجليزية) *
+                    {t("projects.descEnLabel")} *
                   </label>
                   <textarea
                     required
@@ -451,7 +453,7 @@ export default function ProjectsManagement() {
                       handleFieldChange("descriptionEn", e.target.value)
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                    placeholder="الوصف بالإنجليزية"
+                    placeholder={t("projects.descEnPh")}
                   />
                 </div>
               </div>
@@ -459,7 +461,7 @@ export default function ProjectsManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    الفئة *
+                    {t("projects.categoryLabel")} *
                   </label>
                   <input
                     type="text"
@@ -467,12 +469,12 @@ export default function ProjectsManagement() {
                     value={form.category}
                     onChange={(e) => handleFieldChange("category", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
-                    placeholder="مثال: البحث، التطوير"
+                    placeholder={t("projects.categoryPh")}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
-                    الحالة *
+                    {t("common.status")} *
                   </label>
                   <select
                     required
@@ -480,9 +482,9 @@ export default function ProjectsManagement() {
                     onChange={(e) => handleFieldChange("status", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
                   >
-                    <option value="active">نشط</option>
-                    <option value="completed">مكتمل</option>
-                    <option value="paused">متوقف</option>
+                    <option value="active">{t("projects.status.active")}</option>
+                    <option value="completed">{t("projects.status.completed")}</option>
+                    <option value="paused">{t("projects.status.paused")}</option>
                   </select>
                 </div>
               </div>
@@ -492,7 +494,7 @@ export default function ProjectsManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5" />
-                      تاريخ البداية
+                      {t("projects.startDateLabel")}
                     </span>
                   </label>
                   <input
@@ -506,7 +508,7 @@ export default function ProjectsManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5" />
-                      تاريخ النهاية
+                      {t("projects.endDateLabel")}
                     </span>
                   </label>
                   <input
@@ -520,7 +522,7 @@ export default function ProjectsManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#cbd5e1]">
                     <span className="flex items-center gap-1.5">
                       <DollarSign className="h-3.5 w-3.5" />
-                      الميزانية (دولار أمريكي)
+                      {t("projects.budgetLabel")}
                     </span>
                   </label>
                   <input
@@ -539,7 +541,7 @@ export default function ProjectsManagement() {
                 value={form.featuredImage}
                 onChange={(url) => handleFieldChange("featuredImage", url)}
                 folder="projects"
-                label="الصورة الرئيسية"
+                label={t("projects.imageLabel")}
               />
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
@@ -548,7 +550,7 @@ export default function ProjectsManagement() {
                   onClick={closeModal}
                   className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -556,10 +558,10 @@ export default function ProjectsManagement() {
                   className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting
-                    ? "جاري الحفظ..."
+                    ? t("common.saving")
                     : editingProject
-                      ? "تحديث المشروع"
-                      : "إنشاء مشروع"}
+                      ? t("projects.updateBtn")
+                      : t("projects.createBtn")}
                 </button>
               </div>
             </form>
