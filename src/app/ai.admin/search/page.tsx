@@ -10,6 +10,7 @@ import {
   CalendarDays,
   FolderOpen,
   ArrowRight,
+  ArrowLeft,
   Loader2,
 } from "lucide-react"
 import { useAdminLang } from "../admin-lang"
@@ -146,7 +147,7 @@ function SearchContent() {
           onClick={() => router.back()}
           className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-[#cbd5e1] hover:text-gray-800 dark:hover:text-[#f1f5f9] hover:bg-gray-100 dark:hover:bg-[#1e2d42] rounded-xl transition-colors"
         >
-          <ArrowRight className="w-4 h-4" />
+          {lang === "ar" ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
           {t("search.back")}
         </button>
       </div>
@@ -196,7 +197,7 @@ function SearchContent() {
                     <p className="text-sm text-gray-500 dark:text-[#94a3b8] mt-1 truncate">{result.description}</p>
                   )}
                 </div>
-                <ArrowRight className="w-5 h-5 text-gray-400 dark:text-[#7a8ba3] group-hover:text-[#1A3A6B] dark:group-hover:text-[#60a5fa] transition-colors" />
+                {lang === "ar" ? <ArrowLeft className="w-5 h-5 text-gray-400 dark:text-[#7a8ba3] group-hover:text-[#1A3A6B] dark:group-hover:text-[#60a5fa] transition-colors" /> : <ArrowRight className="w-5 h-5 text-gray-400 dark:text-[#7a8ba3] group-hover:text-[#1A3A6B] dark:group-hover:text-[#60a5fa] transition-colors" />}
               </Link>
             )
           })}

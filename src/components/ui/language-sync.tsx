@@ -7,6 +7,7 @@ export default function LanguageSync({ fontAr, fontEn }: { fontAr?: string; font
   const pathname = usePathname()
 
   useEffect(() => {
+    if (pathname.startsWith("/ai.admin")) return
     const lang = pathname.startsWith("/en") ? "en" : "ar"
     const dir = lang === "ar" ? "rtl" : "ltr"
     const html = document.documentElement

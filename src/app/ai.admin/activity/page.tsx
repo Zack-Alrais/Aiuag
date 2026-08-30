@@ -181,13 +181,13 @@ export default function ActivityPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder={t("activity.searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
+              className="w-full ps-9 pe-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
             />
           </div>
 
@@ -201,7 +201,7 @@ export default function ActivityPage() {
                 <button
                   key={u.id}
                   onClick={() => handleSelectUser(u.id)}
-                  className={`w-full text-right px-4 py-3 border-b border-gray-100 dark:border-[#253347] transition-colors ${
+                  className={`w-full text-start px-4 py-3 border-b border-gray-100 dark:border-[#253347] transition-colors ${
                     selectedUserId === u.id
                       ? "bg-blue-50 dark:bg-blue-500/10"
                       : "hover:bg-gray-50 dark:hover:bg-[#1e2d42]"
@@ -413,7 +413,7 @@ export default function ActivityPage() {
                     disabled={logsPage <= 1}
                     className="p-1.5 rounded-lg border border-gray-200 disabled:opacity-30 dark:border-[#3b4f6b]"
                   >
-                    <ChevronRight className="h-3.5 w-3.5" />
+                    {lang === "ar" ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
                   </button>
                   <span className="text-xs text-gray-600 dark:text-[#7a8ba3]">{t("activity.pageOf").replace("{n}", String(logsPage))}</span>
                   <button
@@ -421,7 +421,7 @@ export default function ActivityPage() {
                     disabled={logsPage * 30 >= logsTotal}
                     className="p-1.5 rounded-lg border border-gray-200 disabled:opacity-30 dark:border-[#3b4f6b]"
                   >
-                    <ChevronLeft className="h-3.5 w-3.5" />
+{lang === "ar" ? <ChevronLeft className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
                   </button>
                 </div>
               </div>

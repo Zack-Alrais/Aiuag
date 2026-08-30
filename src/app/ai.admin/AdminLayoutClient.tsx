@@ -268,7 +268,13 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
         <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-white/10 rounded-lg hidden lg:block transition-colors">
-          {sidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+          {sidebarOpen
+            ? lang === "ar"
+              ? <ChevronRight className="w-5 h-5" />
+              : <ChevronLeft className="w-5 h-5" />
+            : lang === "ar"
+              ? <ChevronLeft className="w-5 h-5" />
+              : <ChevronRight className="w-5 h-5" />}
         </button>
       </div>
 
@@ -396,13 +402,13 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
               <Menu className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             </button>
             <form onSubmit={handleSearch} className="relative hidden sm:block">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+              <Search className="w-4 h-4 absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
 <input
                   type="text"
                   placeholder={t("shell.searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 bg-gray-100/80 dark:bg-[#111927] dark:border dark:border-[#3b4f6b] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3A6B]/20 dark:focus:ring-blue-500/30 focus:bg-white dark:focus:bg-[#1a2332] w-40 md:w-56 xl:w-72 transition-all text-gray-800 dark:text-[#f1f5f9] placeholder-gray-500 dark:placeholder-[#7a8ba3]"
+                  className="ps-10 pe-4 py-2 bg-gray-100/80 dark:bg-[#111927] dark:border dark:border-[#3b4f6b] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3A6B]/20 dark:focus:ring-blue-500/30 focus:bg-white dark:focus:bg-[#1a2332] w-40 md:w-56 xl:w-72 transition-all text-gray-800 dark:text-[#f1f5f9] placeholder-gray-500 dark:placeholder-[#7a8ba3]"
               />
             </form>
 
@@ -436,7 +442,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
               >
                 <Bell className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-[#D4A843] text-[#0f2547] text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                  <span className="absolute -top-0.5 -end-0.5 min-w-[18px] h-[18px] bg-[#D4A843] text-[#0f2547] text-[10px] font-bold rounded-full flex items-center justify-center px-1">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
@@ -445,7 +451,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
               {notifOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
-                  <div className="absolute left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: lang === "ar" ? "rtl" : "ltr" }}>
+                  <div className="absolute end-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: lang === "ar" ? "rtl" : "ltr" }}>
                     <div className="flex items-center justify-between px-4 py-3 border-b dark:border-[#2a3d56] bg-gradient-to-l from-[#1A3A6B] to-[#2B5EA7]">
                       <div className="flex items-center gap-2">
                         <Bell className="w-4 h-4 text-white" />
@@ -525,7 +531,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
               {userMenuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
-                  <div className="absolute left-0 mt-2 w-56 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: lang === "ar" ? "rtl" : "ltr" }}>
+                  <div className="absolute end-0 mt-2 w-56 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl border border-gray-100 dark:border-[#2a3d56] z-50 overflow-hidden" style={{ direction: lang === "ar" ? "rtl" : "ltr" }}>
                     <div className="bg-gradient-to-br from-[#1A3A6B] to-[#122848] p-4 text-white">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-white/30">

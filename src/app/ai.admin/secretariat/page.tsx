@@ -449,7 +449,7 @@ export default function SecretariatManagement() {
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden p-3 sm:p-4 sm:p-6">
         {loading ? (
           <div className="flex items-center justify-center py-16 text-gray-500 dark:text-gray-400">
-            <Users className="h-5 w-5 animate-spin mr-2 sm:mr-3" />
+            <Users className="h-5 w-5 animate-spin ms-2 sm:ms-3" />
             <span className="text-sm sm:text-base">{t("secretariat.loading")}</span>
           </div>
         ) : items.length === 0 ? (

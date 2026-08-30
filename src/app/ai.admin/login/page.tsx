@@ -95,7 +95,7 @@ export default function AdminLoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1A3A6B]/20 focus:border-[#1A3A6B] text-right transition-all"
+                    className="w-full px-4 py-3 ps-11 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1A3A6B]/20 focus:border-[#1A3A6B] text-start transition-all"
                     placeholder="admin@aiuag.org"
                     dir="ltr"
                   />
@@ -111,7 +111,7 @@ export default function AdminLoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full px-4 py-3 pr-11 pl-11 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1A3A6B]/20 focus:border-[#1A3A6B] text-right transition-all"
+                    className="w-full px-4 py-3 ps-11 pe-11 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1A3A6B]/20 focus:border-[#1A3A6B] text-start transition-all"
                     placeholder="••••••••"
                   />
                   <Lock className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />

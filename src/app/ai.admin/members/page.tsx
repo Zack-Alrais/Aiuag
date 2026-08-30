@@ -599,13 +599,13 @@ export default function MembersManagement() {
           ))}
         </div>
         <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
+          <Search className="w-4 h-4 absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
           <input
             type="text"
             placeholder={t("members.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
+            className="w-full ps-9 pe-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
           />
         </div>
       </div>
@@ -646,7 +646,7 @@ export default function MembersManagement() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60 dark:bg-[#111927] dark:border-[#2a3d56]">
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap w-10">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap w-10">
                     <button onClick={toggleSelectAll} className="flex items-center justify-center">
                       {selectedIds.size === filteredMembers.length && filteredMembers.length > 0 ? (
                         <CheckSquare className="w-4 h-4 text-blue-600" />
@@ -655,40 +655,40 @@ export default function MembersManagement() {
                       )}
                     </button>
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     {t("common.name")}
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     <span className="flex items-center gap-1.5">
                       <Mail className="h-3.5 w-3.5" />
                       {t("common.email")}
                     </span>
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     {t("members.gender")}
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     {t("members.country")}
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     {t("members.role")}
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     {t("members.faculty")}
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     {t("members.specialization")}
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     <span className="flex items-center gap-1.5">
                       <GraduationCap className="h-3.5 w-3.5" />
                       {t("members.graduationYear")}
                     </span>
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     {t("common.status")}
                   </th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-end text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     {t("common.actions")}
                   </th>
                 </tr>
@@ -711,7 +711,7 @@ export default function MembersManagement() {
                       </button>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <button onClick={() => setDetailMember(member)} className="text-right w-full">
+                      <button onClick={() => setDetailMember(member)} className="text-start w-full">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-gray-900 text-sm dark:text-[#f1f5f9] hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{member.name}</span>
                           {member.hasMember === false && (
@@ -1268,7 +1268,7 @@ export default function MembersManagement() {
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(detailMember.status)}`}>
                     {detailMember.status === "pending" ? t("comments.pendingReview") : detailMember.status === "approved" ? t("common.approved") : t("common.rejected")}
                   </span>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mr-2 ${
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ms-2 ${
                     detailMember.role === "admin" ? "bg-purple-100 text-purple-700" : detailMember.role === "moderator" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
                   }`}>
                     {detailMember.role === "admin" ? t("members.role.admin") : detailMember.role === "moderator" ? t("members.role.moderator") : t("members.role.member")}
@@ -1346,7 +1346,7 @@ export default function MembersManagement() {
                   onClick={() => { setDetailMember(null); openEditModal(detailMember) }}
                   className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors"
                 >
-                  <Pencil className="w-4 h-4 inline ml-1.5" />
+                  <Pencil className="w-4 h-4 inline ms-1.5" />
                   {t("common.edit")}
                 </button>
                 <button

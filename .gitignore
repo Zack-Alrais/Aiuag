@@ -24,6 +24,7 @@ yarn-debug.log*
 yarn-error.log*
 next-debug.log
 dev.log
+next-dev.log
 
 # Windows
 nul

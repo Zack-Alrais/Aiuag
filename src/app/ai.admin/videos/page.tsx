@@ -186,7 +186,7 @@ export default function VideosManagement() {
       <div className="bg-white dark:bg-[#1a2332] dark:border-[#2a3d56] rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20 text-gray-400 dark:text-[#3b4f6b]">
-            <Video className="h-5 w-5 animate-spin mr-2" />
+            <Video className="h-5 w-5 animate-spin ms-2" />
             {t("videos.loading")}
           </div>
         ) : items.length === 0 ? (
@@ -199,22 +199,22 @@ export default function VideosManagement() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-[#253347] bg-gray-50/60 dark:bg-[#111927]">
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("common.title")}
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("videos.preview")}
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("videos.source")}
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("common.category")}
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("common.date")}
                   </th>
-                  <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-end text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("common.actions")}
                   </th>
                 </tr>

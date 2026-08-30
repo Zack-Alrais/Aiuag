@@ -190,12 +190,12 @@ export default function DonationsManagement() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.numberCol")}</th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.donorCol")}</th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.amountCol")}</th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.gatewayCol")}</th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.statusCol")}</th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.dateCol")}</th>
+                  <th className="text-start px-4 py-3 font-semibold text-gray-600">{t("donations.numberCol")}</th>
+                  <th className="text-start px-4 py-3 font-semibold text-gray-600">{t("donations.donorCol")}</th>
+                  <th className="text-start px-4 py-3 font-semibold text-gray-600">{t("donations.amountCol")}</th>
+                  <th className="text-start px-4 py-3 font-semibold text-gray-600">{t("donations.gatewayCol")}</th>
+                  <th className="text-start px-4 py-3 font-semibold text-gray-600">{t("donations.statusCol")}</th>
+                  <th className="text-start px-4 py-3 font-semibold text-gray-600">{t("donations.dateCol")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">

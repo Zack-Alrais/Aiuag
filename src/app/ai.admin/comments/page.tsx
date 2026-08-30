@@ -103,13 +103,13 @@ export default function CommentsManagement() {
           ))}
         </div>
         <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
+          <Search className="w-4 h-4 absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
           <input
             type="text"
             placeholder={t("comments.search")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
+            className="w-full ps-9 pe-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
           />
         </div>
       </div>
@@ -117,7 +117,7 @@ export default function CommentsManagement() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden dark:bg-[#1a2332] dark:border-[#2a3d56]">
         {loading ? (
           <div className="flex items-center justify-center py-20 text-gray-400">
-            <Loader2 className="w-5 h-5 animate-spin mr-2" />
+            <Loader2 className="w-5 h-5 animate-spin ms-2" />
             {t("comments.loading")}
           </div>
         ) : filteredComments.length === 0 ? (
@@ -130,12 +130,12 @@ export default function CommentsManagement() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60 dark:bg-[#111927] dark:border-[#2a3d56]">
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("comments.member")}</th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("comments.post")}</th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("comments.comment")}</th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.date")}</th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.status")}</th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.actions")}</th>
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("comments.member")}</th>
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("comments.post")}</th>
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("comments.comment")}</th>
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.date")}</th>
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.status")}</th>
+                  <th className="px-4 py-3.5 text-end text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-[#253347]">

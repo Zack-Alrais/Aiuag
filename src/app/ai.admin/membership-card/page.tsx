@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { Printer, Loader2, CreditCard, ArrowLeft } from "lucide-react"
+import { Printer, Loader2, CreditCard, ArrowLeft, ArrowRight } from "lucide-react"
 import { MembershipCardEngine } from "@/components/cards/membership-card-engine"
 import { useAdminLang } from "../admin-lang"
 
@@ -91,7 +91,7 @@ function MembershipCardContent() {
     return (
       <div className="space-y-4">
         <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> {t("membershipCard.back")}
+          {lang === "ar" ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t("membershipCard.back")}
         </button>
         <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
           <p className="text-red-700">{error || t("membershipCard.notFound")}</p>
@@ -105,7 +105,7 @@ function MembershipCardContent() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-3">
           <button onClick={() => router.back()} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-            <ArrowLeft className="w-5 h-5" />
+            {lang === "ar" ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
           </button>
           <CreditCard className="w-8 h-8 text-[#1A3A6B]" />
           <div>
@@ -122,7 +122,7 @@ function MembershipCardContent() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="flex flex-col items-center justify-center border-l md:border-l-0 border-gray-200 md:pl-6">
+        <div className="flex flex-col items-center justify-center border-s md:border-s-0 border-gray-200 md:ps-6">
           <p className="text-xs text-gray-400 mb-2">{t("membershipCard.cardPhoto")}</p>
           {member.photo ? (
             <img src={member.photo} alt={t("membershipCard.photoAlt")} className="w-32 h-40 rounded-xl object-cover border border-gray-200 shadow-sm" />

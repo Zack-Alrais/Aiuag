@@ -198,13 +198,13 @@ export default function NewsManagement() {
           ))}
         </div>
         <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
+          <Search className="w-4 h-4 absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
           <input
             type="text"
             placeholder={t("news.search")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
+            className="w-full ps-9 pe-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] dark:placeholder-[#7a8ba3]"
           />
         </div>
       </div>
@@ -215,19 +215,19 @@ export default function NewsManagement() {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-[#2a3d56]">
             <thead className="bg-gray-50 dark:bg-[#111927]">
               <tr>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   {t("common.title")}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   {t("common.status")}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   {t("news.category")}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   {t("news.date")}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
+                <th className="px-6 py-3 text-end text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   {t("common.actions")}
                 </th>
               </tr>

@@ -261,14 +261,14 @@ export default function AdminDashboard() {
           <div className="space-y-3">
             {(analytics?.contentBreakdown || []).map((item, i) => (
               <div key={i} className="flex items-center gap-3">
-                <span className="text-xs text-gray-600 dark:text-[#cbd5e1] w-16 text-left">{item.name}</span>
+                <span className="text-xs text-gray-600 dark:text-[#cbd5e1] w-16 text-end">{item.name}</span>
                 <div className="flex-1 h-5 bg-gray-100 dark:bg-[#111927] rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all"
                     style={{ width: `${(item.count / maxContent) * 100}%`, backgroundColor: item.color, minWidth: item.count > 0 ? 8 : 0 }}
                   />
                 </div>
-                <span className="text-xs font-bold text-gray-700 dark:text-[#e2e8f0] w-8 text-right">{item.count}</span>
+                <span className="text-xs font-bold text-gray-700 dark:text-[#e2e8f0] w-8 text-start">{item.count}</span>
               </div>
             ))}
           </div>
@@ -291,7 +291,7 @@ export default function AdminDashboard() {
                     style={{ width: `${(item.count / maxCountry) * 100}%`, minWidth: item.count > 0 ? 8 : 0 }}
                   />
                 </div>
-                <span className="text-xs font-bold text-gray-700 dark:text-[#e2e8f0] w-8 text-right">{item.count}</span>
+                <span className="text-xs font-bold text-gray-700 dark:text-[#e2e8f0] w-8 text-start">{item.count}</span>
               </div>
             ))}
             {(!analytics?.membersByCountry || analytics.membersByCountry.length === 0) && (
@@ -317,7 +317,7 @@ export default function AdminDashboard() {
                     style={{ width: `${(item.count / maxFaculty) * 100}%`, minWidth: item.count > 0 ? 8 : 0 }}
                   />
                 </div>
-                <span className="text-xs font-bold text-gray-700 dark:text-[#e2e8f0] w-8 text-right">{item.count}</span>
+                <span className="text-xs font-bold text-gray-700 dark:text-[#e2e8f0] w-8 text-start">{item.count}</span>
               </div>
             ))}
             {(!analytics?.membersByFaculty || analytics.membersByFaculty.length === 0) && (

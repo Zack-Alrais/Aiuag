@@ -142,7 +142,7 @@ export default function GraduatesImportPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto" dir={lang === "ar" ? "rtl" : "ltr"}>
+    <div className="max-w-5xl mx-auto">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[#0f2547] dark:text-white">{t("graduates.title")}</h1>
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t("graduates.subtitle")}</p>
@@ -188,7 +188,7 @@ export default function GraduatesImportPage() {
           </div>
         )}
 
-        {error && <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 whitespace-pre-line"><AlertCircle className="w-4 h-4 inline ml-1" />{error}</div>}
+        {error && <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 whitespace-pre-line"><AlertCircle className="w-4 h-4 inline ms-1" />{error}</div>}
 
         {/* Preview */}
         {preview && (
@@ -213,15 +213,15 @@ export default function GraduatesImportPage() {
                   <p className="text-xs text-gray-500 mb-2">{t("graduates.firstRows").replace("{n}", String(preview.sample.length))}</p>
                   <table className="w-full text-xs border border-gray-200 dark:border-[#2a3d56]">
                     <thead><tr className="bg-gray-100 dark:bg-[#111927]">
-                      <th className="px-3 py-2 text-right">{t("common.name")}</th>
-                      <th className="px-3 py-2 text-right">{t("members.country")}</th>
-                      <th className="px-3 py-2 text-right">{t("members.faculty")}</th>
-                      <th className="px-3 py-2 text-right">{t("members.specialization")}</th>
-                      <th className="px-3 py-2 text-right">{t("members.graduationYear")}</th>
-                      <th className="px-3 py-2 text-right">{t("members.form.university")}</th>
-                      <th className="px-3 py-2 text-right">{t("common.email")}</th>
-                      <th className="px-3 py-2 text-right">{t("common.phone")}</th>
-                      <th className="px-3 py-2 text-right">{t("graduates.studentIdCol")}</th>
+                      <th className="px-3 py-2 text-start">{t("common.name")}</th>
+                      <th className="px-3 py-2 text-start">{t("members.country")}</th>
+                      <th className="px-3 py-2 text-start">{t("members.faculty")}</th>
+                      <th className="px-3 py-2 text-start">{t("members.specialization")}</th>
+                      <th className="px-3 py-2 text-start">{t("members.graduationYear")}</th>
+                      <th className="px-3 py-2 text-start">{t("members.form.university")}</th>
+                      <th className="px-3 py-2 text-start">{t("common.email")}</th>
+                      <th className="px-3 py-2 text-start">{t("common.phone")}</th>
+                      <th className="px-3 py-2 text-start">{t("graduates.studentIdCol")}</th>
                     </tr></thead>
                     <tbody>{preview.sample.map((r: any, i: number) => (
                       <tr key={i} className="border-t border-gray-100 dark:border-[#253347]">
@@ -279,10 +279,10 @@ export default function GraduatesImportPage() {
         <div className="p-4 border-b border-gray-100 dark:border-[#2a3d56]">
           <div className="flex gap-3 mb-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute end-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("graduates.searchPlaceholder")}
                 onKeyDown={(e) => e.key === "Enter" && fetchGraduates(search, filterFaculty, filterCountry, filterYear, filterSpec)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-200 dark:border-[#3b4f6b] rounded-xl text-sm dark:bg-[#111927] dark:text-[#f1f5f9] focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                className="w-full pe-10 ps-4 py-2 border border-gray-200 dark:border-[#3b4f6b] rounded-xl text-sm dark:bg-[#111927] dark:text-[#f1f5f9] focus:outline-none focus:ring-2 focus:ring-primary/20" />
             </div>
             <button onClick={() => fetchGraduates(search, filterFaculty, filterCountry, filterYear, filterSpec)} className="px-4 py-2 bg-primary/10 text-primary rounded-xl text-sm font-medium hover:bg-primary/20 transition-colors">{t("graduates.searchBtn")}</button>
             <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${showFilters ? "bg-primary text-white" : "bg-gray-100 dark:bg-[#1e2d42] text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#253347]"}`}>
@@ -351,7 +351,7 @@ export default function GraduatesImportPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="text-xs text-gray-500 border-b border-gray-50 dark:border-[#253347]">
-                <th className="text-right px-4 py-3">{t("common.name")}</th><th className="text-right px-4 py-3">{t("members.country")}</th><th className="text-right px-4 py-3">{t("members.faculty")}</th><th className="text-right px-4 py-3">{t("members.specialization")}</th><th className="text-right px-4 py-3">{t("members.graduationYear")}</th><th className="text-right px-4 py-3">{t("common.email")}</th><th className="text-right px-4 py-3">{t("common.phone")}</th><th className="text-right px-4 py-3">{t("graduates.studentIdCol")}</th><th className="text-right px-4 py-3">{t("common.status")}</th></tr></thead>
+                <th className="text-start px-4 py-3">{t("common.name")}</th><th className="text-start px-4 py-3">{t("members.country")}</th><th className="text-start px-4 py-3">{t("members.faculty")}</th><th className="text-start px-4 py-3">{t("members.specialization")}</th><th className="text-start px-4 py-3">{t("members.graduationYear")}</th><th className="text-start px-4 py-3">{t("common.email")}</th><th className="text-start px-4 py-3">{t("common.phone")}</th><th className="text-start px-4 py-3">{t("graduates.studentIdCol")}</th><th className="text-start px-4 py-3">{t("common.status")}</th></tr></thead>
               <tbody>{graduates.map((g: any) => (
                 <tr key={g.id} className="border-b border-gray-50 dark:border-[#253347] hover:bg-gray-50/50 dark:hover:bg-[#1e2d42]/50">
                   <td className="px-4 py-3 font-medium text-[#0f2547] dark:text-white">{g.name}</td>

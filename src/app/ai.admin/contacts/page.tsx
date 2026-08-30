@@ -102,7 +102,7 @@ export default function ContactsManagement() {
             <p className="text-sm text-gray-500">
               {t("contacts.subtitle")}
               {unreadCount > 0 && (
-                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <span className="ms-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                   {t("contacts.newBadge").replace("{n}", String(unreadCount))}
                 </span>
               )}
@@ -134,31 +134,31 @@ export default function ContactsManagement() {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-[#253347]">
             <thead className="bg-gray-50 dark:bg-[#111927]">
               <tr>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   <span className="flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5" />
                     {t("contacts.nameCol")}
                   </span>
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   <span className="flex items-center gap-1.5">
                     <Mail className="w-3.5 h-3.5" />
                     {t("contacts.emailCol")}
                   </span>
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   {t("contacts.subjectCol")}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   {t("contacts.statusCol")}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   <span className="flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5" />
                     {t("common.date")}
                   </span>
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
+                <th className="px-6 py-3 text-end text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   {t("common.actions")}
                 </th>
               </tr>

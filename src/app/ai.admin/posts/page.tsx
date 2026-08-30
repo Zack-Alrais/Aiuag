@@ -179,12 +179,12 @@ export default function PostsManagement() {
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative">
-          <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
+          <Calendar className="w-4 h-4 absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7a8ba3]" />
           <input
             type="date"
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
-            className="pr-4 pl-9 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
+            className="pe-4 ps-9 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9]"
           />
         </div>
         {filterDate && (
@@ -219,23 +219,23 @@ export default function PostsManagement() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60 dark:bg-[#111927] dark:border-[#2a3d56]">
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("posts.content")}</th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("posts.content")}</th>
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     <span className="flex items-center gap-1.5"><Image className="h-3.5 w-3.5" /> {t("posts.images")}</span>
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     <span className="flex items-center gap-1.5"><Film className="h-3.5 w-3.5" /> {t("posts.videos")}</span>
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     <span className="flex items-center gap-1.5"><Heart className="h-3.5 w-3.5" /> {t("posts.likes")}</span>
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     <span className="flex items-center gap-1.5"><MessageSquare className="h-3.5 w-3.5" /> {t("posts.comments")}</span>
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
+                  <th className="px-4 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">
                     <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {t("common.date")}</span>
                   </th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.actions")}</th>
+                  <th className="px-4 py-3.5 text-end text-xs font-semibold text-gray-500 dark:text-[#94a3b8] whitespace-nowrap">{t("common.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-[#253347]">
@@ -351,7 +351,7 @@ export default function PostsManagement() {
                 </div>
                 {form.images.map((url, i) => (
                   <div key={i} className="relative mb-2 p-3 border border-dashed border-gray-300 dark:border-[#3b4f6b] rounded-lg">
-                    <button type="button" onClick={() => removeImage(i)} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600 z-10">×</button>
+                    <button type="button" onClick={() => removeImage(i)} className="absolute -top-2 -end-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600 z-10">×</button>
                     <FileUpload value={url} onChange={(newUrl) => updateImage(i, newUrl)} type="image" folder="posts" />
                     <div className="mt-2">
                       <input

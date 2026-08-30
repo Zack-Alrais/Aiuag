@@ -237,25 +237,25 @@ export default function BoardManagement() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60 dark:bg-[#111927] dark:border-[#2a3d56]">
-                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
+                    <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
                       {t("board.nameArCol")}
                     </th>
-                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
+                    <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
                       {t("board.positionArCol")}
                     </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
                     <span className="flex items-center gap-1.5">
                       <Mail className="h-3.5 w-3.5" />
                       {t("common.email")}
                     </span>
                   </th>
-                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
+                    <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
                       {t("board.orderCol")}
                     </th>
-                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
+                    <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
                       {t("common.status")}
                     </th>
-                    <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
+                    <th className="px-6 py-3.5 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-[#94a3b8]">
                       {t("common.actions")}
                     </th>
                 </tr>

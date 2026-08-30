@@ -109,19 +109,19 @@ export default function PublicationsManagement() {
 
       <div className="bg-white dark:bg-[#1a2332] dark:border-[#2a3d56] rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-gray-400"><BookOpen className="h-5 w-5 animate-spin mr-2" /> {t("publications.loading")}</div>
+          <div className="flex items-center justify-center py-20 text-gray-400"><BookOpen className="h-5 w-5 animate-spin ms-2" /> {t("publications.loading")}</div>
         ) : items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400"><BookOpen className="h-12 w-12 mb-3 opacity-40" /><p className="text-sm">{t("publications.empty")}</p></div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead><tr className="border-b border-gray-100 dark:border-[#253347] bg-gray-50/60 dark:bg-[#111927]">
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("common.title")}</th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("common.category")}</th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("publications.coverCol")}</th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("publications.fileCol")}</th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("common.date")}</th>
-                <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("common.actions")}</th>
+                <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("common.title")}</th>
+                <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("common.category")}</th>
+                <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("publications.coverCol")}</th>
+                <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("publications.fileCol")}</th>
+                <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("common.date")}</th>
+                <th className="px-6 py-3.5 text-end text-xs font-semibold text-gray-500 dark:text-[#94a3b8]">{t("common.actions")}</th>
               </tr></thead>
               <tbody className="divide-y divide-gray-100 dark:divide-[#253347]">
                 {items.map((item) => (

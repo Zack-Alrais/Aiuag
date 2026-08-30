@@ -180,7 +180,7 @@ export default function BranchesManagement() {
       <div className="bg-white dark:bg-[#1a2332] dark:border-[#2a3d56] rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20 text-gray-400 dark:text-[#3b4f6b]">
-            <Building className="h-5 w-5 animate-spin mr-2" />
+            <Building className="h-5 w-5 animate-spin ms-2" />
             {t("branches.loading")}
           </div>
         ) : items.length === 0 ? (
@@ -193,31 +193,31 @@ export default function BranchesManagement() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-[#253347] bg-gray-50/60 dark:bg-[#111927]">
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("common.name")}
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5" />
                       {t("branches.locationCol")}
                     </span>
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <Phone className="h-3.5 w-3.5" />
                       {t("branches.contactCol")}
                     </span>
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <User className="h-3.5 w-3.5" />
                       {t("branches.headCol")}
                     </span>
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("common.status")}
                   </th>
-                  <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-end text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("common.actions")}
                   </th>
                 </tr>

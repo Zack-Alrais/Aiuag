@@ -320,7 +320,7 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 dark:bg-[#0b1120]">
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${toast.type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"}`}>
+        <div className={`fixed top-4 end-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${toast.type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"}`}>
           {toast.type === "success" ? <Save className="w-4 h-4" /> : <X className="w-4 h-4" />}
           {toast.message}
         </div>
@@ -456,12 +456,12 @@ export default function SettingsPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-right font-medium text-gray-600 w-12"></th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-600">{t("settings.imageCol")}</th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-600">{t("settings.titleCol")}</th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-600">{t("settings.pagesCol")}</th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-600">{t("common.status")}</th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-600">{t("common.actions")}</th>
+                      <th className="px-4 py-3 text-start font-medium text-gray-600 w-12"></th>
+                      <th className="px-4 py-3 text-start font-medium text-gray-600">{t("settings.imageCol")}</th>
+                      <th className="px-4 py-3 text-start font-medium text-gray-600">{t("settings.titleCol")}</th>
+                      <th className="px-4 py-3 text-start font-medium text-gray-600">{t("settings.pagesCol")}</th>
+                      <th className="px-4 py-3 text-start font-medium text-gray-600">{t("common.status")}</th>
+                      <th className="px-4 py-3 text-end font-medium text-gray-600">{t("common.actions")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -551,7 +551,7 @@ export default function SettingsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-[#cbd5e1]">{t("settings.choosePages")}</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
                   {pageOptions.map((page) => (
-                    <button key={page.slug} type="button" onClick={() => togglePageInForm(page.slug)} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all text-right ${heroForm.selectedPages.includes(page.slug) ? "bg-blue-100 text-blue-700 border border-blue-300" : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100"}`}>
+                    <button key={page.slug} type="button" onClick={() => togglePageInForm(page.slug)} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all text-start ${heroForm.selectedPages.includes(page.slug) ? "bg-blue-100 text-blue-700 border border-blue-300" : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100"}`}>
                       <div className={`w-4 h-4 rounded border flex items-center justify-center ${heroForm.selectedPages.includes(page.slug) ? "bg-blue-600 border-blue-600" : "border-gray-300"}`}>
                         {heroForm.selectedPages.includes(page.slug) && <Check className="w-3 h-3 text-white" />}
                       </div>

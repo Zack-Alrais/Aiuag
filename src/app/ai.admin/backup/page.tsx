@@ -141,7 +141,7 @@ export default function BackupPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto" dir={lang === "ar" ? "rtl" : "ltr"}>
+    <div className="max-w-5xl mx-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
@@ -244,12 +244,12 @@ export default function BackupPage() {
             <table className="w-full">
               <thead>
                 <tr className="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-50 dark:border-[#253347]">
-                  <th className="text-right px-6 py-3 font-medium">{t("backup.dateCol")}</th>
-                  <th className="text-right px-6 py-3 font-medium">{t("backup.typeCol")}</th>
-                  <th className="text-right px-6 py-3 font-medium">{t("backup.statusCol")}</th>
-                  <th className="text-right px-6 py-3 font-medium">{t("backup.tablesCol")}</th>
-                  <th className="text-right px-6 py-3 font-medium">{t("backup.sizeCol")}</th>
-                  <th className="text-left px-6 py-3 font-medium">{t("backup.actionsCol")}</th>
+                  <th className="text-start px-6 py-3 font-medium">{t("backup.dateCol")}</th>
+                  <th className="text-start px-6 py-3 font-medium">{t("backup.typeCol")}</th>
+                  <th className="text-start px-6 py-3 font-medium">{t("backup.statusCol")}</th>
+                  <th className="text-start px-6 py-3 font-medium">{t("backup.tablesCol")}</th>
+                  <th className="text-start px-6 py-3 font-medium">{t("backup.sizeCol")}</th>
+                  <th className="text-end px-6 py-3 font-medium">{t("backup.actionsCol")}</th>
                 </tr>
               </thead>
               <tbody>

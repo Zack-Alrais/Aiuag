@@ -237,31 +237,31 @@ export default function EventsManagement() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60 dark:bg-[#111927] dark:border-[#2a3d56]">
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("common.title")}
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <CalendarDays className="h-3.5 w-3.5" />
                       {t("common.date")}
                     </span>
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5" />
                       {t("common.location")}
                     </span>
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("common.status")}
                   </th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
                       <Users className="h-3.5 w-3.5" />
                       {t("common.capacity")}
                     </span>
                   </th>
-                  <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
+                  <th className="px-6 py-3.5 text-end text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                     {t("common.actions")}
                   </th>
                 </tr>
@@ -304,7 +304,7 @@ export default function EventsManagement() {
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-[#cbd5e1]">
                       {event.capacity ?? "-"}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-end">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => openEditModal(event)}
