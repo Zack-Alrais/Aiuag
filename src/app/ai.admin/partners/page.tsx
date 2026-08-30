@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, Handshake, Globe, X } from "lucide-react"
 import ImageUpload from "@/components/admin/ImageUpload"
+import { useAdminLang } from "../admin-lang"
 
 interface Partner {
   id: string
@@ -39,12 +40,6 @@ const emptyForm: PartnerFormData = {
   order: "0",
 }
 
-const typeLabels: Record<string, string> = {
-  partner: "Partner",
-  sponsor: "Sponsor",
-  supporter: "Supporter",
-}
-
 const typeBadgeStyles: Record<string, string> = {
   partner: "bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-900/30 dark:text-[#60a5fa] dark:border-blue-800/50",
   sponsor: "bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-900/30 dark:text-[#a78bfa] dark:border-purple-800/50",
@@ -52,6 +47,7 @@ const typeBadgeStyles: Record<string, string> = {
 }
 
 export default function PartnersManagement() {
+  const { lang, t } = useAdminLang()
   const [partners, setPartners] = useState<Partner[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -163,8 +159,8 @@ export default function PartnersManagement() {
         <div className="flex items-center gap-3">
           <Handshake className="w-8 h-8 text-blue-600 dark:text-[#60a5fa]" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">إدارة الشركاء</h1>
-            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">إدارة الشركاء والراعيين والداعمين</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("partners.title")}</h1>
+            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{t("partners.subtitle")}</p>
           </div>
         </div>
         <button
@@ -172,7 +168,7 @@ export default function PartnersManagement() {
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
-          إضافة شريك
+          {t("partners.addBtn")}
         </button>
       </div>
 
@@ -191,7 +187,7 @@ export default function PartnersManagement() {
         ) : partners.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-[#3b4f6b]">
             <Handshake className="h-12 w-12 mb-3 opacity-40" />
-            <p className="text-sm">لا يوجد شركاء</p>
+            <p className="text-sm">{t("partners.empty")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -199,25 +195,25 @@ export default function PartnersManagement() {
               <thead>
                 <tr className="border-b border-gray-100 dark:border-[#253347] bg-gray-50/60 dark:bg-[#111927]">
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                      الاسم بالعربية
+                      {t("committees.nameArCol")}
                     </th>
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                      النوع
+                      {t("committees.typeCol")}
                     </th>
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                       <span className="flex items-center gap-1.5">
                         <Globe className="h-3.5 w-3.5" />
-                        الموقع الإلكتروني
+                        {t("partners.websiteCol")}
                       </span>
                     </th>
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                      الترتيب
+                      {t("partners.orderCol")}
                     </th>
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                      الحالة
+                      {t("common.status")}
                     </th>
                     <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                      الإجراءات
+                      {t("common.actions")}
                     </th>
                 </tr>
               </thead>
@@ -250,7 +246,7 @@ export default function PartnersManagement() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeBadgeStyles[partner.type] || "bg-gray-100 text-gray-600 border border-gray-200"}`}
                       >
-                        {typeLabels[partner.type] || partner.type}
+                        {t("partners.type." + partner.type) || partner.type}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-[#cbd5e1]">
@@ -279,7 +275,7 @@ export default function PartnersManagement() {
                             : "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-[#2a3d56] dark:text-[#cbd5e1] dark:border-[#3b4f6b]"
                         }`}
                       >
-                        {partner.isActive ? "نشط" : "غير نشط"}
+                        {partner.isActive ? t("cards.status.active") : t("cards.status.inactive")}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -287,7 +283,7 @@ export default function PartnersManagement() {
                         <button
                           onClick={() => openEditModal(partner)}
                           className="p-2 text-blue-600 dark:text-[#60a5fa] hover:bg-blue-50 dark:hover:bg-[#1e2d42] rounded-lg transition-colors"
-                           title="تعديل"
+                           title={t("common.edit")}
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
@@ -297,20 +293,20 @@ export default function PartnersManagement() {
                               onClick={() => handleDelete(partner.id)}
                               className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
                             >
-                               تأكيد
+                               {t("common.confirm")}
                             </button>
                             <button
                               onClick={() => setDeleteConfirmId(null)}
                               className="px-2.5 py-1 bg-gray-200 dark:bg-[#2a3d56] text-gray-600 dark:text-[#cbd5e1] text-xs rounded-md hover:bg-gray-300 dark:hover:bg-[#3b4f6b] transition-colors"
                             >
-                                 إلغاء
+                                 {t("common.cancel")}
                             </button>
                           </div>
                         ) : (
                           <button
                             onClick={() => setDeleteConfirmId(partner.id)}
                             className="p-2 text-red-500 dark:text-[#f87171] hover:bg-red-50 dark:hover:bg-[#1e2d42] rounded-lg transition-colors"
-                             title="حذف"
+                             title={t("common.delete")}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -334,7 +330,7 @@ export default function PartnersManagement() {
           <div className="relative bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-[#253347]">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f1f5f9]">
-                {editingPartner ? "تعديل شريك" : "إضافة شريك جديد"}
+                {editingPartner ? t("partners.editTitle") : t("partners.addTitle")}
               </h2>
               <button
                 onClick={closeModal}
@@ -348,7 +344,7 @@ export default function PartnersManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                    <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    الاسم بالعربية *
+                    {t("partners.nameArLabel")} *
                   </label>
                   <input
                     type="text"
@@ -357,12 +353,12 @@ export default function PartnersManagement() {
                     value={form.nameAr}
                     onChange={(e) => handleFieldChange("nameAr", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="الاسم بالعربية"
+                    placeholder={t("partners.nameArPh")}
                   />
                 </div>
                 <div>
                    <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    الاسم بالإنجليزية *
+                    {t("partners.nameEnLabel")} *
                   </label>
                   <input
                     type="text"
@@ -370,7 +366,7 @@ export default function PartnersManagement() {
                     value={form.nameEn}
                     onChange={(e) => handleFieldChange("nameEn", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="Name in English"
+                    placeholder={t("partners.nameEnPh")}
                   />
                 </div>
               </div>
@@ -380,7 +376,7 @@ export default function PartnersManagement() {
                   value={form.logo}
                   onChange={(url) => handleFieldChange("logo", url)}
                   folder="partners"
-                  label="شعار الشريك"
+                  label={t("partners.logoLabel")}
                 />
               </div>
 
@@ -388,7 +384,7 @@ export default function PartnersManagement() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
                   <span className="flex items-center gap-1.5">
                     <Globe className="h-3.5 w-3.5" />
-                    الموقع الإلكتروني
+                    {t("partners.websiteCol")}
                   </span>
                 </label>
                 <input
@@ -402,7 +398,7 @@ export default function PartnersManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                  الوصف بالعربية
+                  {t("partners.descArLabel")}
                 </label>
                 <textarea
                   rows={3}
@@ -410,27 +406,27 @@ export default function PartnersManagement() {
                   value={form.descriptionAr}
                   onChange={(e) => handleFieldChange("descriptionAr", e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
-                  placeholder="الوصف بالعربية"
+                  placeholder={t("partners.descArPh")}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                  الوصف بالإنجليزية
+                  {t("partners.descEnLabel")}
                 </label>
                 <textarea
                   rows={3}
                   value={form.descriptionEn}
                   onChange={(e) => handleFieldChange("descriptionEn", e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
-                  placeholder="Description in English"
+                  placeholder={t("partners.descEnPh")}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    النوع *
+                    {t("partners.typeLabel")} *
                   </label>
                   <select
                     required
@@ -438,14 +434,14 @@ export default function PartnersManagement() {
                     onChange={(e) => handleFieldChange("type", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
                   >
-                    <option value="partner">شريك</option>
-                    <option value="sponsor">راعي</option>
-                    <option value="supporter">داعم</option>
+                    <option value="partner">{t("partners.type.partner")}</option>
+                    <option value="sponsor">{t("partners.type.sponsor")}</option>
+                    <option value="supporter">{t("partners.type.supporter")}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    الترتيب
+                    {t("partners.orderLabel")}
                   </label>
                   <input
                     type="number"
@@ -464,7 +460,7 @@ export default function PartnersManagement() {
                   onClick={closeModal}
                   className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-[#cbd5e1] bg-gray-100 dark:bg-[#2a3d56] hover:bg-gray-200 dark:hover:bg-[#3b4f6b] rounded-lg transition-colors"
                 >
-                   إلغاء
+                   {t("common.cancel")}
                  </button>
                  <button
                    type="submit"
@@ -472,10 +468,10 @@ export default function PartnersManagement() {
                     className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                  >
                    {submitting
-                     ? "جاري الحفظ..."
+                     ? t("common.saving")
                      : editingPartner
-                       ? "تحديث الشريك"
-                       : "إنشاء شريك"}
+                       ? t("partners.updateBtn")
+                       : t("partners.createBtn")}
                 </button>
               </div>
             </form>

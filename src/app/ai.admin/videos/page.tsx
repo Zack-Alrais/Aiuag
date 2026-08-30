@@ -323,7 +323,7 @@ export default function VideosManagement() {
                     <input type="url" required={videoSource === "youtube"} value={form.url} onChange={(e) => handleFieldChange("url", e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="https://www.youtube.com/watch?v=..." />
                     {getYoutubeThumbnail(form.url) && (
                       <div className="mt-2">
-                        <img src={getYoutubeThumbnail(form.url)!} alt="معاينة" className="w-48 h-28 rounded-lg object-cover border border-gray-200 dark:border-[#3b4f6b]" loading="lazy" />
+                        <img src={getYoutubeThumbnail(form.url)!} alt={t("videos.preview")} className="w-48 h-28 rounded-lg object-cover border border-gray-200 dark:border-[#3b4f6b]" loading="lazy" />
                       </div>
                     )}
                   </div>

@@ -6,6 +6,7 @@ import {
   XCircle, RefreshCw, Download, Search, Filter, Calendar,
   ArrowUpRight, ArrowDownRight, FileText, Loader2,
 } from "lucide-react"
+import { useAdminLang } from "../admin-lang"
 
 interface DonationStats {
   today: { count: number; total: number }
@@ -31,6 +32,7 @@ interface Donation {
 }
 
 export default function DonationsManagement() {
+  const { lang, t } = useAdminLang()
   const [donations, setDonations] = useState<Donation[]>([])
   const [stats, setStats] = useState<DonationStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -77,13 +79,13 @@ export default function DonationsManagement() {
     refunded: { label: "مسترجع", labelEn: "Refunded", color: "text-purple-600 bg-purple-50", icon: <RefreshCw className="w-4 h-4" /> },
   }
 
-  const gatewayNames: Record<string, string> = {
-    bankak: "بنكك",
-    fawry: "فوري",
-    okash: "أوكاش",
-    stripe: "Stripe",
-    paypal: "PayPal",
-    verifone: "2Checkout",
+  const gatewayNames: Record<string, { ar: string; en: string }> = {
+    bankak: { ar: "بنكك", en: "Bankak" },
+    fawry: { ar: "فوري", en: "Fawry" },
+    okash: { ar: "أوكاش", en: "OKash" },
+    stripe: { ar: "Stripe", en: "Stripe" },
+    paypal: { ar: "PayPal", en: "PayPal" },
+    verifone: { ar: "2Checkout", en: "2Checkout" },
   }
 
   const statCards = [
@@ -100,12 +102,12 @@ export default function DonationsManagement() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">إدارة التبرعات</h1>
-          <p className="text-sm text-gray-500">متابعة وإدارة جميع التبرعات</p>
+          <h1 className="text-2xl font-bold text-gray-800">{t("donations.title")}</h1>
+          <p className="text-sm text-gray-500">{t("donations.subtitle")}</p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-[#1A3A6B] text-white rounded-xl hover:bg-[#0f2547] transition-colors text-sm font-medium">
           <Download className="w-4 h-4" />
-          تصدير التقرير
+          {t("donations.exportBtn")}
         </button>
       </div>
 
@@ -124,7 +126,7 @@ export default function DonationsManagement() {
               )}
             </div>
             <div className="text-2xl font-bold text-gray-800">{stat.value}</div>
-            <div className="text-xs text-gray-500 mt-1">{stat.label}</div>
+            <div className="text-xs text-gray-500 mt-1">{lang === "ar" ? stat.label : stat.labelEn}</div>
             {stat.total > 0 && (
               <div className="text-xs text-gray-400 mt-1">${stat.total.toLocaleString()}</div>
             )}
@@ -142,7 +144,7 @@ export default function DonationsManagement() {
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setPage(1) }}
               className="w-full ps-10 pe-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#1A3A6B]/20 focus:border-[#1A3A6B]"
-              placeholder="بحث بالاسم أو البريد أو رقم التبرع..."
+              placeholder={t("donations.searchPh")}
               dir="rtl"
             />
           </div>
@@ -151,11 +153,11 @@ export default function DonationsManagement() {
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
             className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#1A3A6B]/20 focus:border-[#1A3A6B]"
           >
-            <option value="all">جميع الحالات</option>
-            <option value="completed">مكتمل</option>
-            <option value="pending">قيد الانتظار</option>
-            <option value="failed">فشل</option>
-            <option value="refunded">مسترجع</option>
+            <option value="all">{t("donations.allStatuses")}</option>
+            <option value="completed">{lang === "ar" ? statusMap.completed.label : statusMap.completed.labelEn}</option>
+            <option value="pending">{lang === "ar" ? statusMap.pending.label : statusMap.pending.labelEn}</option>
+            <option value="failed">{lang === "ar" ? statusMap.failed.label : statusMap.failed.labelEn}</option>
+            <option value="refunded">{lang === "ar" ? statusMap.refunded.label : statusMap.refunded.labelEn}</option>
           </select>
           <input
             type="date"
@@ -181,19 +183,19 @@ export default function DonationsManagement() {
         ) : donations.length === 0 ? (
           <div className="text-center py-12">
             <Coins className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">لا توجد تبرعات</p>
+            <p className="text-gray-500">{t("donations.empty")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">رقم التبرع</th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">المتبرع</th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">المبلغ</th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">البوابة</th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">الحالة</th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">التاريخ</th>
+                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.numberCol")}</th>
+                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.donorCol")}</th>
+                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.amountCol")}</th>
+                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.gatewayCol")}</th>
+                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.statusCol")}</th>
+                  <th className="text-right px-4 py-3 font-semibold text-gray-600">{t("donations.dateCol")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -201,19 +203,19 @@ export default function DonationsManagement() {
                   <tr key={d.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 font-mono text-xs text-[#1A3A6B]">{d.donationNumber}</td>
                     <td className="px-4 py-3">
-                      <div className="font-medium">{d.isAnonymous ? "مجهول" : d.donorName}</div>
+                      <div className="font-medium">{d.isAnonymous ? t("donations.anonymous") : d.donorName}</div>
                       <div className="text-xs text-gray-400">{d.donorEmail}</div>
                     </td>
                     <td className="px-4 py-3 font-bold">{d.amount} {d.currency}</td>
-                    <td className="px-4 py-3 text-gray-600">{gatewayNames[d.gateway || ""] || d.gateway}</td>
+                    <td className="px-4 py-3 text-gray-600">{(gatewayNames[d.gateway || ""] as { ar?: string; en?: string } | undefined)?.[lang === "ar" ? "ar" : "en"] || d.gateway}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${statusMap[d.status]?.color || ""}`}>
                         {statusMap[d.status]?.icon}
-                        {statusMap[d.status]?.label || d.status}
+                        {lang === "ar" ? statusMap[d.status]?.label || d.status : statusMap[d.status]?.labelEn || d.status}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-xs">
-                      {new Date(d.createdAt).toLocaleDateString("ar-EG", { year: "numeric", month: "short", day: "numeric" })}
+                      {new Date(d.createdAt).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", { year: "numeric", month: "short", day: "numeric" })}
                     </td>
                   </tr>
                 ))}
@@ -230,15 +232,15 @@ export default function DonationsManagement() {
               disabled={page === 1}
               className="px-3 py-1 rounded-lg border text-sm disabled:opacity-50"
             >
-              السابق
+              {t("donations.prev")}
             </button>
-            <span className="text-sm text-gray-500">صفحة {page} من {totalPages}</span>
+            <span className="text-sm text-gray-500">{t("donations.pageOf").replace("{page}", String(page)).replace("{total}", String(totalPages))}</span>
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
               className="px-3 py-1 rounded-lg border text-sm disabled:opacity-50"
             >
-              التالي
+              {t("donations.next")}
             </button>
           </div>
         )}

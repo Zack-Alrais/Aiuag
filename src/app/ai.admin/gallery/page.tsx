@@ -93,7 +93,7 @@ setError(err instanceof Error ? err.message : t("gallery.errors.generic"))
         if (!res.ok) throw new Error(t("gallery.errors.create"))
       }
       await fetchItems(); closeModal()
-    } catch (err) { setError(err instanceof Error ? err.message : "حدث خطأ ما") }
+    } catch (err) { setError(err instanceof Error ? err.message : t("gallery.errors.generic")) }
     finally { setSaving(false) }
   }
 
@@ -102,7 +102,7 @@ setError(err instanceof Error ? err.message : t("gallery.errors.generic"))
       const res = await fetch(`/api/admin/gallery/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error(t("gallery.errors.delete"))
       setDeleteConfirm(null); await fetchItems()
-    } catch (err) { setError(err instanceof Error ? err.message : "حدث خطأ ما") }
+    } catch (err) { setError(err instanceof Error ? err.message : t("gallery.errors.generic")) }
   }
 
   function getTypeIcon(type: string) {

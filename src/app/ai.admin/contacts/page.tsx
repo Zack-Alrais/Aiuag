@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { MessageSquare, Mail, Phone, User, Clock, CheckCircle, X, Eye } from "lucide-react"
+import { useAdminLang } from "../admin-lang"
 
 interface Contact {
   id: number
@@ -16,6 +17,7 @@ interface Contact {
 }
 
 export default function ContactsManagement() {
+  const { lang, t } = useAdminLang()
   const [contacts, setContacts] = useState<Contact[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<"all" | "unread" | "read" | "replied">("all")
@@ -74,16 +76,11 @@ export default function ContactsManagement() {
   }
 
   const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      unread: "جديد",
-      read: "مقروء",
-      replied: "تم الرد",
-    }
-    return labels[status] || status
+    return t("contacts.status." + status) || status
   }
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-US", {
+    return new Date(date).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -101,12 +98,12 @@ export default function ContactsManagement() {
         <div className="flex items-center gap-3">
           <MessageSquare className="w-8 h-8 text-blue-600 dark:text-[#60a5fa]" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">رسائل الاتصال</h1>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("contacts.title")}</h1>
             <p className="text-sm text-gray-500">
-              إدارة رسائل نموذج الاتصال الواردة
+              {t("contacts.subtitle")}
               {unreadCount > 0 && (
                 <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  {unreadCount} جديد
+                  {t("contacts.newBadge").replace("{n}", String(unreadCount))}
                 </span>
               )}
             </p>
@@ -126,7 +123,7 @@ export default function ContactsManagement() {
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-[#1e2d42] dark:text-[#cbd5e1] dark:hover:bg-[#2a3d56]"
             }`}
           >
-            {status === "all" ? "الكل" : getStatusLabel(status)}
+            {status === "all" ? t("contacts.all") : getStatusLabel(status)}
           </button>
         ))}
       </div>
@@ -140,29 +137,29 @@ export default function ContactsManagement() {
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   <span className="flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5" />
-                    الاسم
+                    {t("contacts.nameCol")}
                   </span>
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   <span className="flex items-center gap-1.5">
                     <Mail className="w-3.5 h-3.5" />
-                    البريد
+                    {t("contacts.emailCol")}
                   </span>
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
-                  الموضوع
+                  {t("contacts.subjectCol")}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
-                  الحالة
+                  {t("contacts.statusCol")}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
                   <span className="flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5" />
-                    التاريخ
+                    {t("common.date")}
                   </span>
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[#94a3b8] uppercase">
-                  الإجراءات
+                  {t("common.actions")}
                 </th>
               </tr>
             </thead>
@@ -170,13 +167,13 @@ export default function ContactsManagement() {
               {loading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500 dark:text-[#94a3b8]">
-                    جاري تحميل الرسائل...
+                    {t("contacts.loading")}
                   </td>
                 </tr>
               ) : filteredContacts.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500 dark:text-[#94a3b8]">
-                    لا توجد رسائل
+                    {t("contacts.empty")}
                   </td>
                 </tr>
               ) : (
@@ -216,7 +213,7 @@ export default function ContactsManagement() {
                         <button
                           onClick={() => setSelectedContact(contact)}
                           className="p-2 text-blue-600 dark:text-[#60a5fa] hover:bg-blue-50 dark:hover:bg-[#2a3d56] rounded-lg transition-colors"
-                          title="عرض الرسالة"
+                          title={t("contacts.viewTitle")}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -225,7 +222,7 @@ export default function ContactsManagement() {
                             onClick={() => updateStatus(contact.id, "read")}
                             disabled={updating === contact.id}
                             className="p-2 text-green-600 dark:text-[#34d399] hover:bg-green-50 dark:hover:bg-[#2a3d56] rounded-lg transition-colors disabled:opacity-50"
-                            title="تحديد كمقروء"
+                            title={t("contacts.markReadTitle")}
                           >
                             <CheckCircle className="w-4 h-4" />
                           </button>
@@ -247,7 +244,7 @@ export default function ContactsManagement() {
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-[#2a3d56]">
               <div className="flex items-center gap-3">
                 <MessageSquare className="w-5 h-5 text-blue-600 dark:text-[#60a5fa]" />
-                <h2 className="text-xl font-bold text-gray-800 dark:text-[#f1f5f9]">تفاصيل الرسالة</h2>
+                <h2 className="text-xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("contacts.detailTitle")}</h2>
               </div>
               <button
                 onClick={() => setSelectedContact(null)}
@@ -263,14 +260,14 @@ export default function ContactsManagement() {
                 <div className="flex items-start gap-3">
                   <User className="w-5 h-5 text-gray-400 dark:text-[#7a8ba3] mt-0.5" />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide">الاسم</p>
+                    <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide">{t("contacts.nameCol")}</p>
                     <p className="text-sm font-medium text-gray-800 dark:text-[#f1f5f9]">{selectedContact.name}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Mail className="w-5 h-5 text-gray-400 dark:text-[#7a8ba3] mt-0.5" />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide">البريد</p>
+                    <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide">{t("contacts.emailCol")}</p>
                     <p className="text-sm font-medium text-gray-800 dark:text-[#f1f5f9]">{selectedContact.email}</p>
                   </div>
                 </div>
@@ -278,7 +275,7 @@ export default function ContactsManagement() {
                   <div className="flex items-start gap-3">
                     <Phone className="w-5 h-5 text-gray-400 dark:text-[#7a8ba3] mt-0.5" />
                     <div>
-                      <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide">الهاتف</p>
+                      <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide">{t("contacts.phoneLabel")}</p>
                       <p className="text-sm font-medium text-gray-800 dark:text-[#f1f5f9]">{selectedContact.phone}</p>
                     </div>
                   </div>
@@ -286,7 +283,7 @@ export default function ContactsManagement() {
                 <div className="flex items-start gap-3">
                   <Clock className="w-5 h-5 text-gray-400 dark:text-[#7a8ba3] mt-0.5" />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide">التاريخ</p>
+                    <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide">{t("common.date")}</p>
                     <p className="text-sm font-medium text-gray-800 dark:text-[#f1f5f9]">
                       {formatDate(selectedContact.createdAt)}
                     </p>
@@ -296,13 +293,13 @@ export default function ContactsManagement() {
 
               {/* Subject */}
               <div>
-                <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide mb-1">الموضوع</p>
+                <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide mb-1">{t("contacts.subjectLabel")}</p>
                 <p className="text-sm font-medium text-gray-800 dark:text-[#f1f5f9]">{selectedContact.subject}</p>
               </div>
 
               {/* Message */}
               <div>
-                <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide mb-1">الرسالة</p>
+                <p className="text-xs text-gray-500 dark:text-[#7a8ba3] uppercase tracking-wide mb-1">{t("contacts.messageLabel")}</p>
                 <div className="bg-gray-50 dark:bg-[#111927] rounded-lg p-4">
                   <p className="text-sm text-gray-700 dark:text-[#cbd5e1] whitespace-pre-wrap">{selectedContact.message}</p>
                 </div>
@@ -310,7 +307,7 @@ export default function ContactsManagement() {
 
               {/* Status Actions */}
               <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-200 dark:border-[#253347]">
-                <span className="text-sm text-gray-500 dark:text-[#94a3b8]">تحديث الحالة:</span>
+                <span className="text-sm text-gray-500 dark:text-[#94a3b8]">{t("contacts.updateStatusLabel")}</span>
                 {selectedContact.status !== "read" && (
                   <button
                     onClick={() => updateStatus(selectedContact.id, "read")}
@@ -318,7 +315,7 @@ export default function ContactsManagement() {
                     className="flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-[#0d2818] text-green-700 dark:text-[#34d399] rounded-lg text-sm font-medium hover:bg-green-200 dark:hover:bg-[#1a3a2a] transition-colors disabled:opacity-50"
                   >
                     <CheckCircle className="w-4 h-4" />
-                    تحديد كمقروء
+                    {t("contacts.markRead")}
                   </button>
                 )}
                 {selectedContact.status !== "replied" && (
@@ -328,7 +325,7 @@ export default function ContactsManagement() {
                     className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-[#1e2d42] text-gray-700 dark:text-[#cbd5e1] rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-[#2a3d56] transition-colors disabled:opacity-50"
                   >
                     <Mail className="w-4 h-4" />
-                    تحديد كتم الرد
+                    {t("contacts.markReplied")}
                   </button>
                 )}
               </div>
