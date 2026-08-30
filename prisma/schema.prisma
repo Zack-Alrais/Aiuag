@@ -679,3 +679,14 @@ model PostShare {
   @@unique([postId, memberId])
   @@index([postId])
 }
+
+model StoredFile {
+  id           String   @id @default(cuid())
+  filename     String   @unique // full key e.g. "gallery/123456-abcd1234.jpg"
+  folder       String
+  originalName String
+  mimeType     String
+  size         Int
+  data         Bytes
+  createdAt    DateTime @default(now())
+}

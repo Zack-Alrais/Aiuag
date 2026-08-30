@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
-import { NextResponse } from "next/server";
+import { verifyAdminToken } from "@/lib/admin-token";
+import { NextResponse, NextRequest } from "next/server";
 
 const ALL_PAGES = [
   "dashboard", "notifications", "news", "events", "posts", "comments",
@@ -14,21 +15,23 @@ export type PagePermission = typeof ALL_PAGES[number];
 
 const SUPER_ADMIN_EMAIL = "pen@cube.com";
 
-function getAdminEmail(req: Request): string | null {
-  const token = req.headers.get("cookie") || "";
-  const match = token.match(/admin_token=([^;]+)/);
+async function getAdminAuth(req: Request) {
+  const cookie = req.headers.get("cookie") || "";
+  const match = cookie.match(/(?:^|;\s*)admin_token=([^;]+)/);
   if (!match) return null;
-  try {
-    return JSON.parse(decodeURIComponent(match[1])).email?.toLowerCase() || null;
-  } catch {
-    return null;
-  }
+  return verifyAdminToken(decodeURIComponent(match[1]));
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const adminEmail = getAdminEmail(request);
-    if (!adminEmail || adminEmail !== SUPER_ADMIN_EMAIL) {
+    const token = await getAdminAuth(request);
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const isSuper = token.email.toLowerCase() === SUPER_ADMIN_EMAIL;
+    // Any admin can view the list (read-only); only super admin can manage it.
+    if (!isSuper && token.role !== "admin" && token.role !== "moderator") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -52,10 +55,10 @@ export async function GET(request: Request) {
   }
 }
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
   try {
-    const adminEmail = getAdminEmail(request);
-    if (!adminEmail || adminEmail !== SUPER_ADMIN_EMAIL) {
+    const token = await getAdminAuth(request);
+    if (!token || token.email.toLowerCase() !== SUPER_ADMIN_EMAIL) {
       return NextResponse.json({ error: "Only Pen@cube.com can manage permissions" }, { status: 403 });
     }
 
@@ -70,14 +73,7 @@ export async function PATCH(request: Request) {
     });
 
     const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
-    const token = request.headers.get("cookie") || "";
-    const match = token.match(/admin_token=([^;]+)/);
-    if (match) {
-      try {
-        const t = JSON.parse(decodeURIComponent(match[1]));
-        logAudit({ userId: t.id, userEmail: t.email, userName: t.name, action: "update", entity: "permissions", entityId: userId, details: { targetUser: targetUser?.email, permissions } });
-      } catch {}
-    }
+    logAudit({ userId: token.id, userEmail: token.email, userName: token.name, action: "update", entity: "permissions", entityId: userId, details: { targetUser: targetUser?.email, permissions } });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

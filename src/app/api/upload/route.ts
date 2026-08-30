@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 const ALLOWED_TYPES = [
   "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml",
@@ -8,10 +9,19 @@ const ALLOWED_TYPES = [
 const MAX_SIZE = 10 * 1024 * 1024;
 const MAX_FILES = 10;
 
+function sanitizeFolder(folder: string): string {
+  const clean = folder.replace(/[^a-z0-9-_]/gi, "").toLowerCase();
+  return clean || "general";
+}
+
+function randomSuffix(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const folder = (formData.get("folder") as string) || "general";
+    const folder = sanitizeFolder((formData.get("folder") as string) || "general");
 
     const files: File[] = [];
     for (const [key, value] of formData.entries()) {
@@ -28,28 +38,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Max ${MAX_FILES} files allowed` }, { status: 400 });
     }
 
+    for (const file of files) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        return NextResponse.json({ error: `File type not allowed: ${file.type}` }, { status: 400 });
+      }
+      if (file.size > MAX_SIZE) {
+        return NextResponse.json({ error: `File too large: ${file.name}` }, { status: 400 });
+      }
+    }
+
     const isVercel = !!process.env.VERCEL;
 
-    if (isVercel) {
-      if (!process.env.BLOB_READ_WRITE_TOKEN) {
-        return NextResponse.json(
-          { error: "Blob storage is not configured (BLOB_READ_WRITE_TOKEN)" },
-          { status: 503 }
-        );
-      }
+    if (isVercel && process.env.BLOB_READ_WRITE_TOKEN) {
       const { put } = await import("@vercel/blob");
       const results: { url: string; filename: string; name: string }[] = [];
 
       for (const file of files) {
-        if (!ALLOWED_TYPES.includes(file.type)) {
-          return NextResponse.json({ error: `File type not allowed: ${file.type}` }, { status: 400 });
-        }
-        if (file.size > MAX_SIZE) {
-          return NextResponse.json({ error: `File too large: ${file.name}` }, { status: 400 });
-        }
-
         const ext = file.name.split(".").pop() || "jpg";
-        const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const filename = `${folder}/${randomSuffix()}.${ext}`;
 
         const blob = await put(filename, file, {
           access: "public",
@@ -62,33 +68,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ urls: results.map(r => r.url), files: results }, { status: 201 });
     }
 
-    const { writeFile, mkdir } = await import("fs/promises");
-    const path = await import("path");
-    const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
-    await mkdir(uploadDir, { recursive: true });
+    // DB-backed storage fallback (works on Vercel without Blob token and locally)
+    const records = await Promise.all(
+      files.map(async (file) => {
+        const ext = file.name.split(".").pop() || "jpg";
+        const filename = `${folder}/${randomSuffix()}.${ext}`;
+        const buffer = Buffer.from(await file.arrayBuffer());
 
-    const results: { url: string; filename: string; name: string }[] = [];
+        await prisma.storedFile.create({
+          data: {
+            filename,
+            folder,
+            originalName: file.name,
+            mimeType: file.type,
+            size: file.size,
+            data: buffer,
+          },
+        });
 
-    for (const file of files) {
-      if (!ALLOWED_TYPES.includes(file.type)) {
-        return NextResponse.json({ error: `File type not allowed: ${file.type}` }, { status: 400 });
-      }
-      if (file.size > MAX_SIZE) {
-        return NextResponse.json({ error: `File too large: ${file.name}` }, { status: 400 });
-      }
+        return { url: `/api/files/${filename}`, filename, name: file.name };
+      })
+    );
 
-      const ext = file.name.split(".").pop() || "jpg";
-      const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const filepath = path.join(uploadDir, filename);
-
-      const buffer = Buffer.from(await file.arrayBuffer());
-      await writeFile(filepath, buffer);
-
-      const url = `/uploads/${folder}/${filename}`;
-      results.push({ url, filename: `${folder}/${filename}`, name: file.name });
-    }
-
-    return NextResponse.json({ urls: results.map(r => r.url), files: results }, { status: 201 });
+    return NextResponse.json({ urls: records.map(r => r.url), files: records }, { status: 201 });
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
