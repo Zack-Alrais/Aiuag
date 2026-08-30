@@ -44,9 +44,16 @@
 
 html {
   scroll-behavior: smooth;
+  /* Final fail-safe: clip horizontal overflow at the root without creating
+     a scroll container (keeps position:sticky working). Root causes are
+     fixed in the shared layout so this never clips intentional content. */
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 body {
+  max-width: 100%;
+  overflow-x: clip;
   background-color: var(--color-background);
   color: var(--color-text);
   transition: background-color 0.3s, color 0.3s;
