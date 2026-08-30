@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Printer, Loader2, CreditCard, ArrowLeft } from "lucide-react"
 import { MembershipCardEngine } from "@/components/cards/membership-card-engine"
+import { useAdminLang } from "../admin-lang"
 
 interface MemberData {
   nameAr: string
@@ -24,6 +25,7 @@ interface MemberData {
 }
 
 function MembershipCardContent() {
+  const { lang, t } = useAdminLang()
   const searchParams = useSearchParams()
   const router = useRouter()
   const memberId = searchParams.get("id")
@@ -34,7 +36,7 @@ function MembershipCardContent() {
 
   useEffect(() => {
     if (!memberId) {
-      setError("لم يتم تحديد العضو")
+      setError(t("membershipCard.notSpecified"))
       setLoading(false)
       return
     }
@@ -43,8 +45,8 @@ function MembershipCardContent() {
       try {
         const res = await fetch(`/api/admin/members/${memberId}`)
         if (!res.ok) {
-          if (res.status === 404) throw new Error("العضو غير موجود")
-          throw new Error("فشل في تحميل البيانات")
+          if (res.status === 404) throw new Error(t("membershipCard.notFound"))
+          throw new Error(t("membershipCard.fetchFailed"))
         }
         const json = await res.json()
         const m = json.member || json.data || json
@@ -52,7 +54,7 @@ function MembershipCardContent() {
           nameAr: m.nameAr || m.name || "",
           nameEn: m.nameEn || m.name || "",
           membershipNumber: m.membershipNumber || "",
-          memberType: m.membershipType || m.memberType || "عضو مسجل",
+          memberType: m.membershipType || m.memberType || t("membershipCard.memberTypeDefault"),
           photo: m.cardPhoto || m.photo || "",
           faculty: m.faculty || "",
           department: m.department || m.specialization || "",
@@ -63,7 +65,7 @@ function MembershipCardContent() {
           issueDate: m.createdAt || m.memberSince || "",
         })
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "خطأ في تحميل البيانات")
+        setError(err instanceof Error ? err.message : t("membershipCard.fetchError"))
       } finally {
         setLoading(false)
       }
@@ -79,7 +81,7 @@ function MembershipCardContent() {
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 text-[#1A3A6B] animate-spin" />
-          <p className="text-sm text-gray-500">جاري تحميل البطاقة...</p>
+          <p className="text-sm text-gray-500">{t("membershipCard.loading")}</p>
         </div>
       </div>
     )
@@ -89,10 +91,10 @@ function MembershipCardContent() {
     return (
       <div className="space-y-4">
         <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> رجوع
+          <ArrowLeft className="w-4 h-4" /> {t("membershipCard.back")}
         </button>
         <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
-          <p className="text-red-700">{error || "العضو غير موجود"}</p>
+          <p className="text-red-700">{error || t("membershipCard.notFound")}</p>
         </div>
       </div>
     )
@@ -107,7 +109,7 @@ function MembershipCardContent() {
           </button>
           <CreditCard className="w-8 h-8 text-[#1A3A6B]" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">بطاقة العضوية</h1>
+            <h1 className="text-2xl font-bold text-gray-800">{t("membershipCard.title")}</h1>
             <p className="text-sm text-gray-500">{member.nameAr}</p>
           </div>
         </div>
@@ -115,30 +117,30 @@ function MembershipCardContent() {
           onClick={handlePrint}
           className="flex items-center gap-2 px-4 py-2 bg-[#1A3A6B] text-white rounded-xl hover:bg-[#0f2547] transition-colors text-sm font-medium"
         >
-          <Printer className="w-4 h-4" /> طباعة البطاقة
+          <Printer className="w-4 h-4" /> {t("membershipCard.printBtn")}
         </button>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="flex flex-col items-center justify-center border-l md:border-l-0 border-gray-200 md:pl-6">
-          <p className="text-xs text-gray-400 mb-2">صورة البطاقة</p>
+          <p className="text-xs text-gray-400 mb-2">{t("membershipCard.cardPhoto")}</p>
           {member.photo ? (
-            <img src={member.photo} alt="صورة البطاقة" className="w-32 h-40 rounded-xl object-cover border border-gray-200 shadow-sm" />
+            <img src={member.photo} alt={t("membershipCard.photoAlt")} className="w-32 h-40 rounded-xl object-cover border border-gray-200 shadow-sm" />
           ) : (
-            <div className="w-32 h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm border border-gray-200">لا توجد صورة</div>
+            <div className="w-32 h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm border border-gray-200">{t("membershipCard.noPhoto")}</div>
           )}
         </div>
         <div className="md:col-span-2 space-y-3">
-          <h3 className="text-sm font-bold text-gray-700 border-b border-gray-100 pb-2 mb-3">معلومات العضو</h3>
-          <InfoRow label="الاسم (عربي)" value={member.nameAr} />
-          <InfoRow label="الاسم (إنجليزي)" value={member.nameEn} />
-          <InfoRow label="رقم العضوية" value={member.membershipNumber} />
-          <InfoRow label="نوع العضوية" value={member.memberType} />
-          <InfoRow label="الكلية" value={member.faculty || "—"} />
-          <InfoRow label="التخصص" value={member.department || "—"} />
-          <InfoRow label="سنة التخرج" value={member.graduationYear?.toString() || "—"} />
-          <InfoRow label="تاريخ الإصدار" value={member.issueDate || "—"} />
-          <InfoRow label="تاريخ الانتهاء" value={member.expiryDate || "سنتان من تاريخ الإصدار"} />
+          <h3 className="text-sm font-bold text-gray-700 border-b border-gray-100 pb-2 mb-3">{t("membershipCard.memberInfo")}</h3>
+          <InfoRow label={t("membershipCard.nameArLabel")} value={member.nameAr} />
+          <InfoRow label={t("membershipCard.nameEnLabel")} value={member.nameEn} />
+          <InfoRow label={t("membershipCard.membershipNoLabel")} value={member.membershipNumber} />
+          <InfoRow label={t("membershipCard.memberTypeLabel")} value={member.memberType} />
+          <InfoRow label={t("membershipCard.facultyLabel")} value={member.faculty || "—"} />
+          <InfoRow label={t("membershipCard.departmentLabel")} value={member.department || "—"} />
+          <InfoRow label={t("membershipCard.graduationYearLabel")} value={member.graduationYear?.toString() || "—"} />
+          <InfoRow label={t("membershipCard.issueDateLabel")} value={member.issueDate || "—"} />
+          <InfoRow label={t("membershipCard.expiryDateLabel")} value={member.expiryDate || t("membershipCard.expiryDefault")} />
         </div>
       </div>
 

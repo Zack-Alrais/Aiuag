@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useAdminLang } from "../admin-lang";
 
 interface PageContentItem {
   id: string;
@@ -11,27 +12,28 @@ interface PageContentItem {
   valueEn: string;
 }
 
-const PAGE_LABELS: Record<string, string> = {
-  home: "الرئيسية",
-  about: "من نحن",
-  contact: "اتصل بنا",
-  services: "خدماتنا",
-  membership: "العضوية",
-  media: "المركز الإعلامي",
-  organization: "الهيكل التنظيمي",
-  secretariat: "الأمانة العامة",
-  faq: "الأسئلة الشائعة",
-  posts: "المشاركات",
-  projects: "المشاريع",
-  news: "الأخبار",
-  events: "الأحداث",
-  partners: "شركاؤنا",
-  volunteer: "التطوع",
-  donations: "التبرعات",
-  footer: "التذييل",
+const PAGE_LABELS: Record<string, { ar: string; en: string }> = {
+  home: { ar: "الرئيسية", en: "Home" },
+  about: { ar: "من نحن", en: "About" },
+  contact: { ar: "اتصل بنا", en: "Contact" },
+  services: { ar: "خدماتنا", en: "Services" },
+  membership: { ar: "العضوية", en: "Membership" },
+  media: { ar: "المركز الإعلامي", en: "Media Center" },
+  organization: { ar: "الهيكل التنظيمي", en: "Organization" },
+  secretariat: { ar: "الأمانة العامة", en: "Secretariat" },
+  faq: { ar: "الأسئلة الشائعة", en: "FAQ" },
+  posts: { ar: "المشاركات", en: "Posts" },
+  projects: { ar: "المشاريع", en: "Projects" },
+  news: { ar: "الأخبار", en: "News" },
+  events: { ar: "الأحداث", en: "Events" },
+  partners: { ar: "شركاؤنا", en: "Partners" },
+  volunteer: { ar: "التطوع", en: "Volunteer" },
+  donations: { ar: "التبرعات", en: "Donations" },
+  footer: { ar: "التذييل", en: "Footer" },
 };
 
 export default function PageContentsPage() {
+  const { lang, t } = useAdminLang();
   const [contents, setContents] = useState<PageContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPage, setSelectedPage] = useState("home");
@@ -81,10 +83,10 @@ export default function PageContentsPage() {
     try {
       const res = await fetch("/api/admin/seed-content", { method: "POST" });
       const data = await res.json();
-      setSeedResult("تم إدخال " + data.pageCount + " نص و " + data.memberCount + " عضو أمانة");
+      setSeedResult(t("pageContents.seedSuccess").replace("{pages}", String(data.pageCount)).replace("{members}", String(data.memberCount)));
       fetchContents();
     } catch {
-      setSeedResult("حدث خطأ أثناء الإدخال");
+      setSeedResult(t("pageContents.seedError"));
     } finally {
       setSeeding(false);
     }
@@ -107,11 +109,11 @@ export default function PageContentsPage() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{"إدارة نصوص الصفحات"}</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{"تعديل جميع النصوص المعروضة في الموقع"}</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("pageContents.title")}</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t("pageContents.subtitle")}</p>
           </div>
           <button onClick={handleSeed} disabled={seeding} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium">
-            {seeding ? "جاري الإدخال..." : "إدخال النصوص الافتراضية"}
+            {seeding ? t("pageContents.seeding") : t("pageContents.seedBtn")}
           </button>
         </div>
 
@@ -126,14 +128,14 @@ export default function PageContentsPage() {
             <div className="flex flex-wrap gap-2">
               {Object.entries(PAGE_LABELS).map(([slug, label]) => (
                 <button key={slug} onClick={() => setSelectedPage(slug)} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${selectedPage === slug ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-[#1e2d42] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2a3f5f]"}`}>
-                  {label}
+                  {lang === "ar" ? label.ar : label.en}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="p-4 border-b border-gray-200 dark:border-[#3b4f6b]">
-            <input type="text" placeholder="بحث في النصوص..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full px-4 py-2 border border-gray-300 dark:border-[#3b4f6b] rounded-lg bg-white dark:bg-[#1e2d42] text-gray-900 dark:text-[#f1f5f9] text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <input type="text" placeholder={t("pageContents.searchPh")} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full px-4 py-2 border border-gray-300 dark:border-[#3b4f6b] rounded-lg bg-white dark:bg-[#1e2d42] text-gray-900 dark:text-[#f1f5f9] text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
           </div>
 
           <div className="p-4">
@@ -145,8 +147,8 @@ export default function PageContentsPage() {
               </div>
             ) : Object.keys(grouped).length === 0 ? (
               <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                <p className="text-lg mb-2">{"لا توجد نصوص"}</p>
-                <p className="text-sm">{"اضغط إدخال النصوص الافتراضية لإضافة النصوص"}</p>
+                <p className="text-lg mb-2">{t("pageContents.emptyTitle")}</p>
+                <p className="text-sm">{t("pageContents.emptyHint")}</p>
               </div>
             ) : (
               <div className="space-y-6">
@@ -161,14 +163,14 @@ export default function PageContentsPage() {
                           </div>
                           {editingId === item.id ? (
                             <div className="flex-1 space-y-2">
-                              <input type="text" value={editAr} onChange={(e) => setEditAr(e.target.value)} placeholder="النص بالعربية" className="w-full px-3 py-1.5 border border-gray-300 dark:border-[#3b4f6b] rounded bg-white dark:bg-[#1e2d42] text-gray-900 dark:text-[#f1f5f9] text-sm" dir="rtl" />
-                              <input type="text" value={editEn} onChange={(e) => setEditEn(e.target.value)} placeholder="English text" className="w-full px-3 py-1.5 border border-gray-300 dark:border-[#3b4f6b] rounded bg-white dark:bg-[#1e2d42] text-gray-900 dark:text-[#f1f5f9] text-sm" />
+                              <input type="text" value={editAr} onChange={(e) => setEditAr(e.target.value)} placeholder={t("pageContents.arPh")} className="w-full px-3 py-1.5 border border-gray-300 dark:border-[#3b4f6b] rounded bg-white dark:bg-[#1e2d42] text-gray-900 dark:text-[#f1f5f9] text-sm" dir="rtl" />
+                              <input type="text" value={editEn} onChange={(e) => setEditEn(e.target.value)} placeholder={t("pageContents.enPh")} className="w-full px-3 py-1.5 border border-gray-300 dark:border-[#3b4f6b] rounded bg-white dark:bg-[#1e2d42] text-gray-900 dark:text-[#f1f5f9] text-sm" />
                               <div className="flex gap-2">
                                 <button onClick={() => handleSave(item.id)} disabled={saving} className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 disabled:opacity-50">
-                                  {saving ? "جاري الحفظ..." : "حفظ"}
+                                  {saving ? t("common.saving") : t("pageContents.save")}
                                 </button>
                                 <button onClick={() => setEditingId(null)} className="px-3 py-1 bg-gray-300 dark:bg-[#3b4f6b] text-gray-700 dark:text-gray-300 rounded text-xs hover:bg-gray-400">
-                                  {"إلغاء"}
+                                  {t("common.cancel")}
                                 </button>
                               </div>
                             </div>
@@ -177,7 +179,7 @@ export default function PageContentsPage() {
                               <div className="text-sm text-gray-800 dark:text-gray-200 break-words min-w-0" dir="rtl">{item.valueAr}</div>
                               <div className="text-sm text-gray-500 dark:text-gray-400 break-words min-w-0">{item.valueEn}</div>
                               <button onClick={() => { setEditingId(item.id); setEditAr(item.valueAr); setEditEn(item.valueEn || ""); }} className="px-3 py-1 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded whitespace-nowrap">
-                                تعديل
+                                {t("common.edit")}
                               </button>
                             </div>
                           )}

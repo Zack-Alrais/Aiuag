@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Save, Shield, User as UserIcon, Loader2, CheckCircle, XCircle } from "lucide-react"
+import { Save, Loader2, CheckCircle, XCircle } from "lucide-react"
+import { useAdminLang } from "../admin-lang"
 
 interface AdminUser {
   id: string
@@ -12,33 +13,34 @@ interface AdminUser {
 }
 
 const ALL_PAGES = [
-  { id: "dashboard", ar: "الرئيسية" },
-  { id: "notifications", ar: "الإشعارات" },
-  { id: "news", ar: "الأخبار" },
-  { id: "events", ar: "الأحداث" },
-  { id: "posts", ar: "المنشورات التفاعلية" },
-  { id: "comments", ar: "التعليقات" },
-  { id: "videos", ar: "الفيديوهات" },
-  { id: "gallery", ar: "المعرض" },
-  { id: "members", ar: "الأعضاء" },
-  { id: "cards", ar: "البطاقات" },
-  { id: "board", ar: "مجلس الإدارة" },
-  { id: "committees", ar: "اللجان" },
-  { id: "secretariat", ar: "الأمانة العامة" },
-  { id: "projects", ar: "المشاريع" },
-  { id: "publications", ar: "المنشورات" },
-  { id: "branches", ar: "الفروع" },
-  { id: "partners", ar: "الشركاء" },
-  { id: "contacts", ar: "رسائل الاتصال" },
-  { id: "donations", ar: "التبرعات" },
-  { id: "settings", ar: "الإعدادات" },
-  { id: "backup", ar: "النسخ الاحتياطي" },
-  { id: "graduates", ar: "الخريجين" },
-  { id: "activity", ar: "تتبع النشاط" },
-  { id: "permissions", ar: "الصلاحيات" },
+  { id: "dashboard", ar: "الرئيسية", en: "Dashboard" },
+  { id: "notifications", ar: "الإشعارات", en: "Notifications" },
+  { id: "news", ar: "الأخبار", en: "News" },
+  { id: "events", ar: "الأحداث", en: "Events" },
+  { id: "posts", ar: "المنشورات التفاعلية", en: "Interactive Posts" },
+  { id: "comments", ar: "التعليقات", en: "Comments" },
+  { id: "videos", ar: "الفيديوهات", en: "Videos" },
+  { id: "gallery", ar: "المعرض", en: "Gallery" },
+  { id: "members", ar: "الأعضاء", en: "Members" },
+  { id: "cards", ar: "البطاقات", en: "Cards" },
+  { id: "board", ar: "مجلس الإدارة", en: "Board" },
+  { id: "committees", ar: "اللجان", en: "Committees" },
+  { id: "secretariat", ar: "الأمانة العامة", en: "Secretariat" },
+  { id: "projects", ar: "المشاريع", en: "Projects" },
+  { id: "publications", ar: "المنشورات", en: "Publications" },
+  { id: "branches", ar: "الفروع", en: "Branches" },
+  { id: "partners", ar: "الشركاء", en: "Partners" },
+  { id: "contacts", ar: "رسائل الاتصال", en: "Contact Messages" },
+  { id: "donations", ar: "التبرعات", en: "Donations" },
+  { id: "settings", ar: "الإعدادات", en: "Settings" },
+  { id: "backup", ar: "النسخ الاحتياطي", en: "Backup" },
+  { id: "graduates", ar: "الخريجين", en: "Graduates" },
+  { id: "activity", ar: "تتبع النشاط", en: "Activity Log" },
+  { id: "permissions", ar: "الصلاحيات", en: "Permissions" },
 ]
 
 export default function PermissionsPage() {
+  const { lang, t } = useAdminLang()
   const [admins, setAdmins] = useState<AdminUser[]>([])
   const [allPages, setAllPages] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
@@ -89,7 +91,7 @@ export default function PermissionsPage() {
       if (res.ok) {
         setAdmins((prev) => prev.map((a) => a.id === userId ? { ...a, permissions: editPerms } : a))
         setEditing(null)
-        setSuccess("تم حفظ الصلاحيات")
+        setSuccess(t("permissions.saved"))
         setTimeout(() => setSuccess(""), 3000)
       }
     } catch (e) {
@@ -100,11 +102,11 @@ export default function PermissionsPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto" dir="rtl">
+    <div className="max-w-5xl mx-auto" dir={lang === "ar" ? "rtl" : "ltr"}>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-[#0f2547] dark:text-white">صلاحيات المشرفين</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">تحديد الصفحات التي يمكن لكل مشرف الوصول إليها</p>
+          <h1 className="text-2xl font-bold text-[#0f2547] dark:text-white">{t("permissions.title")}</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t("permissions.subtitle")}</p>
         </div>
         {success && (
           <div className="flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-xl text-sm text-green-700 dark:text-green-400">
@@ -114,7 +116,7 @@ export default function PermissionsPage() {
       </div>
 
       {loading ? (
-        <div className="p-12 text-center text-gray-400"><Loader2 className="w-8 h-8 mx-auto animate-spin mb-2" /><span>جارٍ التحميل...</span></div>
+        <div className="p-12 text-center text-gray-400"><Loader2 className="w-8 h-8 mx-auto animate-spin mb-2" /><span>{t("permissions.loading")}</span></div>
       ) : (
         <div className="space-y-6">
           {admins.map((admin) => (
@@ -131,7 +133,7 @@ export default function PermissionsPage() {
                 <span className={`px-3 py-1 rounded-lg text-xs font-medium ${
                   admin.role === "admin" ? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400" : "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400"
                 }`}>
-                  {admin.role === "admin" ? "مدير النظام" : "مشرف"}
+                  {admin.role === "admin" ? t("permissions.role.admin") : t("permissions.role.editor")}
                 </span>
                 {editing !== admin.id ? (
                   isSuper ? (
@@ -139,20 +141,20 @@ export default function PermissionsPage() {
                       onClick={() => { setEditing(admin.id); setEditPerms([...admin.permissions]) }}
                       className="px-4 py-2 border border-gray-200 dark:border-[#3b4f6b] rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1e2d42] transition-colors"
                     >
-                      تعديل الصلاحيات
+                      {t("permissions.editBtn")}
                     </button>
                   ) : (
-                    <span className="px-3 py-1 bg-gray-100 dark:bg-[#2a3d56] rounded-xl text-xs text-gray-400 dark:text-gray-500">عرض فقط</span>
+                    <span className="px-3 py-1 bg-gray-100 dark:bg-[#2a3d56] rounded-xl text-xs text-gray-400 dark:text-gray-500">{t("permissions.viewOnly")}</span>
                   )
                 ) : (
                   <div className="flex gap-2">
                     <button onClick={() => setEditing(null)} className="px-4 py-2 border border-gray-200 dark:border-[#3b4f6b] rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1e2d42] transition-colors">
-                      إلغاء
+                      {t("common.cancel")}
                     </button>
                     <button onClick={() => handleSave(admin.id)} disabled={saving === admin.id}
                       className="px-4 py-2 bg-[#1A3A6B] text-white rounded-xl text-sm font-medium hover:bg-[#0f2547] disabled:opacity-60 transition-colors flex items-center gap-2">
                       {saving === admin.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                      حفظ
+                      {t("permissions.save")}
                     </button>
                   </div>
                 )}
@@ -162,8 +164,8 @@ export default function PermissionsPage() {
               <div className="p-5">
                 {editing === admin.id && (
                   <div className="flex gap-2 mb-4">
-                    <button onClick={selectAll} className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-medium hover:bg-primary/20 transition-colors">تحديد الكل</button>
-                    <button onClick={deselectAll} className="px-3 py-1.5 bg-gray-100 dark:bg-[#2a3d56] text-gray-600 dark:text-gray-300 rounded-lg text-xs font-medium hover:bg-gray-200 dark:hover:bg-[#3b4f6b] transition-colors">إلغاء الكل</button>
+                    <button onClick={selectAll} className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-medium hover:bg-primary/20 transition-colors">{t("permissions.selectAll")}</button>
+                    <button onClick={deselectAll} className="px-3 py-1.5 bg-gray-100 dark:bg-[#2a3d56] text-gray-600 dark:text-gray-300 rounded-lg text-xs font-medium hover:bg-gray-200 dark:hover:bg-[#3b4f6b] transition-colors">{t("permissions.deselectAll")}</button>
                   </div>
                 )}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -182,14 +184,14 @@ export default function PermissionsPage() {
                         } ${isEditing ? "cursor-pointer hover:scale-[1.02]" : "cursor-default"}`}
                       >
                         {permitted ? <CheckCircle className="w-4 h-4 shrink-0" /> : <XCircle className="w-4 h-4 shrink-0" />}
-                        {page.ar}
+                        {lang === "ar" ? page.ar : page.en}
                       </button>
                     )
                   })}
                 </div>
                 {editing !== admin.id && (
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
-                    {admin.permissions.length} من {allPages.length} صفحة متاحة
+                    {t("permissions.count").replace("{n}", String(admin.permissions.length)).replace("{total}", String(allPages.length))}
                   </p>
                 )}
               </div>
