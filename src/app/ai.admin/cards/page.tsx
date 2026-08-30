@@ -24,6 +24,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { MembershipCardEngine } from "@/components/cards/membership-card-engine";
+import { useAdminLang } from "../admin-lang";
 
 interface MemberCard {
   id: string;
@@ -43,15 +44,16 @@ interface MemberCard {
   photo?: string;
 }
 
-const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  active: { label: "نشط", color: "bg-green-100 text-green-700" },
-  inactive: { label: "غير نشط", color: "bg-gray-100 text-gray-600" },
-  expired: { label: "منتهي", color: "bg-red-100 text-red-600" },
+const STATUS_MAP: Record<string, { labelKey: string; color: string }> = {
+  active: { labelKey: "cards.status.active", color: "bg-green-100 text-green-700" },
+  inactive: { labelKey: "cards.status.inactive", color: "bg-gray-100 text-gray-600" },
+  expired: { labelKey: "cards.status.expired", color: "bg-red-100 text-red-600" },
 };
 
 type SortField = "nameAr" | "country" | "faculty" | "graduationYear";
 
 export default function AdminCardsPage() {
+  const { lang, t } = useAdminLang();
   const [cards, setCards] = useState<MemberCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -128,7 +130,7 @@ export default function AdminCardsPage() {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>بطاقة العضوية - ${card.nameAr}</title>
+        <title>${t("cards.printCardTitle")} - ${card.nameAr}</title>
         <style>
           @media print {
             body { margin: 0; padding: 20px; }
@@ -151,7 +153,7 @@ export default function AdminCardsPage() {
 
   const handleDownload = (card: MemberCard) => {
     const link = document.createElement("a");
-    const content = `بطاقة عضوية - رابطة خريجي جامعة أفريقيا العالمية\n${"=".repeat(40)}\nالاسم: ${card.nameAr}\nالاسم الإنجليزي: ${card.nameEn}\nرقم العضوية: ${card.membershipNumber}\nرقم الطالب: ${card.studentId}\nالكلية: ${card.faculty}\nالقسم: ${card.department}\nسنة التخرج: ${card.graduationYear}\nالدولة: ${card.country}\nنوع العضوية: ${card.membershipType}\nالحالة: ${STATUS_MAP[card.status].label}`;
+    const content = `${t("cards.downloadContent")}\n${"=".repeat(40)}\n${t("cards.downloadName")}: ${card.nameAr}\n${t("cards.downloadNameEn")}: ${card.nameEn}\n${t("cards.membershipNumber")}: ${card.membershipNumber}\n${t("cards.downloadStudentId")}: ${card.studentId}\n${t("members.faculty")}: ${card.faculty}\n${t("cards.downloadDept")}: ${card.department}\n${t("cards.downloadYear")}: ${card.graduationYear}\n${t("members.country")}: ${card.country}\n${t("cards.downloadType")}: ${card.membershipType}\n${t("cards.downloadStatus")}: ${t(STATUS_MAP[card.status].labelKey)}`;
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     link.href = URL.createObjectURL(blob);
     link.download = `card-${card.membershipNumber}.txt`;
@@ -165,7 +167,7 @@ export default function AdminCardsPage() {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>طباعة البطاقات</title>
+        <title>${t("cards.printAll")}</title>
         <style>
           @media print {
             body { margin: 0; padding: 20px; }
@@ -216,18 +218,18 @@ export default function AdminCardsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">البطاقات</h1>
-          <p className="text-sm text-gray-500">{filteredCards.length} بطاقة عضوية</p>
+          <h1 className="text-2xl font-bold text-gray-800">{t("cards.title")}</h1>
+          <p className="text-sm text-gray-500">{t("cards.count").replace("{n}", String(filteredCards.length))}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button onClick={() => setShowUpload(true)} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors">
-            <Upload className="w-4 h-4" />رفع Excel
+            <Upload className="w-4 h-4" />{t("cards.uploadExcel")}
           </button>
           <button onClick={handlePrintAll} className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors">
-            <Printer className="w-4 h-4" />طباعة الكل
+            <Printer className="w-4 h-4" />{t("cards.printAll")}
           </button>
           <button onClick={() => filteredCards.forEach(handleDownload)} className="flex items-center gap-2 px-4 py-2 bg-[#1A3A6B] text-white rounded-xl text-sm font-medium hover:bg-[#0f2547] transition-colors">
-            <Download className="w-4 h-4" />تحميل الكل
+            <Download className="w-4 h-4" />{t("cards.downloadAll")}
           </button>
         </div>
       </div>
@@ -237,10 +239,10 @@ export default function AdminCardsPage() {
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input type="text" placeholder="بحث بالاسم أو الرقم..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pe-4 ps-11 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3A6B]/20 focus:border-[#1A3A6B]" />
+            <input type="text" placeholder={t("cards.searchPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pe-4 ps-11 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3A6B]/20 focus:border-[#1A3A6B]" />
           </div>
           <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${showFilters || countryFilter || facultyFilter || statusFilter ? "bg-[#1A3A6B] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
-            <Filter className="w-4 h-4" />الفلاتر
+            <Filter className="w-4 h-4" />{t("cards.filtersBtn")}
             {(countryFilter || facultyFilter || statusFilter) && <span className="w-5 h-5 bg-white/20 rounded-full text-xs flex items-center justify-center">{[countryFilter, facultyFilter, statusFilter].filter(Boolean).length}</span>}
           </button>
           <div className="flex bg-gray-100 rounded-xl overflow-hidden">
@@ -251,24 +253,24 @@ export default function AdminCardsPage() {
         {showFilters && (
           <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-2">الدولة</label>
+              <label className="block text-sm font-medium text-gray-600 mb-2">{t("members.country")}</label>
               <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3A6B]/20">
-                <option value="">الكل</option>
+                <option value="">{t("common.all")}</option>
                 {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-2">الكلية</label>
+              <label className="block text-sm font-medium text-gray-600 mb-2">{t("members.faculty")}</label>
               <select value={facultyFilter} onChange={(e) => setFacultyFilter(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3A6B]/20">
-                <option value="">الكل</option>
+                <option value="">{t("common.all")}</option>
                 {FACULTIES.map((f) => <option key={f} value={f}>{f}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-2">الحالة</label>
+              <label className="block text-sm font-medium text-gray-600 mb-2">{t("common.status")}</label>
               <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3A6B]/20">
-                <option value="">الكل</option>
-                {Object.entries(STATUS_MAP).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                <option value="">{t("common.all")}</option>
+                {Object.entries(STATUS_MAP).map(([k, v]) => <option key={k} value={k}>{t(v.labelKey)}</option>)}
               </select>
             </div>
           </div>
@@ -277,11 +279,11 @@ export default function AdminCardsPage() {
 
       {/* Sort Bar */}
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 px-2">
-        <span className="text-sm text-gray-400">ترتيب حسب:</span>
-        <SortBtn field="nameAr" label="الاسم" />
-        <SortBtn field="country" label="الدولة" />
-        <SortBtn field="faculty" label="الكلية" />
-        <SortBtn field="graduationYear" label="سنة التخرج" />
+        <span className="text-sm text-gray-400">{t("cards.sortBy")}</span>
+        <SortBtn field="nameAr" label={t("common.name")} />
+        <SortBtn field="country" label={t("members.country")} />
+        <SortBtn field="faculty" label={t("members.faculty")} />
+        <SortBtn field="graduationYear" label={t("members.graduationYear")} />
       </div>
 
       {/* Grid View */}
@@ -294,7 +296,7 @@ export default function AdminCardsPage() {
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-3">
                     <CreditCard className="w-6 h-6 text-[#D4A843]" />
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${STATUS_MAP[card.status].color}`}>{STATUS_MAP[card.status].label}</span>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${STATUS_MAP[card.status].color}`}>{t(STATUS_MAP[card.status].labelKey)}</span>
                   </div>
                   <h3 className="font-bold text-lg">{card.nameAr}</h3>
                   <p className="text-white/70 text-xs">{card.nameEn}</p>
@@ -308,8 +310,8 @@ export default function AdminCardsPage() {
                   <div className="flex items-center gap-2 text-sm"><Calendar className="w-4 h-4 text-gray-400 shrink-0" /><span className="text-gray-500">{card.graduationYear}</span></div>
                 </div>
                 <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-                  <button onClick={(e) => { e.stopPropagation(); handlePrint(card); }} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-[#1A3A6B]/5 text-[#1A3A6B] rounded-lg text-xs font-medium hover:bg-[#1A3A6B]/10 transition-colors"><Printer className="w-3.5 h-3.5" />طباعة</button>
-                  <button onClick={(e) => { e.stopPropagation(); handleDownload(card); }} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-[#D4A843]/10 text-[#D4A843] rounded-lg text-xs font-medium hover:bg-[#D4A843]/20 transition-colors"><Download className="w-3.5 h-3.5" />تحميل</button>
+                  <button onClick={(e) => { e.stopPropagation(); handlePrint(card); }} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-[#1A3A6B]/5 text-[#1A3A6B] rounded-lg text-xs font-medium hover:bg-[#1A3A6B]/10 transition-colors"><Printer className="w-3.5 h-3.5" />{t("cards.print")}</button>
+                  <button onClick={(e) => { e.stopPropagation(); handleDownload(card); }} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-[#D4A843]/10 text-[#D4A843] rounded-lg text-xs font-medium hover:bg-[#D4A843]/20 transition-colors"><Download className="w-3.5 h-3.5" />{t("cards.download")}</button>
                 </div>
               </div>
             </div>
@@ -321,12 +323,12 @@ export default function AdminCardsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead><tr className="bg-gray-50 border-b border-gray-100">
-                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">الاسم</th>
-                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">رقم العضوية</th>
-                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">الكلية</th>
-                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">الدولة</th>
-                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">الحالة</th>
-                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">إجراءات</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">{t("common.name")}</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">{t("cards.membershipNumber")}</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">{t("members.faculty")}</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">{t("members.country")}</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">{t("common.status")}</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-500">{t("common.actions")}</th>
               </tr></thead>
               <tbody>
                 {filteredCards.map((card) => (
@@ -335,7 +337,7 @@ export default function AdminCardsPage() {
                     <td className="px-4 py-3 font-mono text-sm">{card.membershipNumber}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">{card.faculty}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">{card.country}</td>
-                    <td className="px-4 py-3"><span className={`px-2.5 py-1 rounded-full text-xs font-medium ${STATUS_MAP[card.status].color}`}>{STATUS_MAP[card.status].label}</span></td>
+                    <td className="px-4 py-3"><span className={`px-2.5 py-1 rounded-full text-xs font-medium ${STATUS_MAP[card.status].color}`}>{t(STATUS_MAP[card.status].labelKey)}</span></td>
                     <td className="px-4 py-3"><div className="flex gap-2">
                       <button onClick={(e) => { e.stopPropagation(); handlePrint(card); }} className="p-2 text-[#1A3A6B] hover:bg-[#1A3A6B]/5 rounded-lg transition-colors"><Printer className="w-4 h-4" /></button>
                       <button onClick={(e) => { e.stopPropagation(); handleDownload(card); }} className="p-2 text-[#D4A843] hover:bg-[#D4A843]/10 rounded-lg transition-colors"><Download className="w-4 h-4" /></button>
@@ -349,14 +351,14 @@ export default function AdminCardsPage() {
       )}
 
       {/* Empty */}
-      {filteredCards.length === 0 && <div className="text-center py-16"><CreditCard className="w-16 h-16 text-gray-300 mx-auto mb-4" /><h3 className="text-lg font-bold text-gray-800 mb-2">لا توجد بطاقات</h3><p className="text-gray-500">جرب تغيير معايير البحث</p></div>}
+      {filteredCards.length === 0 && <div className="text-center py-16"><CreditCard className="w-16 h-16 text-gray-300 mx-auto mb-4" /><h3 className="text-lg font-bold text-gray-800 mb-2">{t("cards.emptyTitle")}</h3><p className="text-gray-500">{t("cards.emptyHint")}</p></div>}
 
       {/* Upload Modal */}
       {showUpload && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => { if (!uploading) setShowUpload(false) }}>
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="sticky top-0 bg-white z-10 p-4 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-800">رفع ملف Excel لإنشاء البطاقات</h2>
+              <h2 className="text-lg font-bold text-gray-800">{t("cards.uploadModalTitle")}</h2>
               <button onClick={() => { if (!uploading) setShowUpload(false) }} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                 <X className="w-5 h-5 text-gray-500" />
               </button>
@@ -366,15 +368,15 @@ export default function AdminCardsPage() {
                 <div>
                   <div className="border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center hover:border-[#1A3A6B] transition-colors cursor-pointer" onClick={() => document.getElementById("excel-upload-input")?.click()}>
                     <Upload className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-600 font-medium mb-1">انقر لاختيار ملف Excel</p>
-                    <p className="text-gray-400 text-sm">يدعم الصيغ .xlsx, .xls</p>
-                    <p className="text-gray-400 text-xs mt-2">الأعمدة المطلوبة: الاسم، البريد الإلكتروني</p>
-                    <p className="text-gray-400 text-xs">أعمدة اختيارية: الاسم الإنجليزي، رقم العضوية، الجوال، الكلية، التخصص، سنة التخرج، نوع العضوية، الدولة</p>
+                    <p className="text-gray-600 font-medium mb-1">{t("cards.dropHint")}</p>
+                    <p className="text-gray-400 text-sm">{t("cards.acceptedFormats")}</p>
+                    <p className="text-gray-400 text-xs mt-2">{t("cards.requiredCols")}</p>
+                    <p className="text-gray-400 text-xs">{t("cards.optionalCols")}</p>
                   </div>
                   <input id="excel-upload-input" type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUpload} />
                   {uploading && (
                     <div className="mt-4 flex items-center justify-center gap-2 text-gray-600">
-                      <Loader2 className="w-5 h-5 animate-spin" /> جاري المعالجة...
+                      <Loader2 className="w-5 h-5 animate-spin" /> {t("cards.processing")}
                     </div>
                   )}
                 </div>
@@ -382,13 +384,13 @@ export default function AdminCardsPage() {
                 <div>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex items-center gap-1.5 text-sm text-green-700 bg-green-50 px-3 py-1.5 rounded-lg">
-                      <CheckCircle className="w-4 h-4" /> {uploadResults.filter(r => r.status === "success").length} نجاح
+                      <CheckCircle className="w-4 h-4" /> {t("cards.successCount").replace("{n}", String(uploadResults.filter(r => r.status === "success").length))}
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-yellow-700 bg-yellow-50 px-3 py-1.5 rounded-lg">
-                      <AlertTriangle className="w-4 h-4" /> {uploadResults.filter(r => r.status === "skipped").length} تم التخطي
+                      <AlertTriangle className="w-4 h-4" /> {t("cards.skippedCount").replace("{n}", String(uploadResults.filter(r => r.status === "skipped").length))}
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-red-700 bg-red-50 px-3 py-1.5 rounded-lg">
-                      <XCircle className="w-4 h-4" /> {uploadResults.filter(r => r.status === "error").length} خطأ
+                      <XCircle className="w-4 h-4" /> {t("cards.errorCount").replace("{n}", String(uploadResults.filter(r => r.status === "error").length))}
                     </div>
                   </div>
                   <div className="max-h-80 overflow-y-auto overflow-x-auto border border-gray-200 rounded-xl">
@@ -396,9 +398,9 @@ export default function AdminCardsPage() {
                       <thead className="bg-gray-50 sticky top-0">
                         <tr>
                           <th className="px-3 py-2 text-start text-gray-500 font-medium">#</th>
-                          <th className="px-3 py-2 text-start text-gray-500 font-medium">الاسم</th>
-                          <th className="px-3 py-2 text-start text-gray-500 font-medium">رقم العضوية</th>
-                          <th className="px-3 py-2 text-start text-gray-500 font-medium">الحالة</th>
+                          <th className="px-3 py-2 text-start text-gray-500 font-medium">{t("common.name")}</th>
+                          <th className="px-3 py-2 text-start text-gray-500 font-medium">{t("cards.membershipNumber")}</th>
+                          <th className="px-3 py-2 text-start text-gray-500 font-medium">{t("common.status")}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -409,11 +411,11 @@ export default function AdminCardsPage() {
                             <td className="px-3 py-2 font-mono text-gray-600">{r.membershipNumber || "—"}</td>
                             <td className="px-3 py-2">
                               {r.status === "success" ? (
-                                <span className="text-green-700 bg-green-50 px-2 py-0.5 rounded-full text-xs font-medium">تم</span>
+                                <span className="text-green-700 bg-green-50 px-2 py-0.5 rounded-full text-xs font-medium">{t("cards.done")}</span>
                               ) : r.status === "skipped" ? (
-                                <span className="text-yellow-700 bg-yellow-50 px-2 py-0.5 rounded-full text-xs font-medium" title={r.error}>تخطي</span>
+                                <span className="text-yellow-700 bg-yellow-50 px-2 py-0.5 rounded-full text-xs font-medium" title={r.error}>{t("cards.skippedLbl")}</span>
                               ) : (
-                                <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded-full text-xs font-medium" title={r.error}>خطأ</span>
+                                <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded-full text-xs font-medium" title={r.error}>{t("cards.errorLbl")}</span>
                               )}
                             </td>
                           </tr>
@@ -423,7 +425,7 @@ export default function AdminCardsPage() {
                   </div>
                   <div className="mt-4 flex justify-end">
                     <button onClick={() => { setShowUpload(false); setUploadResults(null) }} className="px-4 py-2 bg-[#1A3A6B] text-white rounded-xl text-sm font-medium hover:bg-[#0f2547] transition-colors">
-                      إغلاق
+                      {t("common.close")}
                     </button>
                   </div>
                 </div>
@@ -438,7 +440,7 @@ export default function AdminCardsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setSelectedCard(null)}>
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="sticky top-0 bg-white z-10 p-4 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-800">تفاصيل البطاقة</h2>
+              <h2 className="text-lg font-bold text-gray-800">{t("cards.detailTitle")}</h2>
               <button onClick={() => setSelectedCard(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                 <X className="w-5 h-5 text-gray-500" />
               </button>
@@ -464,10 +466,10 @@ export default function AdminCardsPage() {
             </div>
             <div className="sticky bottom-0 bg-white z-10 p-4 border-t border-gray-100 flex gap-3">
               <button onClick={() => handlePrint(selectedCard)} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#1A3A6B] text-white rounded-xl font-medium hover:bg-[#0f2547] transition-colors">
-                <Printer className="w-5 h-5" />طباعة البطاقة
+                <Printer className="w-5 h-5" />{t("cards.printCard")}
               </button>
               <button onClick={() => handleDownload(selectedCard)} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#D4A843] text-white rounded-xl font-medium hover:bg-[#c49a38] transition-colors">
-                <Download className="w-5 h-5" />تحميل البطاقة
+                <Download className="w-5 h-5" />{t("cards.downloadCard")}
               </button>
             </div>
           </div>

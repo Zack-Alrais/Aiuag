@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Plus, Pencil, Trash2, Building2, Mail, Phone, Users, X, ToggleLeft, ToggleRight } from "lucide-react"
 import { TranslateInto } from "@/components/admin/AutoTranslate"
+import { useAdminLang } from "../admin-lang"
 
 interface Committee {
   id: string
@@ -46,6 +47,7 @@ const emptyForm: CommitteeFormData = {
 }
 
 export default function CommitteesManagement() {
+  const { lang, t } = useAdminLang()
   const [committees, setCommittees] = useState<Committee[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<"all" | string>("all")
@@ -84,6 +86,11 @@ export default function CommitteesManagement() {
       special: "bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-[#fbbf24] dark:border-amber-800/50",
     }
     return styles[type] || "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-[#2a3d56] dark:text-[#cbd5e1] dark:border-[#3b4f6b]"
+  }
+
+  const typeLabel = (type: string) => {
+    const val = t(`committees.${type}`)
+    return val === `committees.${type}` ? type : val
   }
 
   const openAddModal = () => {
@@ -189,8 +196,8 @@ export default function CommitteesManagement() {
         <div className="flex items-center gap-3">
           <Users className="w-8 h-8 text-blue-600 dark:text-[#60a5fa]" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">إدارة اللجان</h1>
-            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">إدارة اللجان التنظيمية وأعضائها</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-[#f1f5f9]">{t("committees.title")}</h1>
+            <p className="text-sm text-gray-500 dark:text-[#94a3b8]">{t("committees.subtitle")}</p>
           </div>
         </div>
         <button
@@ -198,7 +205,7 @@ export default function CommitteesManagement() {
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
-          إضافة لجنة
+          {t("committees.addBtn")}
         </button>
       </div>
 
@@ -213,7 +220,7 @@ export default function CommitteesManagement() {
                 : "bg-gray-100 dark:bg-[#2a3d56] text-gray-700 dark:text-[#cbd5e1] hover:bg-gray-200 dark:hover:bg-[#3b4f6b]"
             }`}
           >
-            {type === "all" ? "جميع الأنواع" : type}
+            {type === "all" ? t("committees.allTypes") : typeLabel(type)}
           </button>
         ))}
       </div>
@@ -222,12 +229,12 @@ export default function CommitteesManagement() {
         {loading ? (
           <div className="flex items-center justify-center py-20 text-gray-400 dark:text-[#3b4f6b]">
             <Users className="h-5 w-5 animate-spin mr-2" />
-            جاري تحميل اللجان...
+            {t("committees.loading")}
           </div>
         ) : filteredCommittees.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-[#3b4f6b]">
             <Users className="h-12 w-12 mb-3 opacity-40" />
-            <p className="text-sm">لا توجد لجان</p>
+            <p className="text-sm">{t("committees.empty")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -235,31 +242,31 @@ export default function CommitteesManagement() {
               <thead>
                 <tr className="border-b border-gray-100 dark:border-[#253347] bg-gray-50/60 dark:bg-[#111927]">
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                      الاسم بالعربية
+                      {t("committees.nameArCol")}
                     </th>
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                       <span className="flex items-center gap-1.5">
                         <Building2 className="h-3.5 w-3.5" />
-                        النوع
+                        {t("committees.typeCol")}
                       </span>
                     </th>
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                       <span className="flex items-center gap-1.5">
                         <Users className="h-3.5 w-3.5" />
-                        رئيس اللجنة
+                        {t("committees.chairCol")}
                       </span>
                     </th>
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
                       <span className="flex items-center gap-1.5">
                         <Mail className="h-3.5 w-3.5" />
-                        البريد الإلكتروني
+                        {t("common.email")}
                       </span>
                     </th>
                     <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                      الحالة
+                      {t("common.status")}
                     </th>
                     <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 dark:text-[#94a3b8] uppercase tracking-wider">
-                      الإجراءات
+                      {t("common.actions")}
                     </th>
                 </tr>
               </thead>
@@ -279,7 +286,7 @@ export default function CommitteesManagement() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getTypeBadge(committee.type)}`}
                       >
-                        {committee.type}
+                        {typeLabel(committee.type)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -314,7 +321,7 @@ export default function CommitteesManagement() {
                         ) : (
                           <ToggleLeft className="h-3.5 w-3.5" />
                         )}
-                        {committee.isActive ? "نشط" : "غير نشط"}
+                        {committee.isActive ? t("committees.active") : t("committees.inactive")}
                       </button>
                     </td>
                     <td className="px-6 py-4">
@@ -322,7 +329,7 @@ export default function CommitteesManagement() {
                         <button
                           onClick={() => openEditModal(committee)}
                           className="p-2 text-blue-600 dark:text-[#60a5fa] hover:bg-blue-50 dark:hover:bg-[#1e2d42] rounded-lg transition-colors"
-                           title="تعديل"
+                           title={t("common.edit")}
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
@@ -332,20 +339,20 @@ export default function CommitteesManagement() {
                               onClick={() => handleDelete(committee.id)}
                               className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
                             >
-                              تأكيد
+                              t("common.yes")
                             </button>
                             <button
                               onClick={() => setDeleteConfirmId(null)}
                               className="px-2.5 py-1 bg-gray-200 dark:bg-[#2a3d56] text-gray-600 dark:text-[#cbd5e1] text-xs rounded-md hover:bg-gray-300 dark:hover:bg-[#3b4f6b] transition-colors"
                             >
-                               إلغاء
+                               {t("common.cancel")}
                             </button>
                           </div>
                         ) : (
                           <button
                             onClick={() => setDeleteConfirmId(committee.id)}
                             className="p-2 text-red-500 dark:text-[#f87171] hover:bg-red-50 dark:hover:bg-[#1e2d42] rounded-lg transition-colors"
-                             title="حذف"
+                             title={t("common.delete")}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -369,7 +376,7 @@ export default function CommitteesManagement() {
           <div className="relative bg-white dark:bg-[#1a2332] rounded-2xl shadow-2xl dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-[#253347]">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f1f5f9]">
-                {editingCommittee ? "تعديل لجنة" : "إضافة لجنة جديدة"}
+                {editingCommittee ? t("committees.editTitle") : t("committees.addTitle")}
               </h2>
               <button
                 onClick={closeModal}
@@ -383,7 +390,7 @@ export default function CommitteesManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                    <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    الاسم بالعربية *
+                    {t("committees.nameArLabel")} *
                   </label>
                   <input
                     type="text"
@@ -391,13 +398,13 @@ export default function CommitteesManagement() {
                     value={form.nameAr}
                     onChange={(e) => handleFieldChange("nameAr", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="اسم اللجنة بالعربية"
+                    placeholder={t("committees.nameArPh")}
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
-                      الاسم بالإنجليزية *
+                      {t("committees.nameEnLabel")} *
                     </label>
                     <TranslateInto source={form.nameAr} target={form.nameEn} onTranslated={(t) => handleFieldChange("nameEn", t)} />
                   </div>
@@ -407,7 +414,7 @@ export default function CommitteesManagement() {
                     value={form.nameEn}
                     onChange={(e) => handleFieldChange("nameEn", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="اسم اللجنة بالإنجليزية"
+                    placeholder={t("committees.nameEnPh")}
                   />
                 </div>
               </div>
@@ -415,20 +422,20 @@ export default function CommitteesManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    الوصف بالعربية
+                    {t("committees.descArLabel")}
                   </label>
                   <textarea
                     rows={3}
                     value={form.descriptionAr}
                     onChange={(e) => handleFieldChange("descriptionAr", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
-                    placeholder="وصف اللجنة بالعربية"
+                    placeholder={t("committees.descArPh")}
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
-                      الوصف بالإنجليزية
+                      {t("committees.descEnLabel")}
                     </label>
                     <TranslateInto source={form.descriptionAr} target={form.descriptionEn} onTranslated={(t) => handleFieldChange("descriptionEn", t)} />
                   </div>
@@ -437,7 +444,7 @@ export default function CommitteesManagement() {
                     value={form.descriptionEn}
                     onChange={(e) => handleFieldChange("descriptionEn", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
-                    placeholder="وصف اللجنة بالإنجليزية"
+                    placeholder={t("committees.descEnPh")}
                   />
                 </div>
               </div>
@@ -447,7 +454,7 @@ export default function CommitteesManagement() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
                     <span className="flex items-center gap-1.5">
                       <Building2 className="h-3.5 w-3.5" />
-                      النوع *
+                      {t("committees.typeCol")} *
                     </span>
                   </label>
                   <select
@@ -455,14 +462,14 @@ export default function CommitteesManagement() {
                     onChange={(e) => handleFieldChange("type", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
                   >
-                    <option value="standing">دورية</option>
-                    <option value="adhoc">مؤقتة</option>
-                    <option value="special">خاصة</option>
+                    <option value="standing">{t("committees.standing")}</option>
+                    <option value="adhoc">{t("committees.adhoc")}</option>
+                    <option value="special">{t("committees.special")}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    الترتيب
+                    {t("committees.orderLabel")}
                   </label>
                   <input
                     type="number"
@@ -470,7 +477,7 @@ export default function CommitteesManagement() {
                     value={form.order}
                     onChange={(e) => handleFieldChange("order", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="الترتيب الظاهر"
+                    placeholder={t("committees.orderPh")}
                   />
                 </div>
               </div>
@@ -478,20 +485,20 @@ export default function CommitteesManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
-                    اسم رئيس اللجنة بالعربية
+                    {t("committees.chairArLabel")}
                   </label>
                   <input
                     type="text"
                     value={form.chairNameAr}
                     onChange={(e) => handleFieldChange("chairNameAr", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="اسم رئيس اللجنة بالعربية"
+                    placeholder={t("committees.chairArPh")}
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-sm font-medium text-gray-700 dark:text-[#94a3b8]">
-                      اسم رئيس اللجنة بالإنجليزية
+                      {t("committees.chairEnLabel")}
                     </label>
                     <TranslateInto source={form.chairNameAr} target={form.chairNameEn} onTranslated={(t) => handleFieldChange("chairNameEn", t)} />
                   </div>
@@ -500,7 +507,7 @@ export default function CommitteesManagement() {
                     value={form.chairNameEn}
                     onChange={(e) => handleFieldChange("chairNameEn", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:bg-[#111927] dark:border-[#3b4f6b] dark:text-[#f1f5f9] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    placeholder="اسم الرئيس بالإنجليزية"
+                    placeholder={t("committees.chairEnPh")}
                   />
                 </div>
               </div>
@@ -510,7 +517,7 @@ export default function CommitteesManagement() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
                     <span className="flex items-center gap-1.5">
                       <Mail className="h-3.5 w-3.5" />
-                      البريد الإلكتروني
+                      {t("common.email")}
                     </span>
                   </label>
                   <input
@@ -525,7 +532,7 @@ export default function CommitteesManagement() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-[#94a3b8] mb-1">
                     <span className="flex items-center gap-1.5">
                       <Phone className="h-3.5 w-3.5" />
-                      الهاتف
+                      {t("common.phone")}
                     </span>
                   </label>
                   <input
@@ -544,7 +551,7 @@ export default function CommitteesManagement() {
                   onClick={closeModal}
                   className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-[#cbd5e1] bg-gray-100 dark:bg-[#2a3d56] hover:bg-gray-200 dark:hover:bg-[#3b4f6b] rounded-lg transition-colors"
                 >
-                   إلغاء
+                   {t("common.cancel")}
                  </button>
                  <button
                    type="submit"
@@ -552,10 +559,10 @@ export default function CommitteesManagement() {
                     className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                  >
                    {submitting
-                     ? "جاري الحفظ..."
+                     ? t("common.saving")
                      : editingCommittee
-                       ? "تحديث اللجنة"
-                       : "إنشاء اللجنة"}
+                       ? t("committees.updateBtn")
+                       : t("committees.createBtn")}
                 </button>
               </div>
             </form>
