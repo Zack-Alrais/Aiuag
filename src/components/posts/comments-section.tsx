@@ -27,6 +27,7 @@ interface CommentsSectionProps {
   lang: string
   member: MemberIdentity | null
   onCountChange?: (count: number) => void
+  loginHref?: string
 }
 
 function Avatar({ src, name, size = 30 }: { src?: string | null | undefined; name?: string; size?: number }) {
@@ -50,7 +51,7 @@ function countTotal(list: CommentItem[]): number {
   return list.reduce((sum, c) => sum + 1 + (Array.isArray(c.replies) ? c.replies.length : 0), 0)
 }
 
-export default function CommentsSection({ postId, lang, member, onCountChange }: CommentsSectionProps) {
+export default function CommentsSection({ postId, lang, member, onCountChange, loginHref }: CommentsSectionProps) {
   const isArabic = lang === "ar"
   const [comments, setComments] = useState<CommentItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -302,7 +303,7 @@ export default function CommentsSection({ postId, lang, member, onCountChange }:
       ) : (
         <div className="flex items-center justify-center gap-1.5 py-2 text-xs text-text-light">
           <LogIn className="w-3.5 h-3.5" />
-          <Link href="/auth/login" className="text-primary hover:underline">
+           <Link href={loginHref || "/auth/login"} className="text-primary hover:underline">
             {isArabic ? "سجل الدخول للتعليق" : "Log in to comment"}
           </Link>
         </div>

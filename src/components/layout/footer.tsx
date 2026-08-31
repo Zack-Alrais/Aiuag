@@ -37,7 +37,6 @@ export default function Footer({ lang }: FooterProps) {
     { label: isArabic ? "المركز الإعلامي" : "Media", href: `/${lang}/media` },
     { label: isArabic ? "الأخبار" : "News", href: `/${lang}/news` },
     { label: isArabic ? "الأحداث" : "Events", href: `/${lang}/events` },
-    { label: isArabic ? "الشركاء" : "Partners", href: `/${lang}/partners` },
     { label: isArabic ? "طلب عضوية" : "Membership", href: `/${lang}/membership/apply` },
     { label: isArabic ? "خدمات الخريجين" : "Alumni Services", href: `/${lang}/services` },
   ]

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   MessageCircle, Share2, Calendar, ArrowRight, ArrowLeft,
 } from "lucide-react";
@@ -96,6 +96,11 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
 
   const isArabic = lang === "ar";
 
+  const requireLogin = useCallback(() => {
+    const cb = `/${lang}/posts/${id}`
+    window.location.assign(`/auth/login?callbackUrl=${encodeURIComponent(cb)}`)
+  }, [lang, id])
+
   useEffect(() => {
     params.then((p) => { setLang(p.lang); setId(p.id); });
   }, [params]);
@@ -155,18 +160,20 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
   };
 
   const handleShare = async () => {
-    if (!post || !member) return;
+    if (!post) return;
     const url = `${window.location.origin}/${lang}/posts/${post.id}`;
-    try {
-      await fetch(`/api/posts/${post.id}/share`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberId: member.id }),
-      });
-    } catch {}
+    if (member) {
+      try {
+        await fetch(`/api/posts/${post.id}/share`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ memberId: member.id }),
+        });
+      } catch {}
+    }
     try {
       if (navigator.share) {
-        await navigator.share({ title: post.content, text: post.content, url });
+        await navigator.share({ url });
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(url);
         toast.success(isArabic ? "تم نسخ الرابط" : "Link copied");
@@ -318,13 +325,12 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
                 return (
                   <button
                     key={r.type}
-                    onClick={() => member ? handleReact(r.type) : null}
-                    disabled={!member}
+                    onClick={() => member ? handleReact(r.type) : requireLogin()}
                     className={`flex-1 flex flex-col items-center gap-0.5 py-3 text-xs transition-all hover:scale-105 active:scale-95 ${
                       isActive
                         ? "text-primary bg-primary/5"
                         : "text-text-secondary hover:bg-black/5 dark:hover:bg-white/5"
-                    } ${!member ? "opacity-50 cursor-not-allowed" : ""}`}
+                    }`}
                     style={{ animation: `bounce-in 0.3s ease-out ${i * 60}ms both` }}
                   >
                     <span className="text-2xl transition-transform hover:scale-110">{r.emoji}</span>
@@ -358,6 +364,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
               lang={lang}
               member={member}
               onCountChange={(n) => setCommentCount(n)}
+              loginHref={`/auth/login?callbackUrl=${encodeURIComponent(`/${lang}/posts/${id}`)}`}
             />
           </div>
         </div>

@@ -41,7 +41,6 @@ function getNavItems(lang: string): NavItem[] {
       ],
     },
     { label: isArabic ? "المشاريع" : "Projects", href: "/projects" },
-    { label: isArabic ? "الشركاء" : "Partners", href: "/partners" },
     {
       label: isArabic ? "المركز الإعلامي" : "Media",
       href: "/media",
@@ -57,7 +56,6 @@ function getNavItems(lang: string): NavItem[] {
       children: [
         { label: isArabic ? "طلب عضوية" : "Apply", href: "/membership/apply" },
         { label: isArabic ? "مزايا العضوية" : "Benefits", href: "/membership/benefits" },
-        { label: isArabic ? "بطاقتي" : "My Card", href: "/cards", authRequired: true },
         { label: isArabic ? "إدارة العضوية" : "Manage", href: "/membership/manage" },
       ],
     },

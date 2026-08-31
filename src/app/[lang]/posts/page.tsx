@@ -118,18 +118,19 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
   };
 
   const handleShare = async (post: Post) => {
-    if (!member) return;
     const url = `${window.location.origin}/${lang}/posts/${post.id}`;
-    try {
-      await fetch(`/api/posts/${post.id}/share`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberId: member.id }),
-      });
-    } catch {}
+    if (member) {
+      try {
+        await fetch(`/api/posts/${post.id}/share`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ memberId: member.id }),
+        });
+      } catch {}
+    }
     try {
       if (navigator.share) {
-        await navigator.share({ title: post.content, text: post.content, url });
+        await navigator.share({ url });
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(url);
         toast.success(isArabic ? "تم نسخ الرابط" : "Link copied");

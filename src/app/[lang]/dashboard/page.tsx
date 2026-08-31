@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { User, Calendar, FileText, Settings, Bell, BookOpen, Heart, Award, Clock, ChevronLeft, ChevronRight, MapPin, LogOut, Edit, Loader2, CreditCard } from "lucide-react";
-import { MembershipCardEngine } from "@/components/cards/membership-card-engine";
 import Link from "next/link";
 
 interface ProfileData {
@@ -59,7 +58,7 @@ export default function DashboardPage({ params }: { params: Promise<{ lang: stri
 
   const quickActions = [
     { icon: Calendar, title: isArabic ? "الأحداث" : "Events", href: `/${lang}/events`, color: "bg-primary/10 text-primary" },
-    { icon: CreditCard, title: isArabic ? "بطاقتي" : "My Card", href: `/${lang}/cards`, color: "bg-secondary/10 text-secondary" },
+    { icon: CreditCard, title: isArabic ? "بطاقتي" : "My Card", href: `/${lang}/profile`, color: "bg-secondary/10 text-secondary" },
     { icon: Heart, title: isArabic ? "التبرعات" : "Donations", href: `/${lang}/donations`, color: "bg-error/10 text-error" },
     { icon: FileText, title: isArabic ? "المنشورات" : "Posts", href: `/${lang}/media/posts`, color: "bg-accent/10 text-accent" },
     { icon: BookOpen, title: isArabic ? "المشاريع" : "Projects", href: `/${lang}/projects`, color: "bg-primary/10 text-primary" },
@@ -148,7 +147,7 @@ export default function DashboardPage({ params }: { params: Promise<{ lang: stri
                 <p className="text-white/60 text-xs mb-1">{isArabic ? "رقم العضوية" : "Membership Number"}</p>
                 <p className="font-mono font-bold">{profile.membershipNumber || "—"}</p>
               </div>
-              <Link href={`/${lang}/cards`} className="mt-4 block text-center px-4 py-2 bg-white/20 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors">
+              <Link href={`/${lang}/profile`} className="mt-4 block text-center px-4 py-2 bg-white/20 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors">
                 {isArabic ? "عرض البطاقة" : "View Card"}
               </Link>
             </div>

@@ -489,7 +489,7 @@ function PostCard({
             labels={labels}
             onReact={onReact}
             canReact={!!member}
-            onRequireLogin={() => window.location.assign("/auth/login")}
+            onRequireLogin={() => window.location.assign(`/auth/login?callbackUrl=${encodeURIComponent(`/${lang}/posts/${post.id}`)}`)}
             className="flex-1 py-2.5"
           />
           <button onClick={() => setShowComments((s) => !s)} className="flex-1 py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors">
@@ -586,7 +586,7 @@ function ShareModal({ post, member, lang, onClose, onRepost, onShared }: {
   const [sharing, setSharing] = useState(false);
 
   const postUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/${lang}/media/posts`
+    ? `${window.location.origin}/${lang}/posts/${post.id}`
     : "";
 
   const recordShare = async (): Promise<boolean> => {
@@ -613,7 +613,7 @@ function ShareModal({ post, member, lang, onClose, onRepost, onShared }: {
     try {
       // Prefer the native Web Share API when available
       if (typeof navigator !== "undefined" && navigator.share) {
-        await navigator.share({ title: post.content, text: post.content, url: postUrl });
+        await navigator.share({ url: postUrl });
       } else if (typeof navigator !== "undefined" && navigator.clipboard) {
         await navigator.clipboard.writeText(postUrl);
         toast.success(isAr ? "تم نسخ رابط المشاركة" : "Share link copied");

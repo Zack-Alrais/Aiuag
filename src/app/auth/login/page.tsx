@@ -18,6 +18,9 @@ function LoginContent() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
 
+  const callbackUrl = searchParams.get("callbackUrl") || "/"
+  const safeCallbackUrl = callbackUrl.startsWith("/") && !callbackUrl.startsWith("//") ? callbackUrl : "/"
+
   useEffect(() => {
     if (searchParams.get("verified") === "true") {
       setSuccess("تم تأكيد حسابك بنجاح. يمكنك الآن تسجيل الدخول.")
@@ -46,7 +49,7 @@ function LoginContent() {
           setError("البريد الإلكتروني أو كلمة المرور غير صحيحة")
         }
       } else {
-        router.push("/")
+        router.push(safeCallbackUrl)
         router.refresh()
       }
     } catch {
@@ -56,7 +59,7 @@ function LoginContent() {
     }
   }
 
-  const handleGoogleLogin = () => signIn("google", { callbackUrl: "/" })
+  const handleGoogleLogin = () => signIn("google", { callbackUrl: safeCallbackUrl })
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative bg-background dark:bg-dark">

@@ -8,6 +8,7 @@ import { useRef } from "react"
 import { Users, Calendar, FolderOpen, Award, ArrowLeft, ArrowRight, Heart, ChevronLeft, ChevronRight, Clock, MapPin, Phone, Mail } from "lucide-react"
 import ScrollReveal from "@/components/ui/scroll-reveal"
 import { staggerContainer, staggerItem } from "@/components/ui/motion"
+import PartnersCarousel from "@/components/sections/partners-carousel"
 
 function formatDate(d: Date | null | undefined, locale: string): string {
   if (!d) return ""
@@ -238,6 +239,9 @@ export default function HomeClient({ lang, isArabic, stats, sections, galleryIma
           </section>
         </ScrollReveal>
       ))}
+
+      {/* Partners Section */}
+      <PartnersCarousel lang={lang} isArabic={isArabic} />
 
       {/* Gallery Section */}
       {galleryImages.length > 0 && (
