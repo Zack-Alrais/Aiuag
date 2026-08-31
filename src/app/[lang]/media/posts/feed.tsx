@@ -505,7 +505,7 @@ function PostCard({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 0.35 }}
-        className="bg-white dark:bg-[#111927] rounded-2xl shadow-sm border border-gray-100 dark:border-[#1e2d42] overflow-hidden"
+        className="bg-white dark:bg-[#111927] rounded-2xl shadow-sm border border-gray-100 dark:border-[#1e2d42]"
       >
         {/* Header */}
         <div className="p-4 pb-3">
@@ -671,7 +671,7 @@ function PostCard({
         </div>
 
         {/* Actions */}
-        <div className="px-2 py-1">
+        <div className="px-2 py-1 flex items-stretch border-t border-gray-100 dark:border-[#1e2d42]">
           <ReactionButton
             postId={post.id}
             myReaction={post.myReaction ?? null}
@@ -680,18 +680,16 @@ function PostCard({
             onReact={onReact}
             canReact={!!member}
             onRequireLogin={() => window.location.assign(`/auth/login?callbackUrl=${encodeURIComponent(`/${lang}/posts/${post.id}`)}`)}
-            className="w-full justify-between px-2 py-1.5"
+            className="flex-1"
           />
-          <div className="flex items-center border-t border-gray-100 dark:border-[#1e2d42] mt-1">
-            <button onClick={() => setShowComments((s) => !s)} className="flex-1 py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors active:scale-95">
-              <MessageCircle className="w-5 h-5" />
-              {isAr ? "تعليق" : "Comment"}
-            </button>
-            <button onClick={() => onShare(post)} className="flex-1 py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors active:scale-95">
-              <Share2 className="w-5 h-5" />
-              {isAr ? "مشاركة" : "Share"}
-            </button>
-          </div>
+          <button onClick={() => setShowComments((s) => !s)} className="flex-1 py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors active:scale-95">
+            <MessageCircle className="w-5 h-5" />
+            {isAr ? "تعليق" : "Comment"}
+          </button>
+          <button onClick={() => onShare(post)} className="flex-1 py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors active:scale-95">
+            <Share2 className="w-5 h-5" />
+            {isAr ? "مشاركة" : "Share"}
+          </button>
         </div>
 
         {/* Comments */}
