@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import { useMember } from "@/hooks/use-member";
@@ -19,10 +20,15 @@ import {
   Globe,
   Link2,
   ExternalLink,
+  Bookmark,
+  Flag,
+  Trash2,
+  Pencil,
+  EyeOff,
 } from "lucide-react";
 import ReactionButton from "@/components/posts/reaction-button";
 import CommentsSection from "@/components/posts/comments-section";
-import PhotoViewer from "@/components/posts/photo-viewer";
+import MediaViewer from "@/components/posts/media-viewer";
 
 interface Author {
   id: string;
@@ -49,6 +55,7 @@ interface Post {
   originalPostId?: string | null;
   createdAt: string;
   updatedAt: string;
+  editedAt?: string | null;
   _count?: { comments: number; reactions: number; shares: number };
   reactionSummary?: Record<string, number>;
   myReaction?: string | null;
@@ -109,6 +116,54 @@ function Avatar({ src, name, size = 40 }: { src?: string | null | undefined; nam
         unoptimized
         onError={() => setError(true)}
       />
+    </div>
+  );
+}
+
+// ========== PROGRESSIVE BLUR-UP IMAGE ==========
+function ProgressiveImage({ src, alt, className, aspectClass }: { src: string; alt: string; className?: string; aspectClass: string }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className={`relative overflow-hidden bg-gray-200 dark:bg-[#0d1525] ${aspectClass} ${className || ""}`}>
+      <div
+        className={`absolute inset-0 bg-gradient-to-br from-transparent via-black/5 to-transparent animate-pulse transition-opacity ${loaded ? "opacity-0" : "opacity-100"}`}
+        style={{ backgroundSize: "200% 200%" }}
+      />
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        unoptimized
+        draggable={false}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        className={`object-cover transition-all duration-500 ${loaded ? "blur-0 scale-100 opacity-100" : "blur-2xl scale-105 opacity-60"}`}
+      />
+    </div>
+  );
+}
+
+// ========== POST CARD SKELETON ==========
+function PostCardSkeleton({ isAr }: { isAr: boolean }) {
+  const shimmer = "animate-pulse bg-gray-200 dark:bg-[#1e2d42] rounded";
+  return (
+    <div className="bg-white dark:bg-[#111927] rounded-2xl shadow-sm border border-gray-100 dark:border-[#1e2d42] overflow-hidden" aria-hidden="true">
+      <div className="p-4 flex items-center gap-3">
+        <div className={`w-11 h-11 rounded-full ${shimmer}`} />
+        <div className="space-y-2 flex-1">
+          <div className={`h-3 w-32 ${shimmer}`} />
+          <div className={`h-2.5 w-20 ${shimmer}`} />
+        </div>
+      </div>
+      <div className="px-4 pb-3 space-y-2">
+        <div className={`h-3 w-full ${shimmer}`} />
+        <div className={`h-3 w-2/3 ${shimmer}`} />
+      </div>
+      <div className={`h-56 mx-4 mb-3 ${shimmer}`} />
+      <div className="px-4 pb-3 flex justify-between">
+        <div className={`h-8 w-1/3 ${shimmer}`} />
+        <div className={`h-8 w-1/4 ${shimmer}`} />
+      </div>
     </div>
   );
 }
@@ -385,42 +440,168 @@ function PostCard({
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
   const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const images = parseMedia(post.images);
   const videos = parseMedia(post.videos);
   const totalReactions = Object.values(post.reactionSummary || {}).reduce((a, b) => a + b, 0);
   const shownComments = commentCount || post._count?.comments || 0;
+  const isOwner = !!member && post.authorId === member.id;
+  const needsCollapse = (post.content?.length || 0) > 220;
 
   const labels = isAr
     ? { like: "أعجبني", love: "أحببته", haha: "ضحك", wow: "مدهش", sad: "محزن", angry: "غاضب" }
     : { like: "Like", love: "Love", haha: "Haha", wow: "Wow", sad: "Sad", angry: "Angry" };
 
   const author = post.author || { id: "", name: isAr ? "عضو" : "Member", image: null };
+  const postUrl = `${location.origin}/${lang}/posts/${post.id}`;
+
+  const handleLikeDoubleTap = useCallback(() => {
+    // Double-tap on media should like (never unlike)
+    if (!member) {
+      window.location.assign(`/auth/login?callbackUrl=${encodeURIComponent(`/${lang}/posts/${post.id}`)}`);
+      return;
+    }
+    if (post.myReaction !== "like") onReact(post.id, "like");
+    toast.success(isAr ? "أعجبك هذا المنشور" : "You liked this post");
+  }, [member, post.id, post.myReaction, onReact, isAr, lang]);
+
+  // close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [menuOpen]);
+
+  const copyLink = async () => {
+    try { await navigator.clipboard.writeText(postUrl); toast.success(isAr ? "تم نسخ الرابط" : "Link copied"); }
+    catch { window.prompt(isAr ? "انسخ الرابط" : "Copy link", postUrl); }
+    setMenuOpen(false);
+  };
+
+  const handleDelete = async () => {
+    if (!member) return;
+    setDeleting(true);
+    try {
+      await fetch(`/api/posts/${post.id}`, { method: "DELETE" });
+      toast.success(isAr ? "تم حذف المنشور" : "Post deleted");
+      window.location.reload();
+    } catch {
+      toast.error(isAr ? "فشل حذف المنشور" : "Failed to delete post");
+    } finally { setDeleting(false); }
+  };
 
   return (
     <>
-      <div className="bg-white dark:bg-[#111927] rounded-2xl shadow-sm border border-gray-100 dark:border-[#1e2d42] overflow-hidden">
+      <motion.article
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.35 }}
+        className="bg-white dark:bg-[#111927] rounded-2xl shadow-sm border border-gray-100 dark:border-[#1e2d42] overflow-hidden"
+      >
         {/* Header */}
         <div className="p-4 pb-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <Avatar src={author.image} name={author.name} size={44} />
-              <div>
-                <h3 className="font-semibold text-sm text-gray-900 dark:text-[#f1f5f9]">{author.name}</h3>
+              <div className="min-w-0">
+                <h3 className="font-semibold text-sm text-gray-900 dark:text-[#f1f5f9] truncate">
+                  {author.name}
+                </h3>
                 <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                   <span>{timeAgo(post.createdAt, isAr)}</span>
-                  <span>·</span>
-                  <Globe className="w-3 h-3" />
+                  {post.editedAt && <span aria-hidden>·</span>}
+                  {post.editedAt && <span>{isAr ? "معدل" : "edited"}</span>}
+                  <span aria-hidden>·</span>
+                  <Globe className="w-3 h-3" aria-label={isAr ? "عام" : "Public"} />
                 </div>
               </div>
+            </div>
+            {/* More menu */}
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen((o) => !o)}
+                className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors"
+                aria-label={isAr ? "المزيد من الخيارات" : "More options"}
+                aria-expanded={menuOpen}
+              >
+                <MoreHorizontal className="w-5 h-5" />
+              </button>
+              <AnimatePresence>
+                {menuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: -6 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: -6 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-11 z-30 w-52 bg-white dark:bg-[#1a2440] rounded-xl shadow-xl border border-gray-100 dark:border-[#2a3f5f] overflow-hidden"
+                    role="menu"
+                  >
+                    <button role="menuitem" onClick={copyLink} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2a3f5f] transition-colors">
+                      <Link2 className="w-4 h-4 text-gray-400" /> {isAr ? "نسخ الرابط" : "Copy link"}
+                    </button>
+                    {member && (
+                      <button role="menuitem" onClick={() => { toast.success(isAr ? "تم الحفظ" : "Saved"); setMenuOpen(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2a3f5f] transition-colors">
+                        <Bookmark className="w-4 h-4 text-gray-400" /> {isAr ? "حفظ المنشور" : "Save post"}
+                      </button>
+                    )}
+                    <button role="menuitem" onClick={() => { toast.message(isAr ? "تم إخفاء المنشور" : "Post hidden"); setMenuOpen(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2a3f5f] transition-colors">
+                      <EyeOff className="w-4 h-4 text-gray-400" /> {isAr ? "إخفاء المنشور" : "Hide post"}
+                    </button>
+                    <button role="menuitem" onClick={() => { toast.message(isAr ? "تم إرسال البلاغ" : "Report sent"); setMenuOpen(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                      <Flag className="w-4 h-4" /> {isAr ? "الإبلاغ" : "Report"}
+                    </button>
+                    {isOwner && <div className="h-px bg-gray-100 dark:bg-[#2a3f5f]" />}
+                    {isOwner && (
+                      <button role="menuitem" onClick={async () => {
+                        setMenuOpen(false);
+                        const newContent = window.prompt(isAr ? "عدّل نص المنشور" : "Edit post text", post.content || "");
+                        if (newContent === null || !member) return;
+                        try {
+                          const res = await fetch(`/api/posts/${post.id}`, {
+                            method: "PUT", headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ content: newContent, authorId: member.id }),
+                          });
+                          if (res.ok) { toast.success(isAr ? "تم التعديل" : "Post updated"); window.location.reload(); }
+                          else { const d = await res.json().catch(() => null); toast.error(d?.error || (isAr ? "فشل التعديل" : "Failed to update")); }
+                        } catch { toast.error(isAr ? "فشل التعديل" : "Failed to update"); }
+                      }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2a3f5f] transition-colors">
+                        <Pencil className="w-4 h-4 text-gray-400" /> {isAr ? "تعديل" : "Edit"}
+                      </button>
+                    )}
+                    {isOwner && (
+                      <button role="menuitem" onClick={() => { setConfirmDelete(true); setMenuOpen(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                        <Trash2 className="w-4 h-4" /> {isAr ? "حذف" : "Delete"}
+                      </button>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
 
-        {/* Content */}
+        {/* Content with long-text collapse */}
         {post.content && (
           <div className="px-4 pb-3">
-            <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed" dir="rtl" dangerouslySetInnerHTML={{ __html: highlightMentions(post.content) }} />
+            <p
+              className={`text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed ${!expanded && needsCollapse ? "line-clamp-5" : ""}`}
+              dir="rtl"
+              dangerouslySetInnerHTML={{ __html: highlightMentions(post.content) }}
+            />
+            {needsCollapse && (
+              <button onClick={() => setExpanded((e) => !e)} className="mt-1 text-blue-600 dark:text-blue-400 font-medium text-sm hover:underline">
+                {expanded ? (isAr ? "عرض أقل" : "Show less") : (isAr ? "عرض المزيد" : "Show more")}
+              </button>
+            )}
           </div>
         )}
 
@@ -439,23 +620,30 @@ function PostCard({
         {images.length > 0 && (
           <div className={`grid gap-0.5 ${images.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
             {images.slice(0, 4).map((url, i) => (
-              <div key={i} className={`relative cursor-pointer overflow-hidden ${images.length === 1 ? "aspect-video" : "aspect-square"}`} onClick={() => setLightbox({ images, index: i })}>
-                <Image src={url} alt="" fill className="object-cover hover:scale-105 transition-transform duration-300" unoptimized />
+              <motion.button
+                key={i}
+                whileTap={{ scale: 0.99 }}
+                onClick={() => setLightbox({ images, index: i })}
+                type="button"
+                aria-label={isAr ? "فتح الصورة" : "Open image"}
+                className={`relative cursor-pointer overflow-hidden group ${images.length === 1 ? "aspect-video" : "aspect-square"}`}
+              >
+                <ProgressiveImage src={url} alt="" aspectClass={images.length === 1 ? "aspect-video" : "aspect-square"} className="group-hover:scale-105 transition-transform duration-300" />
                 {i === 3 && images.length > 4 && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">+{images.length - 4}</span>
+                    <span className="text-white text-2xl font-bold">{isAr ? `+${images.length - 4} صور` : `+${images.length - 4}`}</span>
                   </div>
                 )}
-              </div>
+              </motion.button>
             ))}
           </div>
         )}
 
         {/* Videos */}
         {videos.length > 0 && (
-          <div className="px-4 pb-3 space-y-2">
+          <div className="space-y-2">
             {videos.map((url, i) => (
-              <video key={i} src={url} controls className="w-full rounded-xl max-h-[400px] object-cover bg-black" />
+              <video key={i} src={url} controls preload="metadata" className="w-full rounded-xl max-h-[400px] object-cover bg-black" />
             ))}
           </div>
         )}
@@ -463,15 +651,17 @@ function PostCard({
         {/* Stats */}
         <div className="px-4 py-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-[#1e2d42]">
           <div className="flex items-center gap-1">
-            {totalReactions > 0 && (
+            {totalReactions > 0 ? (
               <>
                 <div className="flex -space-x-1">
                   {Object.entries(post.reactionSummary || {}).sort(([, a], [, b]) => b - a).slice(0, 3).map(([type]) => (
-                    <span key={type} className="text-sm">{REACTION_EMOJIS[type] || "👍"}</span>
+                    <motion.span key={type} initial={{ scale: 0.6 }} animate={{ scale: 1 }} className="text-sm">{REACTION_EMOJIS[type] || "👍"}</motion.span>
                   ))}
                 </div>
                 <span>{totalReactions}</span>
               </>
+            ) : (
+              <span>{isAr ? "كن أول من يتفاعل" : "Be the first to react"}</span>
             )}
           </div>
           <div className="flex items-center gap-3">
@@ -493,11 +683,11 @@ function PostCard({
             className="w-full justify-between px-2 py-1.5"
           />
           <div className="flex items-center border-t border-gray-100 dark:border-[#1e2d42] mt-1">
-            <button onClick={() => setShowComments((s) => !s)} className="flex-1 py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors">
+            <button onClick={() => setShowComments((s) => !s)} className="flex-1 py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors active:scale-95">
               <MessageCircle className="w-5 h-5" />
               {isAr ? "تعليق" : "Comment"}
             </button>
-            <button onClick={() => onShare(post)} className="flex-1 py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors">
+            <button onClick={() => onShare(post)} className="flex-1 py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors active:scale-95">
               <Share2 className="w-5 h-5" />
               {isAr ? "مشاركة" : "Share"}
             </button>
@@ -505,26 +695,72 @@ function PostCard({
         </div>
 
         {/* Comments */}
-        {showComments && (
-          <div className="border-t border-gray-100 dark:border-[#1e2d42] px-4 py-3 max-h-96 overflow-y-auto">
-            <CommentsSection
-              postId={post.id}
-              lang={lang}
-              member={member}
-              onCountChange={(n) => setCommentCount(n)}
-            />
-          </div>
-        )}
-      </div>
+        <AnimatePresence>
+          {showComments && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="border-t border-gray-100 dark:border-[#1e2d42] overflow-hidden"
+            >
+              <div className="px-4 py-3 max-h-96 overflow-y-auto">
+                <CommentsSection
+                  postId={post.id}
+                  lang={lang}
+                  member={member}
+                  onCountChange={(n) => setCommentCount(n)}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* Photo Viewer */}
+        {/* Delete confirm */}
+        <AnimatePresence>
+          {confirmDelete && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[80] bg-black/60 flex items-center justify-center p-4"
+              onClick={() => setConfirmDelete(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, y: 10 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 10 }}
+                transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                className="bg-white dark:bg-[#1a2440] rounded-2xl w-full max-w-sm p-5 shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-3">
+                  <Trash2 className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="font-bold text-gray-900 dark:text-white mb-1">{isAr ? "حذف المنشور؟" : "Delete post?"}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{isAr ? "لا يمكن التراجع عن هذا الإجراء." : "This action cannot be undone."}</p>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setConfirmDelete(false)} className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2a3f5f] rounded-xl">{isAr ? "إلغاء" : "Cancel"}</button>
+                  <button onClick={handleDelete} disabled={deleting} className="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold disabled:opacity-50">
+                    {deleting ? (isAr ? "جاري..." : "Deleting...") : (isAr ? "حذف" : "Delete")}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.article>
+
+      {/* Media Viewer */}
       {lightbox && (
-        <PhotoViewer
+        <MediaViewer
           images={lightbox.images}
           index={lightbox.index}
           onClose={() => setLightbox(null)}
-          caption={{ authorName: author.name, authorImage: author.image, text: post.content }}
+          onLike={handleLikeDoubleTap}
+          liked={post.myReaction === "like"}
           isArabic={isAr}
+          caption={{ authorName: author.name, authorImage: author.image, text: post.content }}
         />
       )}
     </>
@@ -716,6 +952,26 @@ export default function PostsFeed() {
 
   const handleReact = async (postId: string, type: string) => {
     if (!member) return;
+    // Optimistic update with rollback
+    const prevState = posts.find((p) => p.id === postId);
+    const optimisticSummary = { ...(prevState?.reactionSummary || {}) };
+    let prevCount = 0;
+    Object.values(optimisticSummary).forEach((n) => (prevCount += n));
+    const prevReaction = prevState?.myReaction ?? null;
+    if (prevReaction && prevReaction === type) {
+      // Removing reaction
+      optimisticSummary[type] = (optimisticSummary[type] || 1) - 1;
+      if (optimisticSummary[type] <= 0) delete optimisticSummary[type];
+      setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, reactionSummary: { ...optimisticSummary }, myReaction: null } : p)));
+    } else {
+      // Adding or switching reaction
+      if (prevReaction && optimisticSummary[prevReaction]) {
+        optimisticSummary[prevReaction] -= 1;
+        if (optimisticSummary[prevReaction] <= 0) delete optimisticSummary[prevReaction];
+      }
+      optimisticSummary[type] = (optimisticSummary[type] || 0) + 1;
+      setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, reactionSummary: { ...optimisticSummary }, myReaction: type } : p)));
+    }
     try {
       const res = await fetch(`/api/posts/${postId}/react`, {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -731,7 +987,10 @@ export default function PostsFeed() {
         });
         setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, reactionSummary: summary, myReaction } : p)));
       }
-    } catch {}
+    } catch {
+      // Rollback
+      setPosts((prev) => prev.map((p) => (p.id === postId && prevState ? { ...p, reactionSummary: prevState.reactionSummary, myReaction: prevReaction } : p)));
+    }
   };
 
   const handleShared = (postId: string) => {
@@ -757,11 +1016,7 @@ export default function PostsFeed() {
         {loading && posts.length === 0 ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white dark:bg-[#111927] rounded-2xl p-4 space-y-3 animate-pulse">
-                <div className="flex gap-3"><div className="w-11 h-11 bg-gray-200 dark:bg-[#1e2d42] rounded-full" /><div className="flex-1 space-y-2"><div className="h-4 bg-gray-200 dark:bg-[#1e2d42] rounded w-1/3" /><div className="h-3 bg-gray-200 dark:bg-[#1e2d42] rounded w-1/4" /></div></div>
-                <div className="h-4 bg-gray-200 dark:bg-[#1e2d42] rounded w-full" /><div className="h-4 bg-gray-200 dark:bg-[#1e2d42] rounded w-2/3" />
-                <div className="h-48 bg-gray-200 dark:bg-[#1e2d42] rounded-xl" />
-              </div>
+              <PostCardSkeleton key={i} isAr={isAr} />
             ))}
           </div>
         ) : (
