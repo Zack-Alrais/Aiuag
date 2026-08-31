@@ -296,6 +296,22 @@ export const adminDict: AdminDict = {
   "comments.comment": { ar: "التعليق", en: "Comment" },
   "comments.approve": { ar: "موافقة", en: "Approve" },
   "comments.unapprove": { ar: "إلغاء الموافقة", en: "Unapprove" },
+  "comments.replyBadge": { ar: "رد", en: "Reply" },
+  "comments.tab": { ar: "التعليقات", en: "Comments" },
+
+  // === Reactions ===
+  "reactions.title": { ar: "تفاعلات المنشورات", en: "Post Reactions" },
+  "reactions.subtitle": { ar: "إحصاءات التفاعلات حسب النوع والأعضاء", en: "Reaction statistics by type and member" },
+  "reactions.tab": { ar: "التفاعلات", en: "Reactions" },
+  "reactions.post": { ar: "المنشور", en: "Post" },
+  "reactions.total": { ar: "الإجمالي", en: "Total" },
+  "reactions.reactionsType": { ar: "التفاعلات", en: "Reactions" },
+  "reactions.loading": { ar: "جاري تحميل التفاعلات...", en: "Loading reactions..." },
+  "reactions.none": { ar: "لا توجد تفاعلات", en: "No reactions found" },
+  "reactions.expand": { ar: "عرض التفاصيل", en: "View details" },
+  "reactions.collapse": { ar: "إخفاء التفاصيل", en: "Hide details" },
+  "reactions.members": { ar: "الأعضاء", en: "Members" },
+  "reactions.noMembers": { ar: "لا يوجد أعضاء", en: "No members" },
 
   // === Members ===
   "members.title": { ar: "إدارة الأعضاء", en: "Members Management" },

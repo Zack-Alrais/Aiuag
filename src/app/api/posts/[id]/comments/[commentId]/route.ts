@@ -50,6 +50,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
+    await prisma.postComment.deleteMany({ where: { parentId: commentId } });
     await prisma.postComment.delete({ where: { id: commentId } });
     return NextResponse.json({ success: true });
   } catch (error) {

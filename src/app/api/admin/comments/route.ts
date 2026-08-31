@@ -6,13 +6,32 @@ export async function GET(request: NextRequest) {
     const comments = await prisma.postComment.findMany({
       include: {
         post: {
-          select: { title: true },
+          select: { id: true, content: true, images: true },
         },
       },
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ data: comments });
+    const memberIds = [...new Set(comments.map((c) => c.memberId))];
+    const members = memberIds.length
+      ? await prisma.member.findMany({
+          where: { id: { in: memberIds } },
+          include: { user: { select: { name: true, email: true, image: true } } },
+        })
+      : [];
+    const memberMap = new Map(
+      members.map((m) => [
+        m.id,
+        { id: m.id, name: m.user.name, email: m.user.email ?? undefined, image: m.user.image },
+      ])
+    );
+
+    const data = comments.map((c) => ({
+      ...c,
+      member: memberMap.get(c.memberId) ?? null,
+    }));
+
+    return NextResponse.json({ data });
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
   }

@@ -41,6 +41,7 @@ function getNavItems(lang: string): NavItem[] {
       ],
     },
     { label: isArabic ? "المشاريع" : "Projects", href: "/projects" },
+    { label: isArabic ? "الشركاء" : "Partners", href: "/partners" },
     {
       label: isArabic ? "المركز الإعلامي" : "Media",
       href: "/media",
@@ -64,8 +65,11 @@ function getNavItems(lang: string): NavItem[] {
       label: isArabic ? "الخدمات" : "Services",
       href: "/services",
       children: [
+        { label: isArabic ? "خدمات الخريجين" : "Alumni Services", href: "/services" },
         { label: isArabic ? "التطوع" : "Volunteer", href: "/volunteer" },
         { label: isArabic ? "التبرعات" : "Donations", href: "/donations" },
+        { label: isArabic ? "المنشورات" : "Publications", href: "/publications" },
+        { label: isArabic ? "الموارد" : "Resources", href: "/resources" },
       ],
     },
     { label: isArabic ? "اتصل بنا" : "Contact", href: "/contact", hideOnLg: true },

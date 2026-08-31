@@ -30,6 +30,13 @@ export async function GET(
       ]),
     ];
 
+    const author = post.authorId
+      ? await prisma.member.findUnique({
+          where: { id: post.authorId },
+          include: { user: { select: { name: true, email: true, image: true } } },
+        })
+      : null;
+
     const members = memberIds.length > 0
       ? await prisma.member.findMany({
           where: { id: { in: memberIds } },
@@ -57,6 +64,9 @@ export async function GET(
 
     const enriched = {
       ...post,
+      author: author
+        ? { id: author.id, name: author.user.name, email: author.user.email, image: author.user.image }
+        : null,
       comments: post.comments.map((c) => ({
         ...c,
         memberName: memberMap.get(c.memberId)?.name ?? null,

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import Image from "next/image";
@@ -24,7 +24,7 @@ import {
   Loader2,
 } from "lucide-react";
 
-interface GalleryItem {
+export interface GalleryItem {
   id: string | number;
   title?: string;
   description?: string;
@@ -83,7 +83,7 @@ export default function GalleryClient({
   const thumbScrollRef = useRef<HTMLDivElement>(null);
 
   const albums = useMemo(
-    () => Array.from(new Set(items.map((i) => i.album).filter(Boolean))),
+    () => Array.from(new Set(items.map((i) => i.album ?? "general"))),
     [items]
   );
 

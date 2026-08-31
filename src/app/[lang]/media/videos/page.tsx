@@ -15,20 +15,35 @@ export default async function VideosPage({ params }: Props) {
   const isArabic = lang === "ar";
   const dir = isArabic ? "rtl" : "ltr";
 
-  const videos = await prisma.video.findMany({
-    select: {
-      id: true,
-      title: true,
-      titleEn: true,
-      url: true,
-      thumbnail: true,
-      category: true,
-      description: true,
-      createdAt: true,
-    },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
+  let videos: {
+    id: string;
+    title: string;
+    titleEn: string | null;
+    url: string;
+    thumbnail: string | null;
+    category: string | null;
+    description: string | null;
+    createdAt: Date;
+  }[] = [];
+
+  try {
+    videos = await prisma.video.findMany({
+      select: {
+        id: true,
+        title: true,
+        titleEn: true,
+        url: true,
+        thumbnail: true,
+        category: true,
+        description: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+  } catch {
+    videos = [];
+  }
 
   const serialized = videos.map((v) => ({
     ...v,

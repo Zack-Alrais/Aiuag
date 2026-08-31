@@ -648,7 +648,7 @@ model PostComment {
   content    String
   isApproved Boolean  @default(false)
   parentId   String?  // for replies
-  parent     PostComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  parent     PostComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies    PostComment[] @relation("CommentReplies")
   createdAt  DateTime @default(now())
   editedAt   DateTime?

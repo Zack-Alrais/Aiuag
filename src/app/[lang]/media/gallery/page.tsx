@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import HeroSection from "@/components/ui/hero-section";
-import GalleryClient from "./gallery-client";
+import GalleryClient, { type GalleryItem } from "./gallery-client";
 import { Image } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -16,11 +16,19 @@ export default async function GalleryPage({ params }: Props) {
 
   // Fetch from API which combines Gallery + Video tables
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `http://localhost:9000`;
-  const res = await fetch(`${baseUrl}/api/public/gallery`, {
-    next: { revalidate: 60 },
-    headers: { "Content-Type": "application/json" },
-  });
-  const items = res.ok ? await res.json() : [];
+  let items: GalleryItem[] = [];
+  try {
+    const res = await fetch(`${baseUrl}/api/public/gallery`, {
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (res.ok) {
+      const data = (await res.json()) as unknown;
+      if (Array.isArray(data)) items = data as GalleryItem[];
+    }
+  } catch {
+    items = [];
+  }
 
   return (
     <div dir={dir}>

@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import {
-  Heart, MessageCircle, Share2, ChevronLeft, ChevronRight, X,
-  Send, Loader2, Calendar, ArrowRight, ArrowLeft, Pencil, Trash2, Check,
+  MessageCircle, Share2, Calendar, ArrowRight, ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import CustomVideoPlayer from "@/components/ui/custom-video-player";
 import { SkeletonLine, SkeletonCircle } from "@/components/ui/skeleton";
-import ReactionIcon from "@/components/shared/reaction-icon";
+import CommentsSection from "@/components/posts/comments-section";
+import PhotoViewer from "@/components/posts/photo-viewer";
 import { useMember } from "@/hooks/use-member";
 import { toast } from "sonner";
 
@@ -32,7 +32,7 @@ interface Post {
   createdAt: string;
   updatedAt: string;
   _count?: { comments: number; reactions: number; shares: number };
-  reactions?: { type: string; count: number }[];
+  reactions?: { type: string; count?: number; memberId?: string }[];
   author?: { id?: string; name: string; nameEn?: string; image?: string };
   comments?: Comment[];
 }
@@ -87,16 +87,12 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
   const [lang, setLang] = useState("ar");
   const [id, setId] = useState("");
   const [post, setPost] = useState<Post | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentCount, setCommentCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const { member } = useMember();
-  const [commentText, setCommentText] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null);
   const [currentReaction, setCurrentReaction] = useState<string | null>(null);
   const [reactionCounts, setReactionCounts] = useState<Record<string, number>>({});
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editCommentText, setEditCommentText] = useState("");
 
   const isArabic = lang === "ar";
 
@@ -107,13 +103,10 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    Promise.all([
-      fetch(`/api/posts/${id}`).then((r) => r.json()),
-      fetch(`/api/posts/${id}/comments`).then((r) => r.json()),
-    ])
-      .then(([postData, commentsData]) => {
+    fetch(`/api/posts/${id}`)
+      .then((r) => r.json())
+      .then((postData) => {
         setPost(postData);
-        setComments(commentsData.data || []);
         if (postData.myReaction) setCurrentReaction(postData.myReaction);
         // Aggregate reactions from raw reaction records
         if (postData.reactions && Array.isArray(postData.reactions)) {
@@ -130,15 +123,22 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    if (member && post?.reactions?.length) {
+      const mine = post.reactions.find((r: any) => r.memberId === member.id);
+      setCurrentReaction(mine?.type ?? null);
+    }
+  }, [member, post]);
+
   const handleReact = async (type: string) => {
     if (!member || !post) return;
     try {
+      const wasSame = currentReaction === type;
       await fetch(`/api/posts/${post.id}/react`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberId: member.id, type }),
+        body: JSON.stringify({ memberId: member.id, type: wasSame ? "" : type }),
       });
-      const wasSame = currentReaction === type;
       setReactionCounts((prev) => {
         const next = { ...prev };
         if (wasSame) {
@@ -152,29 +152,6 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
         return next;
       });
     } catch {}
-  };
-
-  const submitComment = async () => {
-    const text = commentText.trim();
-    if (!text || !member || !post) return;
-    setSubmitting(true);
-    try {
-      const res = await fetch(`/api/posts/${post.id}/comments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberId: member.id, content: text }),
-      });
-      if (res.ok) {
-        const newComment = await res.json();
-        setComments((prev) => [...prev, newComment]);
-        setCommentText("");
-      } else {
-        toast.error(isArabic ? "فشل إرسال التعليق" : "Failed to send comment");
-      }
-    } catch {
-      toast.error(isArabic ? "خطأ في الاتصال" : "Connection error");
-    }
-    setSubmitting(false);
   };
 
   const handleShare = async () => {
@@ -193,37 +170,6 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(url);
         toast.success(isArabic ? "تم نسخ الرابط" : "Link copied");
-      }
-    } catch {}
-  };
-
-  const handleEditComment = async (commentId: string) => {
-    const text = editCommentText.trim();
-    if (!text || !member || !post) return;
-    try {
-      const res = await fetch(`/api/posts/${post.id}/comments/${commentId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberId: member.id, content: text }),
-      });
-      if (res.ok) {
-        setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, content: text } : c)));
-        setEditingCommentId(null);
-        setEditCommentText("");
-      }
-    } catch {}
-  };
-
-  const handleDeleteComment = async (commentId: string) => {
-    if (!member || !post) return;
-    try {
-      const res = await fetch(`/api/posts/${post.id}/comments/${commentId}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberId: member.id }),
-      });
-      if (res.ok) {
-        setComments((prev) => prev.filter((c) => c.id !== commentId));
       }
     } catch {}
   };
@@ -361,7 +307,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
                 )}
               </div>
               <button className="hover:text-primary transition-colors">
-                {comments.length} {isArabic ? "تعليق" : "comments"}
+                {commentCount} {isArabic ? "تعليق" : "comments"}
               </button>
             </div>
 
@@ -400,170 +346,36 @@ export default function PostDetailPage({ params }: { params: Promise<{ lang: str
             </div>
           </article>
 
-          {/* Comment Form */}
-          <div className="bg-surface rounded-2xl shadow-sm border border-border p-5 mt-5">
-            <h3 className="font-semibold text-text mb-4 text-sm">
-              {isArabic ? "أضف تعليقاً" : "Add a comment"}
-            </h3>
-            {member ? (
-              <div className="flex items-start gap-3">
-                <div className="shrink-0">
-                  <Avatar src={member.image} name={member.name} size={36} />
-                </div>
-                <div className="flex-1">
-                  <textarea
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder={isArabic ? "اكتب تعليقاً..." : "Write a comment..."}
-                    rows={3}
-                    className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-text outline-none focus:border-primary resize-none placeholder:text-text-light"
-                  />
-                  <div className="flex justify-between items-center mt-2">
-                    <p className="text-xs text-text-light">{member.name}</p>
-                    <button
-                      onClick={submitComment}
-                      disabled={submitting || !commentText.trim()}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
-                    >
-                      {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                      {isArabic ? "إرسال" : "Send"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-4">
-                <p className="text-text-secondary text-sm mb-2">
-                  {isArabic ? "يجب تسجيل الدخول للتعليق" : "You must log in to comment"}
-                </p>
-                <Link
-                  href="/auth/login"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-dark transition-colors"
-                >
-                  {isArabic ? "تسجيل الدخول" : "Log in"}
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Comments Thread */}
+          {/* Comments */}
           <div className="bg-surface rounded-2xl shadow-sm border border-border p-5 mt-5">
             <h3 className="font-semibold text-text mb-4 text-sm flex items-center gap-2">
               <MessageCircle className="w-4 h-4 text-primary" />
               {isArabic ? "التعليقات" : "Comments"}
-              <span className="text-text-light font-normal text-xs">({comments.length})</span>
+              <span className="text-text-light font-normal text-xs">({commentCount})</span>
             </h3>
-
-            {comments.length === 0 ? (
-              <p className="text-text-secondary text-sm text-center py-6">
-                {isArabic ? "لا توجد تعليقات بعد. كن أول من يعلق!" : "No comments yet. Be the first!"}
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {comments.map((c) => (
-                  <div key={c.id} className="flex gap-3">
-                    <div className="shrink-0 mt-0.5">
-                      <Avatar src={c.memberImage} name={c.memberName} size={32} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      {editingCommentId === c.id ? (
-                        <div className="bg-background rounded-2xl px-4 py-2.5">
-                          <textarea
-                            value={editCommentText}
-                            onChange={(e) => setEditCommentText(e.target.value)}
-                            rows={2}
-                            className="w-full bg-transparent text-sm text-text outline-none resize-none"
-                          />
-                          <div className="flex justify-end gap-2 mt-2">
-                            <button
-                              onClick={() => { setEditingCommentId(null); setEditCommentText(""); }}
-                              className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleEditComment(c.id)}
-                              className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-primary"
-                            >
-                              <Check className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="bg-background rounded-2xl px-4 py-2.5">
-                          <p className="text-xs font-semibold text-text">
-                            {c.memberName || (isArabic ? "عضو" : "Member")}
-                          </p>
-                          <p className="text-sm text-text-secondary mt-1">{c.content}</p>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 mt-1 px-1">
-                        <p className="text-[10px] text-text-light">
-                          {new Date(c.createdAt).toLocaleDateString(isArabic ? "ar-SA" : "en-US", {
-                            day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
-                          })}
-                        </p>
-                        {member && c.memberId === member.id && (
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => { setEditingCommentId(c.id); setEditCommentText(c.content); }}
-                              className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 text-text-light hover:text-text-secondary transition-colors"
-                            >
-                              <Pencil className="w-3 h-3" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteComment(c.id)}
-                              className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 text-text-light hover:text-red-500 transition-colors"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <CommentsSection
+              postId={id}
+              lang={lang}
+              member={member}
+              onCountChange={(n) => setCommentCount(n)}
+            />
           </div>
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Photo Viewer */}
       {lightbox && (
-        <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
-          onClick={() => setLightbox(null)}
-          dir="ltr"
-        >
-          <button
-            onClick={() => setLightbox(null)}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-          >
-            <X className="w-5 h-5" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); setLightbox((l) => l ? { ...l, index: (l.index - 1 + l.images.length) % l.images.length } : null); }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <img
-            src={lightbox.images[lightbox.index]}
-            alt=""
-            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
-            onClick={(e) => e.stopPropagation()}
-          />
-          <button
-            onClick={(e) => { e.stopPropagation(); setLightbox((l) => l ? { ...l, index: (l.index + 1) % l.images.length } : null); }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm bg-black/50 px-3 py-1 rounded-full">
-            {lightbox.index + 1} / {lightbox.images.length}
-          </div>
-        </div>
+        <PhotoViewer
+          images={lightbox.images}
+          index={lightbox.index}
+          onClose={() => setLightbox(null)}
+          caption={{
+            authorName: post.author?.name,
+            authorImage: post.author?.image ?? null,
+            text: post.content,
+          }}
+          isArabic={isArabic}
+        />
       )}
     </div>
   );

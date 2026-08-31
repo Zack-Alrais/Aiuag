@@ -2,17 +2,23 @@
 
 import { useState, useEffect } from "react";
 import {
-  Heart, MessageCircle, Share2, ChevronLeft, ChevronRight, X,
-  Image as ImageIcon, Send, Loader2, Calendar,
+  MessageCircle, Share2, Image as ImageIcon, Loader2, Calendar,
 } from "lucide-react";
 import Link from "next/link";
 import CustomVideoPlayer from "@/components/ui/custom-video-player";
 import { PostSkeleton } from "@/components/ui/skeleton";
-import ReactionIcon from "@/components/shared/reaction-icon";
+import ReactionButton from "@/components/posts/reaction-button";
+import CommentsSection from "@/components/posts/comments-section";
+import PhotoViewer from "@/components/posts/photo-viewer";
 import { useMember } from "@/hooks/use-member";
 import { toast } from "sonner";
 
-const REACTIONS = ["like", "love", "haha", "wow", "sad", "angry"] as const;
+const REACTION_LABELS_AR: Record<string, string> = {
+  like: "إعجاب", love: "حب", haha: "هاها", wow: "واو", sad: "حزين", angry: "غاضب",
+};
+const REACTION_LABELS_EN: Record<string, string> = {
+  like: "Like", love: "Love", haha: "Haha", wow: "Wow", sad: "Sad", angry: "Angry",
+};
 
 interface Post {
   id: string;
@@ -25,15 +31,8 @@ interface Post {
   createdAt: string;
   _count?: { comments: number; reactions: number; shares: number };
   reactionSummary?: Record<string, number>;
+  myReaction?: string | null;
   author?: { id?: string; name: string; nameEn?: string; image?: string };
-}
-
-interface Comment {
-  id: string;
-  content: string;
-  createdAt: string;
-  memberName?: string;
-  memberImage?: string;
 }
 
 function parseImages(raw: string | null): string[] {
@@ -88,13 +87,9 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
-  const [comments, setComments] = useState<Record<string, Comment[]>>({});
-  const [commentsLoading, setCommentsLoading] = useState<Record<string, boolean>>({});
-  const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
-  const [submitting, setSubmitting] = useState<Record<string, boolean>>({});
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
   const { member } = useMember();
-  const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null);
-  const [reactionPopover, setReactionPopover] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<{ post: Post; images: string[]; index: number } | null>(null);
 
   const isArabic = lang === "ar";
 
@@ -102,7 +97,8 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/posts?page=${page}`)
+    const memberParam = member?.id ? `&memberId=${encodeURIComponent(member.id)}` : "";
+    fetch(`/api/posts?page=${page}${memberParam}`)
       .then((r) => r.json())
       .then((data) => {
         const list = data.data || [];
@@ -111,46 +107,14 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [page]);
+  }, [page, member?.id]);
 
-  const toggleComments = async (postId: string) => {
-    if (expandedComments.has(postId)) {
-      setExpandedComments((s) => { const n = new Set(s); n.delete(postId); return n; });
-      return;
-    }
-    setExpandedComments((s) => new Set(s).add(postId));
-    if (!comments[postId]) {
-      setCommentsLoading((s) => ({ ...s, [postId]: true }));
-      try {
-        const res = await fetch(`/api/posts/${postId}/comments`);
-        const data = await res.json();
-        setComments((s) => ({ ...s, [postId]: data.data || [] }));
-      } catch {}
-      setCommentsLoading((s) => ({ ...s, [postId]: false }));
-    }
-  };
-
-  const submitComment = async (postId: string) => {
-    const text = commentTexts[postId]?.trim();
-    if (!text || !member) return;
-    setSubmitting((s) => ({ ...s, [postId]: true }));
-    try {
-      const res = await fetch(`/api/posts/${postId}/comments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberId: member.id, content: text }),
-      });
-      if (res.ok) {
-        const newComment = await res.json();
-        setComments((s) => ({ ...s, [postId]: [...(s[postId] || []), newComment] }));
-        setCommentTexts((s) => ({ ...s, [postId]: "" }));
-      } else {
-        toast.error(isArabic ? "فشل إرسال التعليق" : "Failed to send comment");
-      }
-    } catch {
-      toast.error(isArabic ? "خطأ في الاتصال" : "Connection error");
-    }
-    setSubmitting((s) => ({ ...s, [postId]: false }));
+  const toggleComments = (postId: string) => {
+    setExpandedComments((s) => {
+      const n = new Set(s);
+      if (n.has(postId)) n.delete(postId); else n.add(postId);
+      return n;
+    });
   };
 
   const handleShare = async (post: Post) => {
@@ -177,11 +141,21 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
   const handleReaction = async (postId: string, type: string) => {
     if (!member) return;
     try {
-      await fetch(`/api/posts/${postId}/react`, {
+      const res = await fetch(`/api/posts/${postId}/react`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ memberId: member.id, type }),
       });
+      const reactions = await res.json();
+      if (Array.isArray(reactions)) {
+        const summary: Record<string, number> = {};
+        let myReaction: string | null = null;
+        reactions.forEach((r: { type: string; memberId: string }) => {
+          summary[r.type] = (summary[r.type] || 0) + 1;
+          if (r.memberId === member.id) myReaction = r.type;
+        });
+        setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, reactionSummary: summary, myReaction } : p)));
+      }
     } catch {}
   };
 
@@ -238,7 +212,7 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                     {images.slice(0, 4).map((img, i) => (
                       <button
                         key={i}
-                        onClick={() => setLightbox({ images, index: i })}
+                        onClick={() => setLightbox({ post, images, index: i })}
                         className={`relative overflow-hidden bg-black/5 group ${images.length === 3 && i === 0 ? "row-span-2" : ""}`}
                       >
                         <img src={img} alt="" className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
@@ -265,37 +239,22 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                 <div className="flex items-center justify-between px-4 py-2 text-xs text-text-secondary border-t border-border">
                   <span>{totalReactions} {isArabic ? "تفاعل" : "reactions"}</span>
                   <button onClick={() => toggleComments(post.id)} className="hover:text-primary transition-colors">
-                    {(post._count?.comments ?? 0)} {isArabic ? "تعليق" : "comments"}
+                    {(commentCounts[post.id] ?? post._count?.comments ?? 0)} {isArabic ? "تعليق" : "comments"}
                   </button>
                 </div>
 
                 {/* Action Bar */}
                 <div className="flex items-center border-t border-border divide-x divide-border rtl:divide-x-reverse">
-                  <div className="relative flex-1">
-                    <button
-                      onClick={() => member ? handleReaction(post.id, "like") : setReactionPopover(post.id)}
-                      onMouseEnter={() => setReactionPopover(post.id)}
-                      onMouseLeave={() => setReactionPopover(null)}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 text-sm text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                    >
-                      <Heart className="w-4 h-4" />
-                      {isArabic ? "إعجاب" : "Like"}
-                    </button>
-                    {reactionPopover === post.id && (
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-surface border border-border rounded-2xl shadow-xl p-1.5 flex gap-0.5 z-50 animate-slide-up" dir="ltr">
-                        {REACTIONS.map((type, i) => (
-                          <button
-                            key={type}
-                            onClick={() => { handleReaction(post.id, type); setReactionPopover(null); }}
-                            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all hover:scale-125 active:scale-95"
-                            style={{ animationDelay: `${i * 50}ms`, animation: `bounce-in 0.3s ease-out ${i * 50}ms both` }}
-                          >
-                            <ReactionIcon type={type} size={26} />
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <ReactionButton
+                    postId={post.id}
+                    myReaction={post.myReaction ?? null}
+                    isArabic={isArabic}
+                    labels={isArabic ? REACTION_LABELS_AR : REACTION_LABELS_EN}
+                    onReact={handleReaction}
+                    canReact={!!member}
+                    onRequireLogin={() => window.location.assign("/auth/login")}
+                    className="flex-1 py-2.5"
+                  />
                   <button
                     onClick={() => toggleComments(post.id)}
                     className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
@@ -312,62 +271,14 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                 {/* Comments Section */}
                 {expandedComments.has(post.id) && (
                   <div className="border-t border-border bg-black/[.02] dark:bg-white/[.02]">
-                    {commentsLoading[post.id] ? (
-                      <div className="flex justify-center py-4">
-                        <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                      </div>
-                    ) : (
-                      <div className="p-4 space-y-3 max-h-64 overflow-y-auto">
-                        {(comments[post.id] || []).length === 0 ? (
-                          <p className="text-xs text-text-secondary text-center py-2">
-                            {isArabic ? "لا توجد تعليقات" : "No comments yet"}
-                          </p>
-                        ) : (
-                          (comments[post.id] || []).map((c) => (
-                            <div key={c.id} className="flex gap-2">
-                              <div className="mt-0.5">
-                                <Avatar src={c.memberImage} name={c.memberName} size={28} />
-                              </div>
-                              <div className="bg-surface rounded-xl px-3 py-2 flex-1">
-                                <p className="text-xs font-semibold text-text">{c.memberName || (isArabic ? "عضو" : "Member")}</p>
-                                <p className="text-xs text-text-secondary mt-0.5">{c.content}</p>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )}
-
-                    {/* Comment Form */}
-                    {member ? (
-                      <div className="flex items-center gap-2 px-4 pb-4">
-                        <div className="shrink-0">
-                          <Avatar src={member.image} name={member.name} size={32} />
-                        </div>
-                        <div className="flex-1 flex items-center gap-2 bg-background rounded-xl px-3 py-1.5 border border-border">
-                          <input
-                            value={commentTexts[post.id] || ""}
-                            onChange={(e) => setCommentTexts((s) => ({ ...s, [post.id]: e.target.value }))}
-                            onKeyDown={(e) => { if (e.key === "Enter") submitComment(post.id); }}
-                            placeholder={isArabic ? "اكتب تعليقاً..." : "Write a comment..."}
-                            className="flex-1 bg-transparent text-sm text-text outline-none placeholder:text-text-light"
-                          />
-                          <button
-                            onClick={() => submitComment(post.id)}
-                            disabled={submitting[post.id] || !commentTexts[post.id]?.trim()}
-                            className="text-primary disabled:opacity-30"
-                          >
-                            {submitting[post.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="px-4 pb-4">
-                        <Link href="/auth/login" className="block text-center text-xs text-primary hover:underline py-2">
-                          {isArabic ? "سجل الدخول للتعليق" : "Log in to comment"}
-                        </Link>
-                      </div>
-                    )}
+                    <div className="p-4 max-h-96 overflow-y-auto">
+                      <CommentsSection
+                        postId={post.id}
+                        lang={lang}
+                        member={member}
+                        onCountChange={(n) => setCommentCounts((s) => ({ ...s, [post.id]: n }))}
+                      />
+                    </div>
                   </div>
                 )}
               </article>
@@ -409,41 +320,19 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Photo Viewer */}
       {lightbox && (
-        <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
-          onClick={() => setLightbox(null)}
-          dir="ltr"
-        >
-          <button
-            onClick={() => setLightbox(null)}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-          >
-            <X className="w-5 h-5" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); setLightbox((l) => l ? { ...l, index: (l.index - 1 + l.images.length) % l.images.length } : null); }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <img
-            src={lightbox.images[lightbox.index]}
-            alt=""
-            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
-            onClick={(e) => e.stopPropagation()}
-          />
-          <button
-            onClick={(e) => { e.stopPropagation(); setLightbox((l) => l ? { ...l, index: (l.index + 1) % l.images.length } : null); }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm bg-black/50 px-3 py-1 rounded-full">
-            {lightbox.index + 1} / {lightbox.images.length}
-          </div>
-        </div>
+        <PhotoViewer
+          images={lightbox.images}
+          index={lightbox.index}
+          onClose={() => setLightbox(null)}
+          caption={{
+            authorName: lightbox.post.author?.name,
+            authorImage: lightbox.post.author?.image ?? null,
+            text: lightbox.post.content,
+          }}
+          isArabic={isArabic}
+        />
       )}
     </div>
   );

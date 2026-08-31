@@ -39,6 +39,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Comment not found" }, { status: 404 });
     }
 
+    await prisma.postComment.deleteMany({ where: { parentId: id } });
     await prisma.postComment.delete({ where: { id } });
 
     return NextResponse.json({ message: "Comment deleted successfully" });

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Camera, Play, ArrowLeft, ArrowRight, MessageSquare, Newspaper, Users } from "lucide-react";
+import { Camera, Play, ArrowLeft, ArrowRight, MessageSquare, Newspaper } from "lucide-react";
 import HeroSection from "@/components/ui/hero-section";
 
 export default async function MediaPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -36,17 +36,9 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
       icon: MessageSquare,
       title: isArabic ? "منشورات المجتمع" : "Community Posts",
       desc: isArabic ? "منصة تفاعلية لمناقشات الخريجين وأخبارهم" : "Interactive platform for alumni discussions and updates",
-      href: `/${lang}/posts`,
+      href: `/${lang}/media/posts`,
       color: "from-cyan-600 to-cyan-700",
       stats: isArabic ? "مناقشات + تفاعل" : "Discussions + Feed",
-    },
-    {
-      icon: Users,
-      title: isArabic ? "منشورات الأعضاء" : "Members Feed",
-      desc: isArabic ? "مساحة خاصة للأعضاء للمشاركة والتفاعل" : "Private space for members to post and interact",
-      href: `/${lang}/media/posts`,
-      color: "from-amber-600 to-amber-700",
-      stats: isArabic ? "خاص بالأعضاء" : "Members Only",
     },
   ];
 
