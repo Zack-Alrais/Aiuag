@@ -245,7 +245,7 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                 </div>
 
                 {/* Action Bar */}
-                <div className="flex items-center border-t border-border divide-x divide-border rtl:divide-x-reverse">
+                <div className="border-t border-border px-4 py-2">
                   <ReactionButton
                     postId={post.id}
                     myReaction={post.myReaction ?? null}
@@ -254,19 +254,21 @@ export default function PostsFeedPage({ params }: { params: Promise<{ lang: stri
                     onReact={handleReaction}
                     canReact={!!member}
                     onRequireLogin={() => window.location.assign("/auth/login")}
-                    className="flex-1 py-2.5"
+                    className="w-full justify-between"
                   />
-                  <button
-                    onClick={() => toggleComments(post.id)}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    {isArabic ? "تعليق" : "Comment"}
-                  </button>
-                  <button onClick={() => handleShare(post)} className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                    <Share2 className="w-4 h-4" />
-                    {isArabic ? "مشاركة" : "Share"}
-                  </button>
+                  <div className="flex items-center divide-x divide-border rtl:divide-x-reverse mt-1 pt-1 border-t border-border">
+                    <button
+                      onClick={() => toggleComments(post.id)}
+                      className="flex-1 flex items-center justify-center gap-2 py-2 text-sm text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      {isArabic ? "تعليق" : "Comment"}
+                    </button>
+                    <button onClick={() => handleShare(post)} className="flex-1 flex items-center justify-center gap-2 py-2 text-sm text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                      <Share2 className="w-4 h-4" />
+                      {isArabic ? "مشاركة" : "Share"}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Comments Section */}
