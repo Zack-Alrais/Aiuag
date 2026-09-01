@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Users, Check, ArrowLeft, ArrowRight, Award, BookOpen, Briefcase, Globe, Heart, Shield } from "lucide-react";
+import { Users, Briefcase, BookOpen, Award, Globe, Shield, Heart, ArrowLeft, ArrowRight, UserCog, CreditCard, Bell, FileText, Settings, Calendar, Mail } from "lucide-react";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import HeroSection from "@/components/ui/hero-section";
 
@@ -9,18 +9,21 @@ export default async function MembershipPage({ params }: { params: Promise<{ lan
   const dir = isArabic ? "rtl" : "ltr";
 
   const benefits = [
-    { icon: Users, title: isArabic ? "شبكة خريجين" : "Alumni Network", desc: isArabic ? "تواصل مع آلاف الخريجين من مختلف التخصصات والكليات" : "Connect with thousands of graduates from various disciplines" },
-    { icon: Briefcase, title: isArabic ? "فرص عمل" : "Career Opportunities", desc: isArabic ? "الوصول إلى فرص العمل والتوظيف الحصرية للأعضاء" : "Access exclusive job and recruitment opportunities for members" },
-    { icon: BookOpen, title: isArabic ? "برامج تدريبية" : "Training Programs", desc: isArabic ? "استفد من البرامج التدريبية والورش العمل المجانية" : "Benefit from free training programs and workshops" },
-    { icon: Award, title: isArabic ? "شهادات معتمدة" : "Certified Credentials", desc: isArabic ? "احصل على شهادة عضوية معتمدة من الرابطة" : "Obtain a membership certificate certified by the association" },
-    { icon: Globe, title: isArabic ? "فعاليات حصرية" : "Exclusive Events", desc: isArabic ? "حضور المؤتمرات والندوات بأسعار مميزة" : "Attend conferences and seminars at special prices" },
-    { icon: Shield, title: isArabic ? "دعم مستمر" : "Ongoing Support", desc: isArabic ? "احصل على الدعم والاستشارة المهنية على مدار السنة" : "Get professional support and consultation year-round" },
+    { icon: Users, title: isArabic ? "شبكة خريجين قوية" : "Strong Alumni Network", desc: isArabic ? "تواصل مع آلاف الخريجين من مختلف التخصصات والكليات حول العالم. شارك الخبرات وابنِ شراكات مهنية مفيدة" : "Connect with thousands of graduates from various disciplines around the world. Share experiences and build useful professional partnerships" },
+    { icon: Briefcase, title: isArabic ? "فرص عمل حصرية" : "Exclusive Job Opportunities", desc: isArabic ? "الحصول على فرص العمل والتوظيف الحصرية المقدمة من شركاء الرابطة والخريجين المقيمين في الشركات" : "Access exclusive job and recruitment opportunities provided by association partners and graduates working in companies" },
+    { icon: BookOpen, title: isArabic ? "برامج تدريبية مجانية" : "Free Training Programs", desc: isArabic ? "الاستفادة من البرامج التدريبية والورش العمل المجانية في مختلف المجالات المهنية والأكاديمية" : "Benefit from free training programs and workshops in various professional and academic fields" },
+    { icon: Award, title: isArabic ? "شهادات معتمدة" : "Certified Credentials", desc: isArabic ? "الحصول على شهادة عضوية معتمدة من الرابطة تعكس انتماءك وتفتخر بإنجازاتك" : "Obtain a membership certificate certified by the association reflecting your affiliation and celebrating your achievements" },
+    { icon: Globe, title: isArabic ? "فعاليات حصرية" : "Exclusive Events", desc: isArabic ? "حضور المؤتمرات والندوات والورش بأسعار مميزة للأعضاء مع فرصNetworking مميزة" : "Attend conferences, seminars, and workshops at special member prices with exclusive networking opportunities" },
+    { icon: Shield, title: isArabic ? "دعم مهني مستمر" : "Ongoing Career Support", desc: isArabic ? "الحصول على الاستشارات المهنية والإرشاد الأكاديمي على مدار العام من خبراء الخريجين" : "Get professional consultations and academic mentoring year-round from graduate experts" },
   ];
 
-  const plans = [
-    { name: isArabic ? "عضوية سنوية" : "Annual Membership", price: isArabic ? "50,000" : "50,000", currency: isArabic ? "ج.س" : "SDG", features: [isArabic ? "جميع مزايا العضوية الأساسية" : "All basic membership benefits", isArabic ? "حضور 2 فعالية سنوياً" : "Attend 2 events per year", isArabic ? "نشر سيرة ذاتية في موقع الرابطة" : "Publish CV on association website", isArabic ? "newsletter شهري" : "Monthly newsletter"], popular: false },
-    { name: isArabic ? "عضوية مميزة" : "Premium Membership", price: isArabic ? "100,000" : "100,000", currency: isArabic ? "ج.س" : "SDG", features: [isArabic ? "جميع مزايا العضوية السنوية" : "All annual membership benefits", isArabic ? "حضور غير محدود للفعاليات" : "Unlimited event attendance", isArabic ? "إرشاد أكاديمي شخصي" : "Personal academic mentoring", isArabic ? "استشارات مهنية شهرية" : "Monthly career consultations", isArabic ? "أولوية في البرامج التدريبية" : "Priority in training programs"], popular: true },
-    { name: isArabic ? "عضوية مدى الحياة" : "Lifetime Membership", price: isArabic ? "500,000" : "500,000", currency: isArabic ? "ج.س" : "SDG", features: [isArabic ? "جميع مزايا العضوية المميزة" : "All premium membership benefits", isArabic ? "عضوية دائمة بدون تجديد" : "Permanent membership without renewal", isArabic ? "دعوة لكل الفعاليات الكبرى" : "Invitation to all major events", isArabic ? "عضو مجلس استشاري" : "Advisory council member", isArabic ? "شهادة شرفية" : "Honorary certificate"], popular: false },
+  const manageFeatures = [
+    { icon: UserCog, title: isArabic ? "إدارة الملف الشخصي" : "Profile Management", desc: isArabic ? "تحديث معلوماتك الشخصية والمهنية والحفاظ على بياناتك محدثة" : "Update your personal and professional information and keep your data current" },
+    { icon: CreditCard, title: isArabic ? "تجديد العضوية" : "Renew Membership", desc: isArabic ? "تجديد عضويتك مجاناً وتحديث بياناتك في أي وقت" : "Renew your membership free of charge and update your details anytime" },
+    { icon: Bell, title: isArabic ? "الإشعارات" : "Notifications", desc: isArabic ? "إدارة تفضيلات الإشعارات واستلام آخر الأخبار والفعاليات" : "Manage notification preferences and receive the latest news and events" },
+    { icon: FileText, title: isArabic ? "شهادة العضوية" : "Membership Certificate", desc: isArabic ? "تحميل شهادة العضوية المعتمدة وطباعتها في أي وقت" : "Download your certified membership certificate anytime" },
+    { icon: Calendar, title: isArabic ? "سجل الفعاليات" : "Event History", desc: isArabic ? "عرض سجل الفعاليات التي حضرتها والفعاليات القادمة" : "View your attended events history and upcoming events" },
+    { icon: Settings, title: isArabic ? "إعدادات الحساب" : "Account Settings", desc: isArabic ? "تعديل كلمة المرور وإعدادات الأمان وتفضيلات اللغة" : "Change password, security settings, and language preferences" },
   ];
 
   return (
@@ -29,7 +32,7 @@ export default async function MembershipPage({ params }: { params: Promise<{ lan
         pageSlug="membership"
         lang={lang}
         defaultTitle={isArabic ? "العضوية" : "Membership"}
-        defaultSubtitle={isArabic ? "انضم إلى عائلة رابطة خريجي جامعة أفريقيا العالمية واستفد من مزايا حصرية" : "Join the AIUAG family and benefit from exclusive advantages"}
+        defaultSubtitle={isArabic ? "انضم إلى عائلة رابطة خريجي جامعة أفريقيا العالمية واستفد من مزايا حصرية مجاناً" : "Join the AIUAG family and benefit from exclusive free advantages"}
       />
 
       {/* Benefits */}
@@ -41,56 +44,60 @@ export default async function MembershipPage({ params }: { params: Promise<{ lan
             </h2>
             <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
           </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {benefits.map((b, i) => (
-              <div key={i} className="bg-surface rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-                  <b.icon className="w-8 h-8 text-primary" />
+              <div key={i} className="bg-surface rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 border border-border hover:border-primary/20">
+                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-5">
+                  <b.icon className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="text-lg font-bold text-text mb-3">{b.title}</h3>
-                <p className="text-text-secondary text-sm">{b.desc}</p>
+                <h3 className="text-xl font-bold text-text mb-3">{b.title}</h3>
+                <p className="text-text-secondary leading-relaxed text-sm">{b.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section></ScrollReveal>
 
-      {/* Pricing */}
+      {/* Manage / Login */}
       <ScrollReveal direction="up"><section className="py-20 bg-surface">
         <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center mb-16">
+            <div className="bg-background rounded-3xl p-12 shadow-sm border border-border">
+              <Mail className="w-16 h-16 text-primary mx-auto mb-6" />
+              <h2 className="text-2xl font-bold text-text mb-4">
+                {isArabic ? "تسجيل الدخول مطلوب" : "Login Required"}
+              </h2>
+              <p className="text-text-secondary mb-8">
+                {isArabic
+                  ? "قم بتسجيل الدخول للوصول إلى حسابك وإدارة عضويتك"
+                  : "Sign in to access your account and manage your membership"}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href={`/${lang}/membership/apply`}
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all"
+                >
+                  {isArabic ? "تقديم طلب عضوية جديد" : "Apply for New Membership"}
+                  {isArabic ? <ArrowLeft className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
+                </Link>
+              </div>
+            </div>
+          </div>
+
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">
-              {isArabic ? "خطط العضوية" : "Membership Plans"}
+            <h2 className="text-3xl font-bold text-text mb-4">
+              {isArabic ? "ما يمكنك إدارته" : "What You Can Manage"}
             </h2>
             <div className="w-20 h-1 bg-secondary mx-auto rounded-full" />
           </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {plans.map((plan, i) => (
-              <div key={i} className={`rounded-2xl p-8 border-2 transition-all ${plan.popular ? "border-secondary bg-surface shadow-xl scale-105 relative" : "border-border bg-background hover:border-primary/30"}`}>
-                {plan.popular && (
-                  <span className="absolute -top-4 start-1/2 -translate-x-1/2 px-4 py-1 bg-secondary text-white text-sm font-bold rounded-full">
-                    {isArabic ? "الأكثر طلباً" : "Most Popular"}
-                  </span>
-                )}
-                <h3 className="text-xl font-bold text-text mb-2 mt-2">{plan.name}</h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-primary">{plan.price}</span>
-                  <span className="text-text-secondary text-sm ms-1">{plan.currency}</span>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {manageFeatures.map((feature, i) => (
+              <div key={i} className="bg-background rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 border border-border hover:border-primary/20 text-center">
+                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                  <feature.icon className="w-7 h-7 text-primary" />
                 </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((f, j) => (
-                    <li key={j} className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-                      <span className="text-text-secondary text-sm">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={`/${lang}/membership/apply`}
-                  className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${plan.popular ? "bg-secondary text-white hover:bg-secondary/90" : "bg-primary text-white hover:bg-primary/90"}`}
-                >
-                  {isArabic ? "تقديم طلب" : "Apply Now"}
-                </Link>
+                <h3 className="text-lg font-bold text-text mb-3">{feature.title}</h3>
+                <p className="text-text-secondary text-sm leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -105,17 +112,17 @@ export default async function MembershipPage({ params }: { params: Promise<{ lan
             {isArabic ? "جاهز للانضمام؟" : "Ready to Join?"}
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-            {isArabic ? "املأ طلب العضوية وانضم إلى آلاف الخريجين المتميزين" : "Fill out the membership application and join thousands of distinguished graduates"}
+            {isArabic ? "انضم الآن مجاناً واستفد من جميع المزايا المتاحة للأعضاء" : "Join now for free and benefit from all available member advantages"}
           </p>
           <Link
             href={`/${lang}/membership/apply`}
             className="inline-flex items-center gap-2 px-8 py-4 bg-secondary text-white rounded-xl text-lg font-bold hover:bg-secondary/90 transition-all hover:scale-105"
           >
-            {isArabic ? "طلب عضوية" : "Apply for Membership"}
+            {isArabic ? "تقديم طلب العضوية" : "Apply for Membership"}
             {isArabic ? <ArrowLeft className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
           </Link>
         </div>
-        </section></ScrollReveal>
+      </section></ScrollReveal>
     </div>
   );
 }

@@ -51,19 +51,11 @@ function getNavItems(lang: string): NavItem[] {
       ],
     },
     {
-      label: isArabic ? "العضوية" : "Membership",
-      href: "/membership",
-      children: [
-        { label: isArabic ? "طلب عضوية" : "Apply", href: "/membership/apply" },
-        { label: isArabic ? "مزايا العضوية" : "Benefits", href: "/membership/benefits" },
-        { label: isArabic ? "إدارة العضوية" : "Manage", href: "/membership/manage" },
-      ],
-    },
-    {
       label: isArabic ? "الخدمات" : "Services",
       href: "/services",
       children: [
         { label: isArabic ? "خدمات الخريجين" : "Alumni Services", href: "/services" },
+        { label: isArabic ? "العضوية" : "Membership", href: "/membership" },
         { label: isArabic ? "التطوع" : "Volunteer", href: "/volunteer" },
         { label: isArabic ? "التبرعات" : "Donations", href: "/donations" },
         { label: isArabic ? "المنشورات" : "Publications", href: "/publications" },
@@ -93,21 +85,7 @@ export default function Header({ lang }: HeaderProps) {
   const [profileLoading, setProfileLoading] = useState(false)
 
   const currentLang = lang || (pathname.startsWith("/ar") ? "ar" : "en")
-  let navItems = getNavItems(currentLang)
-  const isLoggedIn = !!session?.user
-  navItems = navItems.map((item) => {
-    if (item.href === "/membership" && item.children) {
-      return {
-        ...item,
-        children: item.children.filter((child) => {
-          if (child.href === "/membership/apply") return !isLoggedIn
-          if ((child as any).authRequired) return isLoggedIn
-          return true
-        }),
-      }
-    }
-    return item
-  })
+  const navItems = getNavItems(currentLang)
   const isArabic = currentLang === "ar"
 
   useEffect(() => {

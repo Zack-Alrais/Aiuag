@@ -49,7 +49,7 @@ export default function SearchOverlay({ lang, onClose }: SearchOverlayProps) {
         href: r.type === "news" ? `/${lang}/news/${r.slug || r.id}`
           : r.type === "event" ? `/${lang}/events#${r.id}`
           : r.type === "project" ? `/${lang}/projects#${r.id}`
-          : r.type === "member" ? `/${lang}/membership/manage`
+          : r.type === "member" ? `/${lang}/membership`
           : `/${lang}/about`,
         icon: r.type === "news" ? <FileText className="w-4 h-4" />
           : r.type === "event" ? <Calendar className="w-4 h-4" />

@@ -43,6 +43,7 @@ export default function Footer({ lang }: FooterProps) {
 
   const servicesLinks = [
     { label: isArabic ? "خدمات الخريجين" : "Alumni Services", href: `/${lang}/services` },
+    { label: isArabic ? "العضوية" : "Membership", href: `/${lang}/membership` },
     { label: isArabic ? "التطوع" : "Volunteer", href: `/${lang}/volunteer` },
     { label: isArabic ? "التبرعات" : "Donations", href: `/${lang}/donations` },
     { label: isArabic ? "المنشورات" : "Publications", href: `/${lang}/publications` },

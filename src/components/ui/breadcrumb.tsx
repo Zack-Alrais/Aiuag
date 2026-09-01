@@ -56,8 +56,6 @@ const defaultLabels: Record<string, BreadcrumbItem> = {
   vision: { label: "Vision", labelAr: "الرؤية", href: "/about/vision" },
   objectives: { label: "Objectives", labelAr: "الأهداف", href: "/about/objectives" },
   apply: { label: "Apply", labelAr: "التقديم", href: "/membership/apply" },
-  benefits: { label: "Benefits", labelAr: "المزايا", href: "/membership/benefits" },
-  manage: { label: "Manage", labelAr: "الإدارة", href: "/membership/manage" },
 }
 
 function Breadcrumb({

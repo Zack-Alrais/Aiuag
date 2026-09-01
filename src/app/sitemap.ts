@@ -20,7 +20,6 @@ const staticPages = [
   "/privacy",
   "/terms",
   "/membership",
-  "/membership/benefits",
   "/membership/apply",
   "/organization",
   "/organization/board",
