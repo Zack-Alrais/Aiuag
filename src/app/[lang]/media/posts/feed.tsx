@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import ScrollReveal from "@/components/ui/scroll-reveal";
@@ -29,6 +30,8 @@ import {
 import ReactionButton from "@/components/posts/reaction-button";
 import CommentsSection from "@/components/posts/comments-section";
 import MediaViewer from "@/components/posts/media-viewer";
+import { FriendButton } from "@/components/social/friend-button";
+import { safeMemberId } from "@/components/social/social-ui";
 
 interface Author {
   id: string;
@@ -59,6 +62,7 @@ interface Post {
   _count?: { comments: number; reactions: number; shares: number };
   reactionSummary?: Record<string, number>;
   myReaction?: string | null;
+  saved?: boolean;
   author?: Author | null;
   originalPost?: OriginalPost | null;
 }
@@ -444,6 +448,9 @@ function PostCard({
   const [expanded, setExpanded] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [saved, setSaved] = useState(!!post.saved);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const images = parseMedia(post.images);
@@ -458,6 +465,10 @@ function PostCard({
     : { like: "Like", love: "Love", haha: "Haha", wow: "Wow", sad: "Sad", angry: "Angry" };
 
   const author = post.author || { id: "", name: isAr ? "عضو" : "Member", image: null };
+  const authorMemberId = safeMemberId(author.id);
+  const authorHref = authorMemberId && authorMemberId !== safeMemberId(member?.id)
+    ? `/${lang}/member/${authorMemberId}`
+    : `/${lang}/posts/${post.id}`;
   const postUrl = `${location.origin}/${lang}/posts/${post.id}`;
 
   const handleLikeDoubleTap = useCallback(() => {
@@ -469,6 +480,31 @@ function PostCard({
     if (post.myReaction !== "like") onReact(post.id, "like");
     toast.success(isAr ? "أعجبك هذا المنشور" : "You liked this post");
   }, [member, post.id, post.myReaction, onReact, isAr, lang]);
+
+  const toggleSave = useCallback(async () => {
+    if (!member) {
+      window.location.assign(`/auth/login?callbackUrl=${encodeURIComponent(`/${lang}/posts/${post.id}`)}`);
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/posts/${post.id}/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ saved: !saved }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d?.error || "فشل الحفظ");
+      setSaved(d.saved);
+      toast.success(
+        isAr ? (d.saved ? "تم حفظ المنشور" : "تمت إزالة المنشور من المحفوظات") : (d.saved ? "Post saved" : "Post removed from saved")
+      );
+    } catch {
+      toast.error(isAr ? "تعذر الحفظ" : "Could not save post");
+    } finally {
+      setSaving(false);
+    }
+  }, [member, post.id, saved, isAr, lang]);
 
   // close menu on outside click
   useEffect(() => {
@@ -511,11 +547,13 @@ function PostCard({
         <div className="p-4 pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
-              <Avatar src={author.image} name={author.name} size={44} />
+              <Link href={authorHref} className="shrink-0">
+                <Avatar src={author.image} name={author.name} size={44} />
+              </Link>
               <div className="min-w-0">
-                <h3 className="font-semibold text-sm text-gray-900 dark:text-[#f1f5f9] truncate">
+                <Link href={authorHref} className="font-semibold text-sm text-gray-900 dark:text-[#f1f5f9] hover:text-primary truncate">
                   {author.name}
-                </h3>
+                </Link>
                 <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                   <span>{timeAgo(post.createdAt, isAr)}</span>
                   {post.editedAt && <span aria-hidden>·</span>}
@@ -525,6 +563,11 @@ function PostCard({
                 </div>
               </div>
             </div>
+            {member && author.id && author.id !== member.id && (
+              <div className="shrink-0 me-1">
+                <FriendButton memberId={author.id} lang={lang} />
+              </div>
+            )}
             {/* More menu */}
             <div className="relative" ref={menuRef}>
               <button
@@ -549,14 +592,14 @@ function PostCard({
                       <Link2 className="w-4 h-4 text-gray-400" /> {isAr ? "نسخ الرابط" : "Copy link"}
                     </button>
                     {member && (
-                      <button role="menuitem" onClick={() => { toast.success(isAr ? "تم الحفظ" : "Saved"); setMenuOpen(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2a3f5f] transition-colors">
-                        <Bookmark className="w-4 h-4 text-gray-400" /> {isAr ? "حفظ المنشور" : "Save post"}
+                      <button role="menuitem" onClick={() => { toggleSave(); setMenuOpen(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2a3f5f] transition-colors">
+                        <Bookmark className="w-4 h-4 text-gray-400" /> {saved ? (isAr ? "إزالة من المحفوظات" : "Unsave post") : (isAr ? "حفظ المنشور" : "Save post")}
                       </button>
                     )}
                     <button role="menuitem" onClick={() => { toast.message(isAr ? "تم إخفاء المنشور" : "Post hidden"); setMenuOpen(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2a3f5f] transition-colors">
                       <EyeOff className="w-4 h-4 text-gray-400" /> {isAr ? "إخفاء المنشور" : "Hide post"}
                     </button>
-                    <button role="menuitem" onClick={() => { toast.message(isAr ? "تم إرسال البلاغ" : "Report sent"); setMenuOpen(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                    <button role="menuitem" onClick={() => { setReportOpen(true); setMenuOpen(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
                       <Flag className="w-4 h-4" /> {isAr ? "الإبلاغ" : "Report"}
                     </button>
                     {isOwner && <div className="h-px bg-gray-100 dark:bg-[#2a3f5f]" />}
@@ -690,6 +733,26 @@ function PostCard({
             <Share2 className="w-5 h-5" />
             {isAr ? "مشاركة" : "Share"}
           </button>
+          <span className="mx-1 w-px bg-gray-100 dark:bg-[#1e2d42] self-stretch my-2" />
+          <button
+            onClick={toggleSave}
+            disabled={saving}
+            title={isAr ? "حفظ" : "Save"}
+            className={`py-2.5 px-2 flex items-center justify-center rounded-xl transition-colors active:scale-95 ${
+              saved
+                ? "text-primary"
+                : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1e2d42]"
+            }`}
+          >
+            {saved ? <Bookmark className="w-5 h-5 fill-current" /> : <Bookmark className="w-5 h-5" />}
+          </button>
+          <button
+            onClick={() => setReportOpen(true)}
+            title={isAr ? "إبلاغ" : "Report"}
+            className="py-2.5 px-2 flex items-center justify-center rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1e2d42] transition-colors active:scale-95"
+          >
+            <Flag className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Comments */}
@@ -747,6 +810,10 @@ function PostCard({
             </motion.div>
           )}
         </AnimatePresence>
+
+        {reportOpen && (
+          <ReportModal postId={post.id} lang={lang} onClose={() => setReportOpen(false)} />
+        )}
       </motion.article>
 
       {/* Media Viewer */}
@@ -762,6 +829,88 @@ function PostCard({
         />
       )}
     </>
+  );
+}
+
+// ========== REPORT MODAL ==========
+function ReportModal({ postId, lang, onClose }: { postId: string; lang: string; onClose: () => void }) {
+  const isAr = lang === "ar";
+  const [reason, setReason] = useState("");
+  const [other, setOther] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const reasons = isAr
+    ? [
+        { value: "spam", label: "رسائل مزعجة / إعلانات" },
+        { value: "inappropriate", label: "محتوى غير لائق" },
+        { value: "misinformation", label: "معلومات مضللة" },
+        { value: "harassment", label: "مضايقة أو تنمر" },
+        { value: "other", label: "سبب آخر" },
+      ]
+    : [
+        { value: "spam", label: "Spam / Ads" },
+        { value: "inappropriate", label: "Inappropriate content" },
+        { value: "misinformation", label: "Misinformation" },
+        { value: "harassment", label: "Harassment / Bullying" },
+        { value: "other", label: "Other" },
+      ];
+
+  const submit = async () => {
+    setSubmitting(true);
+    try {
+      const finalReason = reason === "other" ? other.trim() : reason;
+      const res = await fetch(`/api/posts/${postId}/report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: finalReason || null }),
+      });
+      if (!res.ok) throw new Error("فشل الإبلاغ");
+      toast.success(isAr ? "تم إرسال البلاغ، شكراً لك" : "Report submitted, thank you");
+      onClose();
+    } catch {
+      toast.error(isAr ? "تعذر إرسال البلاغ" : "Could not submit report");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[80] bg-black/60 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white dark:bg-[#1a2440] rounded-2xl w-full max-w-sm p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-gray-900 dark:text-white">{isAr ? "الإبلاغ عن منشور" : "Report Post"}</h3>
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-[#2a3f5f] rounded-full"><X className="w-5 h-5" /></button>
+        </div>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{isAr ? "لماذا تريد الإبلاغ عن هذا المنشور؟" : "Why are you reporting this post?"}</p>
+        <div className="space-y-2 mb-4">
+          {reasons.map((r) => (
+            <label key={r.value} className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${
+              reason === r.value
+                ? "border-primary bg-primary/5"
+                : "border-gray-200 dark:border-[#2a3f5f] hover:border-primary/40"
+            }`}>
+              <input type="radio" name="report-reason" value={r.value} checked={reason === r.value} onChange={() => setReason(r.value)} className="accent-primary" />
+              <span className="text-sm text-gray-700 dark:text-gray-200">{r.label}</span>
+            </label>
+          ))}
+        </div>
+        {reason === "other" && (
+          <textarea
+            value={other}
+            onChange={(e) => setOther(e.target.value)}
+            placeholder={isAr ? "اكتب السبب..." : "Describe the reason..."}
+            className="w-full bg-gray-50 dark:bg-[#0d1525] rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-[#f1f5f9] placeholder-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[70px] mb-4"
+            dir="rtl"
+          />
+        )}
+        <div className="flex gap-2 justify-end">
+          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2a3f5f] rounded-xl">{isAr ? "إلغاء" : "Cancel"}</button>
+          <button onClick={submit} disabled={submitting || (!reason && !other.trim())} className="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold disabled:opacity-50">
+            {submitting ? (isAr ? "جاري..." : "Submitting...") : (isAr ? "إرسال البلاغ" : "Submit report")}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -915,26 +1064,51 @@ function ShareModal({ post, member, lang, onClose, onRepost, onShared }: {
 }
 
 // ========== MAIN PAGE ==========
-export default function PostsFeed() {
+export default function PostsFeed(
+  {
+    scope,
+    title,
+    subtitle,
+    showComposer = true,
+    authorId,
+    embedded = false,
+    lang: langProp,
+  }: {
+    scope?: string;
+    title?: string;
+    subtitle?: string;
+    showComposer?: boolean;
+    /** Restrict to a single author's posts (public profile). */
+    authorId?: string;
+    /** Hide the wrapper header/title block (for embedded use inside a parent). */
+    embedded?: boolean;
+    /** Preferred language; overrides the localStorage default. */
+    lang?: string;
+  } = {}
+) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const { member } = useMember();
-  const [lang, setLang] = useState("ar");
+  const [lang, setLang] = useState<string>(langProp ?? "ar");
   const [repostPost, setRepostPost] = useState<Post | null>(null);
   const [sharePost, setSharePost] = useState<Post | null>(null);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("lang") || "ar";
-    setLang(savedLang);
-  }, []);
+    if (!langProp) {
+      const savedLang = localStorage.getItem("lang") || "ar";
+      setLang(savedLang);
+    }
+  }, [langProp]);
 
   const fetchPosts = useCallback(async (pageNum: number, append = false) => {
     setLoading(true);
     try {
       const memberParam = member?.id ? `&memberId=${encodeURIComponent(member.id)}` : "";
-      const res = await fetch(`/api/posts?page=${pageNum}&limit=10${memberParam}`);
+      const scopeParam = scope ? `&scope=${encodeURIComponent(scope)}` : "";
+      const authorParam = authorId ? `&authorId=${encodeURIComponent(authorId)}` : "";
+      const res = await fetch(`/api/posts?page=${pageNum}&limit=10${memberParam}${scopeParam}${authorParam}`);
       if (!res.ok) return;
       const data = await res.json();
       const list = data.data || [];
@@ -942,7 +1116,7 @@ export default function PostsFeed() {
       else setPosts(list);
       setHasMore(data.pagination?.hasMore ?? false);
     } catch {} finally { setLoading(false); }
-  }, [member?.id]);
+  }, [member?.id, scope, authorId]);
 
   useEffect(() => { fetchPosts(1); }, [fetchPosts]);
 
@@ -1002,14 +1176,16 @@ export default function PostsFeed() {
   };
 
   return (
-    <div className={`min-h-screen ${isAr ? "" : ""} bg-gray-50 dark:bg-[#0a0f1a]`} dir={isAr ? "rtl" : "ltr"}>
-      <ScrollReveal direction="up"><div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
-        <div className="mb-2">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{isAr ? "المنشورات" : "Posts"}</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{isAr ? "شارك وأتفاعل مع مجتمع الخريجين" : "Share and interact with the alumni community"}</p>
-        </div>
+    <div className={`${embedded ? "" : "min-h-screen bg-gray-50 dark:bg-[#0a0f1a]"}`} dir={isAr ? "rtl" : "ltr"}>
+      <ScrollReveal direction="up"><div className={`${embedded ? "w-full" : "max-w-2xl mx-auto px-4 py-6"} space-y-4`}>
+        {!embedded && (
+          <div className="mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{title ?? (isAr ? "المنشورات" : "Posts")}</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{subtitle ?? (isAr ? "شارك وأتفاعل مع مجتمع الخريجين" : "Share and interact with the alumni community")}</p>
+          </div>
+        )}
 
-        <CreatePostBox member={member} onPost={handleNewPost} lang={lang} />
+        {showComposer && <CreatePostBox member={member} onPost={handleNewPost} lang={lang} />}
 
         {loading && posts.length === 0 ? (
           <div className="space-y-4">

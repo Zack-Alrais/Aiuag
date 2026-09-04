@@ -23,6 +23,7 @@ interface ProfileData {
   name: string
   email: string
   image: string | null
+  nameAr: string
   nameEn: string
   phone: string
   gender: string
@@ -40,6 +41,8 @@ interface ProfileData {
   jobTitle: string
   jobSector: string
   yearsOfExperience: number
+  position: string
+  positionEn: string
   membershipType: string
   membershipNumber: string
   memberStatus: string
@@ -540,19 +543,21 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
                   <MembershipCardEngine
                     member={{
                       id: profile.id,
-                      nameAr: profile.name,
+                      nameAr: profile.nameAr || profile.name,
                       nameEn: profile.nameEn || profile.name,
                       membershipNumber: profile.membershipNumber,
                       memberType: profile.membershipType,
-                      title: profile.jobTitle || profile.membershipType,
+                      position: profile.position,
+                      jobTitle: profile.jobTitle,
                       photo: profile.cardPhoto || profile.image || session?.user?.image || undefined,
                       specialization: profile.specialization || profile.faculty || undefined,
                       graduationYear: parseInt(profile.graduationYear) || undefined,
                       phone: profile.phone,
                       email: profile.email,
                       joinDate: profile.memberSince,
+                      expiryDate: profile.membershipEndDate,
                     }}
-                    showBoth size="md"
+                    size="md"
                   />
                 </div>
               </CardContent>

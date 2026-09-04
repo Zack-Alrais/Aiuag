@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 
 export interface CommunityMember {
@@ -41,10 +42,19 @@ function readLegacyMember(): CommunityMember | null {
  *
  * The value is derived from the NextAuth session (server-backed JWT) instead of
  * an unreliable localStorage copy, so the latest avatar/name are always used.
+ *
+ * The fallback localStorage read is deferred to a post-mount effect so the
+ * server-rendered HTML always matches the first client render (hydration-safe).
  */
 export function useMember(): UseMemberResult {
   const { data: session, status } = useSession()
   const user = session?.user
+
+  const [legacyMember, setLegacyMember] = useState<CommunityMember | null>(null)
+
+  useEffect(() => {
+    setLegacyMember(readLegacyMember())
+  }, [])
 
   if (user?.memberId) {
     return {
@@ -59,9 +69,8 @@ export function useMember(): UseMemberResult {
     }
   }
 
-  const legacy = readLegacyMember()
-  if (legacy) {
-    return { status, isAuthenticated: true, member: legacy }
+  if (legacyMember) {
+    return { status, isAuthenticated: true, member: legacyMember }
   }
 
   return { status, isAuthenticated: false, member: null }

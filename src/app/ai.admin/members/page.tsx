@@ -20,6 +20,7 @@ interface MemberRaw {
   status: "pending" | "approved" | "rejected"
   createdAt: string
   hasMember?: boolean
+  nameAr?: string | null
   nameEn?: string | null
   gender?: string | null
   birthDate?: string | null
@@ -33,6 +34,8 @@ interface MemberRaw {
   jobTitle?: string | null
   jobSector?: string | null
   yearsOfExperience?: number | null
+  position?: string | null
+  positionEn?: string | null
   graduationCertificate?: string | null
   barcode?: string | null
   qrCode?: string | null
@@ -56,6 +59,7 @@ interface Member {
   status: "pending" | "approved" | "rejected"
   createdAt: string
   hasMember?: boolean
+  nameAr?: string | null
   nameEn?: string | null
   gender?: string | null
   birthDate?: string | null
@@ -69,6 +73,8 @@ interface Member {
   jobTitle?: string | null
   jobSector?: string | null
   yearsOfExperience?: number | null
+  position?: string | null
+  positionEn?: string | null
   graduationCertificate?: string | null
 }
 
@@ -91,6 +97,7 @@ function flattenMember(raw: MemberRaw): Member {
     status: raw.status,
     createdAt: raw.createdAt,
     hasMember: raw.hasMember,
+    nameAr: raw.nameAr,
     nameEn: raw.nameEn,
     gender: raw.gender,
     birthDate: raw.birthDate,
@@ -104,6 +111,8 @@ function flattenMember(raw: MemberRaw): Member {
     jobTitle: raw.jobTitle,
     jobSector: raw.jobSector,
     yearsOfExperience: raw.yearsOfExperience,
+    position: raw.position,
+    positionEn: raw.positionEn,
     graduationCertificate: raw.graduationCertificate,
     barcode: raw.barcode ?? null,
     qrCode: raw.qrCode ?? null,
@@ -123,6 +132,7 @@ interface MemberFormData {
   bio: string
   linkedin: string
   status: string
+  nameAr: string
   nameEn: string
   gender: string
   birthDate: string
@@ -136,6 +146,8 @@ interface MemberFormData {
   jobTitle: string
   jobSector: string
   yearsOfExperience: string
+  position: string
+  positionEn: string
   graduationCertificate: string
 }
 
@@ -152,6 +164,7 @@ const emptyForm: MemberFormData = {
   bio: "",
   linkedin: "",
   status: "pending",
+  nameAr: "",
   nameEn: "",
   gender: "",
   birthDate: "",
@@ -165,6 +178,8 @@ const emptyForm: MemberFormData = {
   jobTitle: "",
   jobSector: "",
   yearsOfExperience: "",
+  position: "",
+  positionEn: "",
   graduationCertificate: "",
 }
 
@@ -259,6 +274,7 @@ export default function MembersManagement() {
       bio: member.bio ?? "",
       linkedin: member.linkedin ?? "",
       status: member.status,
+      nameAr: member.nameAr ?? "",
       nameEn: member.nameEn ?? "",
       gender: member.gender ?? "",
       birthDate: member.birthDate ?? "",
@@ -272,6 +288,8 @@ export default function MembersManagement() {
       jobTitle: member.jobTitle ?? "",
       jobSector: member.jobSector ?? "",
       yearsOfExperience: member.yearsOfExperience ? String(member.yearsOfExperience) : "",
+      position: member.position ?? "",
+      positionEn: member.positionEn ?? "",
       graduationCertificate: member.graduationCertificate ?? "",
     })
     setBarcodeDataUrl(member.barcode ?? null)
@@ -304,6 +322,7 @@ export default function MembersManagement() {
         bio: form.bio || null,
         linkedin: form.linkedin || null,
         status: form.status,
+        nameAr: form.nameAr || null,
         nameEn: form.nameEn || null,
         gender: form.gender || null,
         birthDate: form.birthDate || null,
@@ -317,6 +336,8 @@ export default function MembersManagement() {
         jobTitle: form.jobTitle || null,
         jobSector: form.jobSector || null,
         yearsOfExperience: form.yearsOfExperience ? Number(form.yearsOfExperience) : null,
+        position: form.position || null,
+        positionEn: form.positionEn || null,
         graduationCertificate: form.graduationCertificate || null,
         barcode: barcodeDataUrl || null,
         qrCode: qrCodeDataUrl || null,
@@ -1092,16 +1113,12 @@ export default function MembersManagement() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.nameEn")}</label>
-                  <input type="text" value={form.nameEn} onChange={(e) => handleFieldChange("nameEn", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Mohamed Ahmed" dir="ltr" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.nameAr")}</label>
+                  <input type="text" value={form.nameAr} onChange={(e) => handleFieldChange("nameAr", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" dir="rtl" placeholder="محمد أحمد" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.gender")}</label>
-                  <select value={form.gender} onChange={(e) => handleFieldChange("gender", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white">
-                    <option value="">{t("common.select")}</option>
-                    <option value="male">{t("members.gender.male")}</option>
-                    <option value="female">{t("members.gender.female")}</option>
-                  </select>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.nameEn")}</label>
+                  <input type="text" value={form.nameEn} onChange={(e) => handleFieldChange("nameEn", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Mohamed Ahmed" dir="ltr" />
                 </div>
               </div>
 
@@ -1163,6 +1180,17 @@ export default function MembersManagement() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.yearsOfExperience")}</label>
                   <input type="number" min="0" value={form.yearsOfExperience} onChange={(e) => handleFieldChange("yearsOfExperience", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="5" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.position")}</label>
+                  <input type="text" value={form.position} onChange={(e) => handleFieldChange("position", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder={t("members.form.positionPlaceholder")} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("members.form.positionEn")}</label>
+                  <input type="text" value={form.positionEn} onChange={(e) => handleFieldChange("positionEn", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="e.g. Treasurer" dir="ltr" />
                 </div>
               </div>
 

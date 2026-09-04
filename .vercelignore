@@ -1,0 +1,7 @@
+node_modules
+.next
+Aiuag_clinte.json
+.env
+.env.local
+.env.vercel
+.env.production.local

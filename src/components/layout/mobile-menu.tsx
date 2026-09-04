@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Globe, LogIn, LogOut, User, ChevronDown, LayoutDashboard } from "lucide-react"
+import { Globe, LogIn, LogOut, User, ChevronDown, LayoutDashboard, MessageCircle, Users, Rss } from "lucide-react"
 import { useState, type ReactNode } from "react"
 import { signOut } from "next-auth/react"
 
@@ -170,6 +170,30 @@ export default function MobileMenu({ lang, navItems, pathname, session, onClose,
               >
                 <LayoutDashboard className="w-4 h-4" />
                 {isArabic ? "لوحة التحكم" : "Dashboard"}
+              </Link>
+              <Link
+                href={`/${lang}/messages`}
+                onClick={onClose}
+                className="flex items-center gap-3 w-full px-5 py-3 bg-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/20 transition-colors"
+              >
+                <MessageCircle className="w-4 h-4" />
+                {isArabic ? "المراسلات" : "Messages"}
+              </Link>
+              <Link
+                href={`/${lang}/friends`}
+                onClick={onClose}
+                className="flex items-center gap-3 w-full px-5 py-3 bg-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/20 transition-colors"
+              >
+                <Users className="w-4 h-4" />
+                {isArabic ? "الأصدقاء" : "Friends"}
+              </Link>
+              <Link
+                href={`/${lang}/posts`}
+                onClick={onClose}
+                className="flex items-center gap-3 w-full px-5 py-3 bg-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/20 transition-colors"
+              >
+                <Rss className="w-4 h-4" />
+                {isArabic ? "منشورات المجتمع" : "Community Posts"}
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: `/${lang}` })}

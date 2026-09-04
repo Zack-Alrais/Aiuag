@@ -9,9 +9,47 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
     const memberId = searchParams.get("memberId");
     const authorId = searchParams.get("authorId");
+    const scope = searchParams.get("scope"); // "friends" | null
 
     const where: Record<string, unknown> = {};
     if (authorId) where.authorId = authorId;
+
+    // Friends-only feed: posts authored by my accepted friends.
+    if (scope === "friends") {
+      if (!memberId) {
+        return NextResponse.json({ error: "Authentication required for friends feed" }, { status: 401 });
+      }
+      const friendRows = await prisma.friendship.findMany({
+        where: {
+          status: "accepted",
+          OR: [{ requesterId: memberId }, { addresseeId: memberId }],
+        },
+        select: { requesterId: true, addresseeId: true },
+      });
+      const friendIds = friendRows.map((r) =>
+        r.requesterId === memberId ? r.addresseeId : r.requesterId
+      );
+      where.authorId = { in: friendIds };
+    } else if (scope === "saved") {
+      if (!memberId) {
+        return NextResponse.json({ error: "Authentication required for saved posts" }, { status: 401 });
+      }
+      const savedRows = await prisma.savedPost.findMany({
+        where: { memberId },
+        select: { postId: true },
+        orderBy: { createdAt: "desc" },
+      });
+      where.id = { in: savedRows.map((s) => s.postId) };
+    }
+
+    const savedIds = memberId
+      ? new Set(
+          (await prisma.savedPost.findMany({
+            where: { memberId },
+            select: { postId: true },
+          })).map((s) => s.postId)
+        )
+      : new Set<string>();
 
     const [posts, total] = await Promise.all([
       prisma.post.findMany({
@@ -88,6 +126,7 @@ export async function GET(request: NextRequest) {
           : null,
         reactionSummary,
         myReaction,
+        saved: savedIds.has(post.id),
         reactions: undefined,
         originalPost: post.originalPostId
           ? (() => {

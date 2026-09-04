@@ -11,7 +11,6 @@ interface SearchResult {
   type: "news" | "event" | "project" | "page" | "member"
   title: string
   description?: string
-  slug?: string
   href: string
   icon: React.ReactNode
 }
@@ -40,17 +39,12 @@ export default function SearchOverlay({ lang, onClose }: SearchOverlayProps) {
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&lang=${lang}`)
       const data = await res.json()
-      const items: SearchResult[] = (data.results || []).map((r: { id: string; type: string; title: string; description?: string; slug?: string }) => ({
+      const items: SearchResult[] = (data.results || []).map((r: { id: string; type: string; title: string; description?: string; url?: string }) => ({
         id: r.id,
         type: r.type,
         title: r.title,
         description: r.description,
-        slug: r.slug,
-        href: r.type === "news" ? `/${lang}/news/${r.slug || r.id}`
-          : r.type === "event" ? `/${lang}/events#${r.id}`
-          : r.type === "project" ? `/${lang}/projects#${r.id}`
-          : r.type === "member" ? `/${lang}/membership`
-          : `/${lang}/about`,
+        href: r.url || `/${lang}/about`,
         icon: r.type === "news" ? <FileText className="w-4 h-4" />
           : r.type === "event" ? <Calendar className="w-4 h-4" />
           : r.type === "project" ? <FolderOpen className="w-4 h-4" />

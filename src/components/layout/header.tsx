@@ -6,9 +6,10 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Globe, Search, ChevronDown, User, LogOut, ChevronUp, LogIn, Sun, Moon, ChevronLeft, ChevronRight, LayoutDashboard } from "lucide-react"
+import { Menu, X, Globe, Search, ChevronDown, User, LogOut, ChevronUp, LogIn, Sun, Moon, ChevronLeft, ChevronRight, LayoutDashboard, MessageCircle, Users, Bookmark } from "lucide-react"
 import SearchOverlay from "./search-overlay"
 import MobileMenu from "./mobile-menu"
+import { NotificationBell } from "./notification-bell"
 import { ASSETS } from "@/lib/assets"
 import { useTheme } from "@/components/theme/theme-provider"
 
@@ -258,6 +259,8 @@ export default function Header({ lang }: HeaderProps) {
               document.body
             )}
 
+            {session?.user && <NotificationBell scrolled={scrolled} />}
+
             <button
               onClick={toggleTheme}
               className={`p-2.5 rounded-lg transition-colors ${
@@ -363,6 +366,30 @@ export default function Header({ lang }: HeaderProps) {
                       >
                         <LayoutDashboard className="w-4 h-4" />
                         {isArabic ? "لوحة التحكم" : "Dashboard"}
+                      </Link>
+                      <Link
+                        href={`/${currentLang}/messages`}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-card hover:text-primary transition-colors border-b border-border dark:border-dark-border"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        {isArabic ? "المراسلات" : "Messages"}
+                      </Link>
+                      <Link
+                        href={`/${currentLang}/friends`}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-card hover:text-primary transition-colors border-b border-border dark:border-dark-border"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Users className="w-4 h-4" />
+                        {isArabic ? "الأصدقاء" : "Friends"}
+                      </Link>
+                      <Link
+                        href={`/${currentLang}/saved-posts`}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-card hover:text-primary transition-colors border-b border-border dark:border-dark-border"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Bookmark className="w-4 h-4" />
+                        {isArabic ? "المنشورات المحفوظة" : "Saved Posts"}
                       </Link>
                       <button
                         onClick={() => signOut({ callbackUrl: `/${currentLang}` })}

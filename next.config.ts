@@ -26,8 +26,6 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      { source: "/ar/posts", destination: "/ar/media/posts", permanent: true },
-      { source: "/en/posts", destination: "/en/media/posts", permanent: true },
       { source: "/ar/membership/benefits", destination: "/ar/membership", permanent: true },
       { source: "/en/membership/benefits", destination: "/en/membership", permanent: true },
       { source: "/ar/membership/manage", destination: "/ar/membership", permanent: true },

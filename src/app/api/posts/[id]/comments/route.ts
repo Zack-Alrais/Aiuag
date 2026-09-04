@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { notifyMember } from "@/lib/social-events";
 
 export async function GET(
   _request: Request,
@@ -118,6 +119,23 @@ export async function POST(
     const comment = await prisma.postComment.create({
       data: { postId: id, memberId: resolvedMemberId, content, parentId: parentId || null, isApproved: true },
     });
+
+    // Notify the post author (unless commenting on your own post).
+    try {
+      if (post.authorId && post.authorId !== resolvedMemberId) {
+        await notifyMember({
+          recipientId: post.authorId,
+          actorId: resolvedMemberId,
+          type: "comment",
+          entityType: "post",
+          entityId: post.id,
+          titleAr: "تعليق جديد على منشورك",
+          titleEn: "New comment on your post",
+          bodyAr: `علق ${memberName ?? "عضو"}: ${content.slice(0, 120)}`,
+          bodyEn: `${memberName ?? "A member"} commented: ${content.slice(0, 120)}`,
+        });
+      }
+    } catch {}
 
     return NextResponse.json({
       ...comment,

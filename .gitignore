@@ -59,3 +59,9 @@ next-env.d.ts
 deploy-cpanel.ps1
 aiuag-deploy.zip
 next-dev-err.log
+.vercel
+.env*
+
+# opencode (local tooling)
+.opencode
+Aiuag_clinte.json

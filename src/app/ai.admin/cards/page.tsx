@@ -39,8 +39,11 @@ interface MemberCard {
   graduationYear: number;
   country: string;
   membershipType: string;
+  position?: string;
+  jobTitle?: string;
   status: "active" | "inactive" | "expired";
   joinDate: string;
+  expiryDate?: string;
   photo?: string;
 }
 
@@ -88,8 +91,11 @@ export default function AdminCardsPage() {
             graduationYear: (m.graduationYear as number) || 0,
             country: (m.country as string) || "",
             membershipType: (m.membershipType as string) || "عضو عامل",
+            position: (m.position as string) || "",
+            jobTitle: (m.jobTitle as string) || "",
             status: m.status === "approved" ? "active" : (m.status === "rejected" ? "inactive" : "active"),
             joinDate: (m.createdAt as string) || "",
+            expiryDate: (m.membershipEndDate as string) || "",
             photo: (m.cardPhoto as string) || (u.image as string) || undefined,
           };
         });
@@ -453,14 +459,16 @@ export default function AdminCardsPage() {
                   nameEn: selectedCard.nameEn,
                   membershipNumber: selectedCard.membershipNumber,
                   memberType: selectedCard.membershipType,
+                  position: selectedCard.position,
+                  jobTitle: selectedCard.jobTitle,
                   photo: selectedCard.photo,
                   specialization: selectedCard.faculty,
-                  department: selectedCard.department,
                   graduationYear: selectedCard.graduationYear,
                   phone: selectedCard.phone,
                   email: selectedCard.email,
+                  joinDate: selectedCard.joinDate,
+                  expiryDate: selectedCard.expiryDate,
                 }}
-                showBoth
                 size="lg"
               />
             </div>

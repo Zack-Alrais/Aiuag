@@ -4,6 +4,7 @@ import AuthProvider from '@/components/auth/provider';
 import ToasterProvider from '@/components/ui/toaster-provider';
 import LanguageSync from '@/components/ui/language-sync';
 import ThemeProvider from '@/components/theme/theme-provider';
+import { PusherProvider } from '@/components/chat/pusher-provider';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -30,8 +31,10 @@ export default function RootLayout({
       <body className="antialiased" suppressHydrationWarning>
         <AuthProvider>
           <ThemeProvider>
-            <LanguageSync fontAr={cairo.className} fontEn={inter.className} />
-            {children}
+            <PusherProvider>
+              <LanguageSync fontAr={cairo.className} fontEn={inter.className} />
+              {children}
+            </PusherProvider>
             <ToasterProvider />
           </ThemeProvider>
         </AuthProvider>

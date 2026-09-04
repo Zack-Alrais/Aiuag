@@ -5,15 +5,8 @@ import { verifyAdminToken } from "@/lib/admin-token";
 const locales = ["ar", "en"];
 const defaultLocale = "ar";
 
-function getLocale(request: NextRequest): string {
-  const acceptLanguage = request.headers.get("accept-language");
-  if (acceptLanguage) {
-    const preferred = acceptLanguage
-      .split(",")
-      .map((lang) => lang.split(";")[0].trim().substring(0, 2))
-      .find((lang) => locales.includes(lang));
-    if (preferred) return preferred;
-  }
+function getLocale(): string {
+  // Default is always Arabic; English is chosen manually via the language toggle.
   return defaultLocale;
 }
 
@@ -99,7 +92,7 @@ export async function middleware(request: NextRequest) {
       (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
     );
     if (!pathnameHasLocale) {
-      const locale = getLocale(request);
+      const locale = getLocale();
       return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
     }
   }
@@ -224,7 +217,7 @@ export async function middleware(request: NextRequest) {
 
   // === MEMBER PAGE PROTECTION ===
   // Protected pages that require member login
-  const memberPaths = ["/media/posts", "/profile", "/dashboard", "/membership/manage"];
+  const memberPaths = ["/profile", "/dashboard"];
   const isMemberProtected = memberPaths.some(p => {
     const pattern = new RegExp(`^/(ar|en)${p}`); // Match /ar/media/posts, /en/media/posts
     return pattern.test(pathname);

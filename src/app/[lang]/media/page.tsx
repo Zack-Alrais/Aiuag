@@ -36,7 +36,7 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
       icon: MessageSquare,
       title: isArabic ? "منشورات المجتمع" : "Community Posts",
       desc: isArabic ? "منصة تفاعلية لمناقشات الخريجين وأخبارهم" : "Interactive platform for alumni discussions and updates",
-      href: `/${lang}/media/posts`,
+      href: `/${lang}/posts`,
       color: "from-cyan-600 to-cyan-700",
       stats: isArabic ? "مناقشات + تفاعل" : "Discussions + Feed",
     },

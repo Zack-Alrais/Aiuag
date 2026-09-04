@@ -51,6 +51,7 @@ export async function GET() {
       email: user.email,
       image: user.image,
       // Personal
+      nameAr: m?.nameAr || "",
       nameEn: m?.nameEn || "",
       phone: m?.phone || "",
       gender: m?.gender || "",
@@ -70,12 +71,15 @@ export async function GET() {
       jobTitle: m?.jobTitle || "",
       jobSector: m?.jobSector || "",
       yearsOfExperience: m?.yearsOfExperience || 0,
+      // Association position (admin-only)
+      position: m?.position || "",
+      positionEn: m?.positionEn || "",
       // Membership
       membershipType: m?.membershipType || "عضو عامل",
       membershipNumber: m?.membershipNumber || "",
       memberStatus: m?.status || "pending",
-      memberSince: m?.createdAt ? new Date(m.createdAt).toLocaleDateString("en-GB") : "",
-      membershipEndDate: m?.membershipEndDate ? new Date(m.membershipEndDate).toLocaleDateString("en-GB") : "",
+      memberSince: m?.createdAt ? new Date(m.createdAt).toISOString().slice(0, 10) : "",
+      membershipEndDate: m?.membershipEndDate ? new Date(m.membershipEndDate).toISOString().slice(0, 10) : "",
       // Media
       cardPhoto: m?.cardPhoto || "",
       graduationCertificate: m?.graduationCertificate || "",
@@ -118,7 +122,7 @@ export async function PATCH(request: Request) {
 
     // Fields that go to Member model
     const memberFields = [
-      "nameEn", "phone", "gender", "birthDate", "country", "state", "city", "address",
+      "nameAr", "nameEn", "phone", "gender", "birthDate", "country", "state", "city", "address",
       "university", "faculty", "specialization", "degree", "graduationYear",
       "employer", "jobTitle", "jobSector", "yearsOfExperience",
       "membershipType",
@@ -166,6 +170,7 @@ export async function PATCH(request: Request) {
       name: updatedUser.name,
       email: updatedUser.email,
       image: updatedUser.image,
+      nameAr: m?.nameAr || "",
       nameEn: m?.nameEn || "",
       phone: m?.phone || "",
       gender: m?.gender || "",
@@ -183,11 +188,13 @@ export async function PATCH(request: Request) {
       jobTitle: m?.jobTitle || "",
       jobSector: m?.jobSector || "",
       yearsOfExperience: m?.yearsOfExperience || 0,
+      position: m?.position || "",
+      positionEn: m?.positionEn || "",
       membershipType: m?.membershipType || "عضو عامل",
       membershipNumber: m?.membershipNumber || "",
       memberStatus: m?.status || "pending",
-      memberSince: m?.createdAt ? new Date(m.createdAt).toLocaleDateString("en-GB") : "",
-      membershipEndDate: m?.membershipEndDate ? new Date(m.membershipEndDate).toLocaleDateString("en-GB") : "",
+      memberSince: m?.createdAt ? new Date(m.createdAt).toISOString().slice(0, 10) : "",
+      membershipEndDate: m?.membershipEndDate ? new Date(m.membershipEndDate).toISOString().slice(0, 10) : "",
       cardPhoto: m?.cardPhoto || "",
       graduationCertificate: m?.graduationCertificate || "",
     });

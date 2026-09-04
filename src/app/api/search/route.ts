@@ -67,12 +67,23 @@ export async function GET(request: NextRequest) {
       }),
       prisma.member.findMany({
         where: {
+          status: "approved",
           OR: [
             { nameEn: { contains: q, mode: "insensitive" } },
-            { bio: { contains: q, mode: "insensitive" } },
+            { specialization: { contains: q, mode: "insensitive" } },
+            { faculty: { contains: q, mode: "insensitive" } },
+            { university: { contains: q, mode: "insensitive" } },
+            { user: { name: { contains: q, mode: "insensitive" } } },
           ],
         },
-        select: { id: true, nameEn: true, bio: true },
+        select: {
+          id: true,
+          nameEn: true,
+          faculty: true,
+          specialization: true,
+          graduationYear: true,
+          user: { select: { name: true, image: true } },
+        },
         take: 5,
       }),
     ])
@@ -119,12 +130,19 @@ export async function GET(request: NextRequest) {
     })
 
     members.forEach((item) => {
+      const meta = [
+        item.faculty,
+        item.specialization,
+        item.graduationYear ? `الدفعة ${item.graduationYear}` : null,
+      ]
+        .filter(Boolean)
+        .join(" · ");
       results.push({
-        title: item.nameEn || "",
-        description: item.bio || "",
-        url: `/${lang}/organization/secretariat`,
+        title: item.user.name || item.nameEn || "",
+        description: meta || item.user.name || "",
+        url: `/${lang}/member/${item.id}`,
         type: "member",
-      })
+      });
     })
 
     return NextResponse.json({ results: results.slice(0, 20) })

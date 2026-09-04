@@ -32,6 +32,7 @@ model Member {
   studentId        String?     @unique
   membershipNumber String?     @unique
   // Personal
+  nameAr           String?
   nameEn           String?
   gender           String?
   birthDate        String?
@@ -52,6 +53,9 @@ model Member {
   jobTitle         String?
   jobSector        String?
   yearsOfExperience Int?
+  // Association position (appointed by admin)
+  position         String?
+  positionEn       String?
   // Membership
   membershipType   String?     @default("عضو عامل")
   status           String      @default("pending") // pending, approved, rejected
@@ -66,6 +70,16 @@ model Member {
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
   donations        Donation[]
+  // Social
+  friendshipsSent          Friendship[]              @relation("FriendshipRequester")
+  friendshipsReceived      Friendship[]              @relation("FriendshipAddressee")
+  conversationParticipants ConversationParticipant[]
+  createdConversations     Conversation[]            @relation("ConversationCreator")
+  messagesSent             ConversationMessage[]
+  notifications            UserNotification[]        @relation("NotificationRecipient")
+  notificationsActed       UserNotification[]        @relation("NotificationActor")
+  savedPosts               SavedPost[]
+  postReports              PostReport[]
 }
 
 model News {
@@ -635,6 +649,8 @@ model Post {
   comments       PostComment[]
   reactions      PostReaction[]
   shares         PostShare[]
+  savedBy        SavedPost[]
+  reports        PostReport[]
 
   @@index([createdAt])
   @@index([originalPostId])
@@ -689,4 +705,117 @@ model StoredFile {
   size         Int
   data         Bytes
   createdAt    DateTime @default(now())
+}
+
+// ===== Social: Friendships =====
+model Friendship {
+  id          String   @id @default(cuid())
+  requesterId String
+  addresseeId String
+  status      String   @default("pending") // pending, accepted, blocked
+  createdAt   DateTime @default(now())
+  respondedAt DateTime?
+  requester   Member   @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee   Member   @relation("FriendshipAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+  @@index([requesterId, status])
+}
+
+// ===== Social: Saved posts (bookmarks) =====
+model SavedPost {
+  id        String   @id @default(cuid())
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([memberId, postId])
+  @@index([memberId])
+}
+
+// ===== Social: Post reports =====
+model PostReport {
+  id         String   @id @default(cuid())
+  postId     String
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reporterId String
+  reporter   Member   @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  reason     String?
+  status     String   @default("open") // open, reviewed, resolved, dismissed
+  createdAt  DateTime @default(now())
+
+  @@index([postId])
+  @@index([status])
+}
+
+// ===== Social: Conversations & Messages =====
+model Conversation {
+  id            String    @id @default(cuid())
+  type          String    @default("direct") // direct, group
+  name          String?
+  avatar        String?
+  createdBy     String?
+  creator       Member?   @relation("ConversationCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  lastMessageAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  participants  ConversationParticipant[]
+  messages      ConversationMessage[]
+
+  @@index([lastMessageAt])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  memberId       String
+  member         Member       @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  role           String       @default("member") // member, admin
+  lastReadAt     DateTime?
+  joinedAt       DateTime     @default(now())
+
+  @@unique([conversationId, memberId])
+  @@index([memberId])
+}
+
+model ConversationMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         Member       @relation(fields: [senderId], references: [id])
+  content        String
+  attachmentUrl  String?
+  attachmentType String? // image, video, file
+  replyToId      String?
+  editedAt       DateTime?
+  deletedAt      DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+// ===== Social: User notifications =====
+model UserNotification {
+  id          String   @id @default(cuid())
+  recipientId String
+  recipient   Member   @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actorId     String?
+  actor       Member?  @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  type        String   // friend_request, friend_accept, message, reaction, comment
+  entityType  String?
+  entityId    String?
+  titleAr     String
+  titleEn     String
+  bodyAr      String?
+  bodyEn      String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([recipientId, isRead])
+  @@index([recipientId, createdAt])
 }

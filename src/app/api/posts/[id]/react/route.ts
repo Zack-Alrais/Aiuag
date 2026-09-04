@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { notifyMember } from "@/lib/social-events";
 
 export async function POST(
   request: Request,
@@ -39,6 +40,22 @@ export async function POST(
       await prisma.postReaction.create({
         data: { postId: id, memberId, type },
       });
+      // Notify the post author (unless reacting to your own post).
+      if (post.authorId && post.authorId !== memberId) {
+        try {
+          await notifyMember({
+            recipientId: post.authorId,
+            actorId: memberId,
+            type: "reaction",
+            entityType: "post",
+            entityId: post.id,
+            titleAr: "تفاعل جديد على منشورك",
+            titleEn: "New reaction on your post",
+            bodyAr: "تفاعل أحد الأعضاء مع منشورك",
+            bodyEn: "A member reacted to your post",
+          });
+        } catch {}
+      }
     }
 
     const reactions = await prisma.postReaction.findMany({

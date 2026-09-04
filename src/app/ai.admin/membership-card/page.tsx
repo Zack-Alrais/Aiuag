@@ -11,6 +11,8 @@ interface MemberData {
   nameEn: string
   membershipNumber: string
   memberType: string
+  position?: string
+  jobTitle?: string
   photo?: string
   faculty?: string
   department?: string
@@ -55,6 +57,8 @@ function MembershipCardContent() {
           nameEn: m.nameEn || m.name || "",
           membershipNumber: m.membershipNumber || "",
           memberType: m.membershipType || m.memberType || t("membershipCard.memberTypeDefault"),
+          position: m.position || "",
+          jobTitle: m.jobTitle || "",
           photo: m.cardPhoto || m.photo || "",
           faculty: m.faculty || "",
           department: m.department || m.specialization || "",
@@ -63,6 +67,7 @@ function MembershipCardContent() {
           email: m.email || "",
           city: m.city || "",
           issueDate: m.createdAt || m.memberSince || "",
+          expiryDate: m.membershipEndDate || m.expiryDate || "",
         })
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : t("membershipCard.fetchError"))
@@ -136,6 +141,8 @@ function MembershipCardContent() {
           <InfoRow label={t("membershipCard.nameEnLabel")} value={member.nameEn} />
           <InfoRow label={t("membershipCard.membershipNoLabel")} value={member.membershipNumber} />
           <InfoRow label={t("membershipCard.memberTypeLabel")} value={member.memberType} />
+          <InfoRow label={t("membershipCard.positionLabel")} value={member.position || "—"} />
+          <InfoRow label={t("membershipCard.jobTitleLabel")} value={member.jobTitle || "—"} />
           <InfoRow label={t("membershipCard.facultyLabel")} value={member.faculty || "—"} />
           <InfoRow label={t("membershipCard.departmentLabel")} value={member.department || "—"} />
           <InfoRow label={t("membershipCard.graduationYearLabel")} value={member.graduationYear?.toString() || "—"} />
@@ -152,6 +159,8 @@ function MembershipCardContent() {
             nameEn: member.nameEn,
             membershipNumber: member.membershipNumber,
             memberType: member.memberType,
+            position: member.position,
+            jobTitle: member.jobTitle,
             photo: member.photo,
             joinDate: member.issueDate,
             expiryDate: member.expiryDate,

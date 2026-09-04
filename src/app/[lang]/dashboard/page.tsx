@@ -60,7 +60,7 @@ export default function DashboardPage({ params }: { params: Promise<{ lang: stri
     { icon: Calendar, title: isArabic ? "الأحداث" : "Events", href: `/${lang}/events`, color: "bg-primary/10 text-primary" },
     { icon: CreditCard, title: isArabic ? "بطاقتي" : "My Card", href: `/${lang}/profile`, color: "bg-secondary/10 text-secondary" },
     { icon: Heart, title: isArabic ? "التبرعات" : "Donations", href: `/${lang}/donations`, color: "bg-error/10 text-error" },
-    { icon: FileText, title: isArabic ? "المنشورات" : "Posts", href: `/${lang}/media/posts`, color: "bg-accent/10 text-accent" },
+    { icon: FileText, title: isArabic ? "المنشورات" : "Posts", href: `/${lang}/posts`, color: "bg-accent/10 text-accent" },
     { icon: BookOpen, title: isArabic ? "المشاريع" : "Projects", href: `/${lang}/projects`, color: "bg-primary/10 text-primary" },
     { icon: Settings, title: isArabic ? "الإعدادات" : "Settings", href: `/${lang}/membership`, color: "bg-text-secondary/10 text-text-secondary" },
   ];
